@@ -1,0 +1,16 @@
+[
+  {"id": "standard_adult", "name": "Standard adult CABG", "desc": "75 kg, normal heart function. The case from the lab video.",
+   "weight": 75, "height": 175, "hct": 0.40, "ef": 1.0, "svr_mult": 1.0, "renal": 1.0, "hep_sens": 1.0, "ai": false, "k0": 4.0, "bv_per_kg": 70, "target_temp": 34.0},
+  {"id": "small_anemic", "name": "Small elderly woman with anemia", "desc": "52 kg, hematocrit 30%. Hemodilution pushes oxygen delivery below target.",
+   "weight": 52, "height": 155, "hct": 0.30, "ef": 0.9, "svr_mult": 1.1, "renal": 0.8, "hep_sens": 1.0, "ai": false, "k0": 4.1, "bv_per_kg": 65, "target_temp": 34.0},
+  {"id": "obese_adult", "name": "Large adult", "desc": "125 kg. High flow demand tests venous drainage and pump head.",
+   "weight": 125, "height": 180, "hct": 0.42, "ef": 1.0, "svr_mult": 0.95, "renal": 1.0, "hep_sens": 0.9, "ai": false, "k0": 4.0, "bv_per_kg": 55, "target_temp": 34.0},
+  {"id": "low_ef", "name": "Low ejection fraction", "desc": "Ischemic cardiomyopathy, EF about 20%. Hard to wean without inotrope.",
+   "weight": 82, "height": 178, "hct": 0.38, "ef": 0.5, "svr_mult": 1.5, "renal": 0.8, "hep_sens": 1.0, "ai": false, "k0": 4.2, "bv_per_kg": 70, "target_temp": 34.0},
+  {"id": "ckd", "name": "Chronic kidney disease", "desc": "Poor potassium clearance. Cardioplegia load causes hyperkalemia.",
+   "weight": 78, "height": 172, "hct": 0.33, "ef": 0.95, "svr_mult": 1.1, "renal": 0.25, "hep_sens": 1.0, "ai": false, "k0": 4.8, "bv_per_kg": 70, "target_temp": 34.0},
+  {"id": "heparin_resistant", "name": "Heparin resistance", "desc": "Standard heparin dose leaves the clotting time too short for bypass.",
+   "weight": 88, "height": 180, "hct": 0.41, "ef": 1.0, "svr_mult": 1.0, "renal": 1.0, "hep_sens": 0.55, "ai": false, "k0": 4.0, "bv_per_kg": 70, "target_temp": 34.0},
+  {"id": "aortic_insufficiency", "name": "Severe aortic insufficiency", "desc": "Leaky aortic valve. Antegrade cardioplegia runs into the ventricle instead of the coronaries.",
+   "weight": 70, "height": 170, "hct": 0.39, "ef": 0.85, "svr_mult": 0.9, "renal": 1.0, "hep_sens": 1.0, "ai": true, "k0": 4.0, "bv_per_kg": 70, "target_temp": 34.0}
+]
