@@ -142,8 +142,11 @@ def run_one(persona, seed, band, max_minutes=150):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--runs", type=int, default=10)
-    ap.add_argument("--out", default=os.path.join(ROOT, "docs", "benchmark.json"))
+    ap.add_argument("--out", help="where to write the JSON (default: docs/benchmark.json for the full 10-run "
+                    "benchmark; other run counts write nothing unless --out is given)")
     a = ap.parse_args()
+    if a.out is None and a.runs == 10:
+        a.out = os.path.join(ROOT, "docs", "benchmark.json")
     bands = ["expert"] + [["strong", "average", "novice"][i * 3 // max(1, a.runs - 1)] for i in range(a.runs - 1)]
     rows = []
     for pid, persona in load_personas().items():
@@ -152,8 +155,9 @@ def main():
             rows.append(r)
             print(f"{pid:<22} run {i} {band:<8} {'ok ' if r['finished'] else 'STUCK ' + str(r['stuck_in']):<6} score {r['score']:>3} crit {r['critical']} "
                   f"{r['case_min']:5.1f} min  errs {','.join(r['errs'])}")
-    with open(a.out, "w") as f:
-        json.dump(rows, f, indent=1)
+    if a.out:
+        with open(a.out, "w") as f:
+            json.dump(rows, f, indent=1)
     tot_steps = sum(r["steps"] for r in rows); tot_wall = sum(r["wall_s"] for r in rows)
     print(f"\n{len(rows)} runs, {tot_steps/1e6:.1f}M model steps in {tot_wall:.0f} s: {tot_steps/tot_wall:,.0f} steps/s, "
           f"{tot_steps*0.02/tot_wall:,.0f}x real time. Mean score by band: "

@@ -1,6 +1,7 @@
 # Benchmark: 10 patients x 10 runs
 
 Reproduce with `python3 scripts/benchmark.py` (about 3 minutes, writes `docs/benchmark.json`).
+`--runs N` with any other N is a quick check and writes nothing unless you pass `--out`.
 
 The model is deterministic, so ten identical expert runs would match exactly. Each patient
 therefore gets one clean expert run plus nine seeded simulated students in three skill bands.
@@ -19,7 +20,11 @@ test of the model and grader, not a substitute for real student data.
 | Novice (3-5 errors) | 30 | 66 | 32 | 92 |
 
 All 100 runs finish. Speed: about 89,000 model steps per second on one core, roughly 1,800 times
-real time, so a 50 minute case replays in under 2 seconds.
+real time, so a 50 minute case replays in under 2 seconds. (x86 Linux, where v0.1 was built.)
+
+On a DGX Spark (GB10, aarch64, DGX OS, Python 3.12.3), `--runs 4` (40 runs) finished every run in
+41 s at about 153,000 steps per second on one core, roughly 3,000 times real time, with mean scores
+expert 100, strong 97, average 81, novice 68.
 
 Mean score per patient over all ten runs: standard adult 83, small anemic 76, large adult 91,
 low EF 86, kidney disease 88, heparin resistance 89, aortic insufficiency 82, vasoplegia 83,
