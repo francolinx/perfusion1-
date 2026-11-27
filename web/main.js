@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { buildPanels } from './panels.js';
 import { initSmash } from './smash.js';
+import { buildAvatar } from './player.js';
 
 const $ = (id) => document.getElementById(id);
 const post = (p, body) => fetch(p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then((r) => r.json());
@@ -20,7 +21,10 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1a1f26);
 const camera = new THREE.PerspectiveCamera(70, 1, 0.05, 60);
 scene.add(camera);   // so things held in the hand (smash mode bat) render
-const player = { x: 0.9, z: 1.6, yaw: 0.72, pitch: -0.16, h: 1.65 };
+// y: feet above the floor (jumping); h: eye height above the feet (crouching); view: 0 first person, 1 behind, 2 in front
+const player = { x: 0.9, z: 1.6, yaw: 0.72, pitch: -0.16, h: 1.65, y: 0, vy: 0, view: 0, crouch: 0, speed: 0, sprint: false };
+const EYE = 1.65, EYE_CROUCH = 1.28, GRAVITY = 24, JUMP_V = 5.4;          // jump apex about 0.6 m
+const WALK = 2.3, SPRINT = 4.2, SNEAK = 0.75, FOV = 70, FOV_SPRINT = 78;
 
 function resize() {
   renderer.setSize(window.innerWidth, window.innerHeight, false);
@@ -467,11 +471,23 @@ const vitEls = VITALS.map(([k]) => {
   const d = document.createElement('div'); d.className = 'v'; d.innerHTML = `<div class="k">${k}</div><div class="n">--</div>`;
   $('vitals').appendChild(d); return d;
 });
-let voiceOn = true, debriefShown = false, started = false;
+// Browser speech is a placeholder until the local voice service replaces it. It is off by default on desktop
+// Linux, where headed Chrome crashed on a DGX Spark right as the first surgeon line was spoken, and every
+// call is guarded so a speech failure stays inside these functions.
+const LINUX_DESKTOP = /Linux/.test(navigator.userAgent) && !/Android/.test(navigator.userAgent);
+let voiceOn = !LINUX_DESKTOP, debriefShown = false, started = false;
+function speechCancel() { try { window.speechSynthesis?.cancel(); } catch (e) { /* voice is optional */ } }
 function say(textLine) {
-  if (!voiceOn || !window.speechSynthesis) return;
-  try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(textLine); u.rate = 1.05; u.pitch = 0.9; speechSynthesis.speak(u); } catch (e) { /* voice is optional */ }
+  if (!voiceOn || !('speechSynthesis' in window)) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(textLine); u.rate = 1.05; u.pitch = 0.9;
+    u.onerror = () => {};                       // a failed utterance is not worth an error in the console
+    speechSynthesis.speak(u);
+  } catch (e) { voiceOn = false; setVoiceLabel(); }
 }
+function setVoiceLabel() { const b = $('btn-voice'); if (b) b.textContent = 'Voice: ' + (voiceOn ? 'on' : 'off'); }
+setVoiceLabel();
 function updateHud(S) {
   $('phase-title').textContent = S.phase_title;
   const chip = $('score-chip'); chip.textContent = S.score.score; chip.className = 'chip' + (S.score.score < 70 ? ' bad' : S.score.score < 90 ? ' mid' : '');
@@ -519,7 +535,7 @@ Object.entries(panels).forEach(([id, p]) => { const b = document.createElement('
 $('btn-tablet').onclick = () => tablet.classList.toggle('hidden');
 $('btn-talk').onclick = () => openPanel('talk');
 $('btn-auto').onclick = () => act({ type: 'autopilot', on: !(state.S && state.S.autopilot) });
-$('btn-voice').onclick = () => { voiceOn = !voiceOn; $('btn-voice').textContent = 'Voice: ' + (voiceOn ? 'on' : 'off'); if (!voiceOn) window.speechSynthesis?.cancel(); };
+$('btn-voice').onclick = () => { voiceOn = !voiceOn; setVoiceLabel(); if (!voiceOn) speechCancel(); };
 document.querySelectorAll('#hud-bottom [data-speed]').forEach((b) => (b.onclick = () => act({ type: 'speed', x: Number(b.dataset.speed) })));
 
 const smash = initSmash({ scene, camera, room: ROOM, onQuip: (t) => { drawBubble(t); say(t); }, pause: () => act({ type: 'speed', x: 0 }) });
@@ -527,18 +543,37 @@ $('btn-smash').onclick = () => { if (!uiBlocked()) smash.toggle(); };
 const keys = {};
 let focus = null;
 const uiBlocked = () => openId || !$('start').classList.contains('hidden') || !$('debrief').classList.contains('hidden');
+const typing = (e) => e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT';
+let lastW = 0;
 window.addEventListener('keydown', (e) => {
-  if (e.target.tagName === 'INPUT' && e.target.type === 'number') return;
+  if (typing(e)) return;
+  if (e.code === 'Space') e.preventDefault();    // Space is jump, never "click the focused button" or scroll
   if (e.code === 'Tab') { e.preventDefault(); tablet.classList.toggle('hidden'); return; }
   if (e.code === 'Escape') { closePanel(); tablet.classList.add('hidden'); return; }
   if (uiBlocked()) return;
+  if (e.code === 'KeyW' && !e.repeat) { const t = performance.now(); if (t - lastW < 300) player.sprint = true; lastW = t; }   // double-tap W sprints
   keys[e.code] = true;
   if (e.code === 'KeyB') { smash.toggle(); return; }
-  if (smash.state.on) { if (e.code === 'Space' || e.code === 'KeyF') { e.preventDefault(); smash.swing(); } return; }
+  if (e.code === 'KeyV' && !e.repeat) { cycleView(); return; }
+  if (smash.state.on) { if (e.code === 'KeyF') smash.swing(); return; }
   if (e.code === 'KeyE' && focus) openPanel(focus.id);
   if (e.code === 'KeyT') openPanel('talk');
 });
-window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+window.addEventListener('keyup', (e) => {
+  if (e.code === 'Space' && !typing(e)) e.preventDefault();
+  keys[e.code] = false;
+  if (e.code === 'KeyW') player.sprint = false;
+});
+window.addEventListener('blur', () => { for (const k in keys) keys[k] = false; player.sprint = false; });
+// Ctrl+W closes a browser tab and a page cannot block it. Ctrl is also a crouch key, so ask before leaving a running case.
+window.addEventListener('beforeunload', (e) => { if (started && state.S && state.S.phase !== 'DONE' && !smash.state.on) { e.preventDefault(); e.returnValue = ''; } });
+function cycleView() {
+  if (smash.state.on) return;                     // the bat is held in first person
+  player.view = (player.view + 1) % 3;
+  const names = ['First person', 'Third person', 'Third person (front)'];
+  $('view-chip').textContent = names[player.view]; $('view-chip').classList.add('show');
+  clearTimeout(cycleView.t); cycleView.t = setTimeout(() => $('view-chip').classList.remove('show'), 1200);
+}
 canvas.addEventListener('click', () => {
   if (uiBlocked()) return;
   if (smash.state.on) { if (document.pointerLockElement !== canvas) canvas.requestPointerLock?.(); smash.swing(); return; }
@@ -553,7 +588,17 @@ window.addEventListener('mousemove', (e) => {
   }
 });
 // touch: left pad moves, dragging elsewhere looks, tapping a name tag's object opens it
-const touch = { move: null, look: null, mx: 0, mz: 0 };
+const touch = { move: null, look: null, mx: 0, mz: 0, jump: false, crouch: false };
+document.querySelectorAll('#touch-btns [data-t]').forEach((b) => {
+  const t = b.dataset.t;
+  b.addEventListener('touchstart', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    if (t === 'jump') touch.jump = true;
+    if (t === 'crouch') { touch.crouch = !touch.crouch; b.classList.toggle('on', touch.crouch); }
+    if (t === 'view') cycleView();
+  }, { passive: false });
+  b.addEventListener('touchend', (e) => { e.preventDefault(); if (t === 'jump') touch.jump = false; }, { passive: false });
+});
 canvas.addEventListener('touchstart', (e) => {
   for (const t of e.changedTouches) {
     if (t.clientX < 160 && t.clientY > window.innerHeight - 260 && !touch.move) touch.move = { id: t.identifier, x: t.clientX, y: t.clientY };
@@ -580,11 +625,23 @@ canvas.addEventListener('touchend', (e) => {
 });
 
 function movePlayer(dt) {
-  if (uiBlocked()) return;
+  const blocked = uiBlocked();
+  // vertical: crouch lowers the eyes, Space jumps from the floor, gravity brings you back
+  const wantCrouch = !blocked && !!(keys.KeyC || keys.ControlLeft || keys.ControlRight || touch.crouch);
+  player.crouch = lerp(player.crouch, wantCrouch ? 1 : 0, dt * 12);
+  player.h = EYE + (EYE_CROUCH - EYE) * player.crouch;
+  if (!blocked && (keys.Space || touch.jump) && player.y === 0 && !wantCrouch) player.vy = JUMP_V;
+  player.vy -= GRAVITY * dt; player.y += player.vy * dt;
+  if (player.y <= 0) { player.y = 0; player.vy = 0; }
+  player.speed = 0;
+  if (blocked) return;
   let f = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0) - touch.mz;
   let s = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0) + touch.mx;
-  if (!f && !s) return;
-  const sp = (keys.ShiftLeft ? 4.2 : 2.3) * dt, sin = Math.sin(player.yaw), cos = Math.cos(player.yaw);
+  if (!f && !s) { player.sprint = false; return; }
+  const sprinting = !wantCrouch && f > 0 && (player.sprint || keys.ShiftLeft || keys.ShiftRight);
+  const v = wantCrouch ? SNEAK : sprinting ? SPRINT : WALK;
+  const sp = v * dt, sin = Math.sin(player.yaw), cos = Math.cos(player.yaw);
+  player.speed = v * Math.min(1, Math.hypot(f, s)); player.sprinting = sprinting;
   const dx = (-sin * f + cos * s) * sp, dz = (-cos * f - sin * s) * sp, r = 0.28;
   const free = (x, z) => x > ROOM.x0 + r && x < ROOM.x1 - r && z > ROOM.z0 + r && z < ROOM.z1 - r &&
     (smash.state.on || !obstacles.some(([x0, x1, z0, z1]) => x > x0 - r && x < x1 + r && z > z0 - r && z < z1 + r));
@@ -594,9 +651,9 @@ function movePlayer(dt) {
 const fwd = new THREE.Vector3(), to = new THREE.Vector3();
 function findFocus() {
   if (smash.state.on) { focus = null; $('hint').textContent = ''; interact.forEach((it) => { it.sprite.visible = false; }); return; }
-  camera.getWorldDirection(fwd); let best = null, bestA = 0.3;
+  fwd.copy(lookDir); let best = null, bestA = 0.3;
   for (const it of interact) {
-    to.copy(it.pos).sub(camera.position); const d = to.length();
+    to.copy(it.pos).sub(eye); const d = to.length();
     it.sprite.material.opacity = d < 6 ? 1 : 0.35;
     if (d > 2.8) continue;
     const a = fwd.angleTo(to);
@@ -683,13 +740,42 @@ async function poll() {
   setTimeout(poll, 100);
 }
 
+// ---------------------------------------------------------------- camera: first person, or third person behind / in front
+const avatar = buildAvatar(scene);
+const eye = new THREE.Vector3(), lookDir = new THREE.Vector3();
+function placeCamera(dt) {
+  eye.set(player.x, player.y + player.h, player.z);
+  const cp = Math.cos(player.pitch);
+  lookDir.set(-Math.sin(player.yaw) * cp, Math.sin(player.pitch), -Math.cos(player.yaw) * cp);
+  const view = smash.state.on ? 0 : player.view;
+  if (view === 0) {
+    camera.position.copy(eye);
+    camera.rotation.set(player.pitch, player.yaw, 0, 'YXZ');
+  } else {
+    // pull back along the view line, but never through a wall or the ceiling
+    const sign = view === 1 ? -1 : 1, m = 0.2;
+    let d = 3.2;
+    for (; d > 0.4; d -= 0.1) {
+      const x = eye.x + lookDir.x * sign * d, y = eye.y + lookDir.y * sign * d, z = eye.z + lookDir.z * sign * d;
+      if (x > ROOM.x0 + m && x < ROOM.x1 - m && z > ROOM.z0 + m && z < ROOM.z1 - m && y > 0.25 && y < ROOM.h - m) break;
+    }
+    const lift = view === 1 ? 0.35 : 0;           // behind: sit a little above the head and aim along the line of sight
+    camera.position.set(eye.x + lookDir.x * sign * d, Math.min(ROOM.h - 0.2, eye.y + lookDir.y * sign * d + lift), eye.z + lookDir.z * sign * d);
+    if (view === 1) camera.lookAt(eye.x + lookDir.x * 1.5, eye.y + lookDir.y * 1.5, eye.z + lookDir.z * 1.5);
+    else camera.lookAt(eye);
+  }
+  $('cross').style.visibility = view === 2 ? 'hidden' : '';
+  const fov = lerp(camera.fov, player.sprinting && player.speed > 0 ? FOV_SPRINT : FOV, dt * 8);
+  if (Math.abs(fov - camera.fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
+  avatar.update({ ...player, airborne: player.y > 0.02 }, dt, view !== 0);
+}
+
 // ---------------------------------------------------------------- main loop
 let last = performance.now(), screenT = 0;
 function frame(nowMs) {
   const dt = Math.min(0.05, (nowMs - last) / 1000); last = nowMs; const now = nowMs / 1000;
   movePlayer(dt);
-  camera.position.set(player.x, player.h, player.z);
-  camera.rotation.set(player.pitch, player.yaw, 0, 'YXZ');
+  placeCamera(dt);
   findFocus();
   const S = state.S;
   if (S) {
@@ -703,6 +789,6 @@ function frame(nowMs) {
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
 }
-window.P1 = { player, camera, openPanel, closePanel, state, smash };
+window.P1 = { player, camera, openPanel, closePanel, state, smash, avatar, cycleView, focused: () => focus && focus.id };
 boot();
 requestAnimationFrame(frame);

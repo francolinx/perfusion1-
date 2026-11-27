@@ -27,6 +27,10 @@ Ordered. Each item says where it has to be built.
 7. **Local voice surgeon.** Speech recognition to callout IDs, a small local language model for
    the surgeon's replies and the debrief prose, text to speech for the voice. The browser's
    built-in speech synthesis is the placeholder today.
+   On the development Spark the local model library is at `~/ssd/GB10_ARSENAL/models` (internal disk).
+   Starting set: `speech/parakeet-tdt-0.6b-v2` (speech recognition), `reasoning/nemotron-3-nano-30b-a3b-nvfp4`
+   (surgeon), `speech/kokoro-82m` (voice) and `healthcare/medgemma-4b-it` (info button). MedGemma 27B text
+   is a later upgrade.
 8. **Synthetic data export** for decision-support research: labeled trajectories from the
    autopilot with injected faults.
 
