@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { buildPanels } from './panels.js';
 import { initSmash } from './smash.js';
 import { buildAvatar } from './player.js';
+import { initSaves } from './saves.js';
 
 const $ = (id) => document.getElementById(id);
 const post = (p, body) => fetch(p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then((r) => r.json());
@@ -509,13 +510,15 @@ function showDebrief(S) {
     <div class="row"><div><h1>Debrief</h1><p class="sub">${S.persona.name}, ${mmss(S.t)} case time, ${mmss(S.bypass_time)} on bypass, ${mmss(S.clamp_time)} clamp time</p></div>
     <div class="big">${sc.score}</div></div>
     <p>Pressure in range ${sc.map_in_range}% of bypass time. Oxygen delivery on target ${sc.do2_in_range}%. Closed-loop callouts ${sc.callouts.made} of ${sc.callouts.due}.</p>
+    ${S.session && S.session.practice ? `<div class="find minor"><b>Practice (resumed from save${S.session.resumed_from ? ': ' + S.session.resumed_from.name.replace(/[<>&]/g, '') : ''})</b>. This score is kept out of comparisons with clean start-to-finish runs.</div>` : ''}
     <h3>What to fix</h3>
     ${sc.findings.length ? sc.findings.map((f) => `<div class="find ${f.sev}"><b>${f.sev}</b> at ${mmss(f.t)}: ${f.msg}</div>`).join('') : '<div class="find">Nothing flagged. Clean run.</div>'}
     <h3>Checklist</h3>
     <div class="check">${sc.checklist.map((c) => `<div class="${c.done ? 'yes' : 'no'}">${c.done ? 'done' : 'missed'}: ${c.label}</div>`).join('')}</div>
-    <div class="row gap"><button class="primary" id="btn-again">Run another case</button></div>`;
+    <div class="row gap"><button class="primary" id="btn-again">Run another case</button><button id="btn-summary">Session summary and timeline</button></div>`;
   $('debrief').classList.remove('hidden');
   $('btn-again').onclick = () => { $('debrief').classList.add('hidden'); $('start').classList.remove('hidden'); started = false; };
+  $('btn-summary').onclick = () => savesUI.openSessions(S.session && S.session.id);
 }
 
 // ---------------------------------------------------------------- panels, input
@@ -542,10 +545,25 @@ const smash = initSmash({ scene, camera, room: ROOM, onQuip: (t) => { drawBubble
 $('btn-smash').onclick = () => { if (!uiBlocked()) smash.toggle(); };
 const keys = {};
 let focus = null;
-const uiBlocked = () => openId || !$('start').classList.contains('hidden') || !$('debrief').classList.contains('hidden');
+const savesUI = initSaves({
+  getState: () => state.S, isCaseRunning: () => started,
+  onLoaded: async (info) => {
+    const S = await fetch('/api/state').then((r) => r.json()); state.S = S;
+    const p = state.META.personas.find((x) => x.id === S.persona.id);
+    if (p) { const k = Math.cbrt(p.weight / 75); P.body.scale.set(Math.min(1.1, 0.9 + (p.height - 155) / 250), k, k); }
+    $('start').classList.add('hidden'); $('debrief').classList.add('hidden');
+    started = true; debriefShown = false; lastLineN = S.n_lines;
+    savesUI.toast(`Loaded "${info.name}" (${info.phase_title}, ${mmss(info.case_time)}). Paused: press 1x to carry on. This run is now practice.`, 6000);
+  },
+});
+const uiBlocked = () => openId || savesUI.isOpen() || !$('start').classList.contains('hidden') || !$('debrief').classList.contains('hidden');
 const typing = (e) => e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT';
 let lastW = 0;
 window.addEventListener('keydown', (e) => {
+  // F5 is quick-save here, never "reload and lose the case"; F9 opens Save / Load
+  if (e.code === 'F5') { e.preventDefault(); if (!savesUI.isOpen()) savesUI.quickSave(); return; }
+  if (e.code === 'F9') { e.preventDefault(); savesUI.toggleSaves(); return; }
+  if (e.code === 'Escape' && savesUI.isOpen()) { savesUI.close(); return; }
   if (typing(e)) return;
   if (e.code === 'Space') e.preventDefault();    // Space is jump, never "click the focused button" or scroll
   if (e.code === 'Tab') { e.preventDefault(); tablet.classList.toggle('hidden'); return; }
@@ -728,6 +746,10 @@ async function boot() {
     $('start').classList.add('hidden');
   };
   $('btn-start').onclick = () => begin(false);
+  $('btn-load-start').onclick = () => savesUI.openSaves();
+  $('btn-sessions-start').onclick = () => savesUI.openSessions();
+  $('btn-saves').onclick = () => savesUI.openSaves();
+  $('btn-sessions').onclick = () => savesUI.openSessions();
   $('btn-watch').onclick = () => begin(true);
   poll();
 }
@@ -789,6 +811,6 @@ function frame(nowMs) {
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
 }
-window.P1 = { player, camera, openPanel, closePanel, state, smash, avatar, cycleView, focused: () => focus && focus.id };
+window.P1 = { player, camera, openPanel, closePanel, state, smash, avatar, cycleView, focused: () => focus && focus.id, savesUI };
 boot();
 requestAnimationFrame(frame);

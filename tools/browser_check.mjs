@@ -51,7 +51,7 @@ const send = (method, params = {}) => new Promise((res, rej) => {
   ws.send(JSON.stringify({ id: i, method, params }));
 });
 const ev = async (expr) => { const r = await send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true }); if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description || r.exceptionDetails.text); return r.result.value; };
-const KEYS = { Space: [' ', 32], KeyW: ['w', 87], KeyC: ['c', 67], KeyV: ['v', 86], KeyE: ['e', 69], KeyB: ['b', 66], KeyF: ['f', 70], Escape: ['Escape', 27], ShiftLeft: ['Shift', 16], ControlLeft: ['Control', 17], Tab: ['Tab', 9] };
+const KEYS = { F5: ['F5', 116], F9: ['F9', 120], Enter: ['Enter', 13], Space: [' ', 32], KeyW: ['w', 87], KeyS: ['s', 83], KeyC: ['c', 67], KeyV: ['v', 86], KeyE: ['e', 69], KeyB: ['b', 66], KeyF: ['f', 70], Escape: ['Escape', 27], ShiftLeft: ['Shift', 16], ControlLeft: ['Control', 17], Tab: ['Tab', 9] };
 const down = (code) => send('Input.dispatchKeyEvent', { type: code === 'Space' ? 'keyDown' : 'rawKeyDown', code, key: KEYS[code][0], windowsVirtualKeyCode: KEYS[code][1] });
 const up = (code) => send('Input.dispatchKeyEvent', { type: 'keyUp', code, key: KEYS[code][0], windowsVirtualKeyCode: KEYS[code][1] });
 const tap = async (code) => { await down(code); await sleep(40); await up(code); };
@@ -153,6 +153,60 @@ check('touch move pad still walks you forward', (await P('p.x')) < x0 - 0.3, `mo
 await send('Emulation.setEmitTouchEventsForMouse', { enabled: false }); await send('Emulation.clearDeviceMetricsOverride'); await send('Emulation.setTouchEmulationEnabled', { enabled: false });
 await send('Page.reload'); await sleep(3000);
 
+// ---- save / load and sessions (unique names per run; never overwrites a save it did not make)
+const saves = () => ev(`fetch('/api/saves').then((r) => r.json()).then((d) => d.saves)`);
+const visible = (id) => ev(`!document.getElementById('${id}').classList.contains('hidden')`);
+const TAG = 'Browser check ' + Date.now().toString(36), TAG_ID = TAG.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+const rowOf = (text) => ev(`[...document.querySelectorAll('#saves-body .sv-row')].findIndex((r) => r.textContent.includes(${JSON.stringify(text)}))`);
+await click('#btn-start'); await sleep(1000);
+await ev(`fetch('/api/action', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({type: 'heparin', units: 30000})})`);
+await ev('window.__marker = 42');
+const hadQuick = (await saves()).some((x) => x.id === 'quick-save');
+if (hadQuick) {
+  await tap('F5'); await sleep(600);
+  check('F5 with an existing quick save asks before overwriting (kept yours: cancelled)', await visible('confirm'));
+  await tap('Escape'); await sleep(300);
+  check('F5 did not reload the page', (await ev('window.__marker')) === 42);
+} else {
+  await tap('F5'); await sleep(800);
+  check('F5 quick-saves without reloading the page', (await ev('window.__marker')) === 42 && (await saves()).some((x) => x.id === 'quick-save'),
+    await ev(`document.getElementById('toast').textContent`));
+  await tap('F5'); await sleep(600);
+  check('F5 again asks before overwriting', await visible('confirm'), (await ev(`document.getElementById('confirm-body').innerText`)).split('\n')[0]);
+  await tap('Enter'); await sleep(600);
+  check('confirming overwrites the quick save', !(await visible('confirm')) && (await saves()).filter((x) => x.id === 'quick-save').length === 1);
+}
+await tap('F9'); await sleep(800);
+check('F9 opens Save / Load', await visible('saves'));
+await ev(`document.getElementById('sv-name').value = ${JSON.stringify(TAG)}; document.getElementById('sv-desc').value = 'typed description'`);
+await click('#sv-save'); await sleep(900);
+check('save with a typed description', (await saves()).some((x) => x.id === TAG_ID && x.description === 'typed description') && !(await visible('confirm')));
+const meta = await ev(`[...document.querySelectorAll('#saves-body .sv-row')].find((r) => r.textContent.includes(${JSON.stringify(TAG)})).querySelector('.sv-meta').textContent`);
+check('saves list shows name, persona, phase, case time, date', /Standard adult CABG · Before bypass · case time \d+:\d\d · score \d+ · /.test(meta), meta);
+await ev(`document.getElementById('sv-name').focus()`);   // Save / Load is still open
+const before = await P('[p.x, p.z]'); await down('KeyW'); await sleep(400); await up('KeyW'); await down('KeyS'); await sleep(300); await up('KeyS');
+const after = await P('[p.x, p.z]');
+check('keys typed while Save / Load is open do not move the player', before[0] === after[0] && before[1] === after[1]);
+await click(`#saves-body .sv-row:nth-child(${(await rowOf(TAG)) + 1}) [data-load]`); await sleep(1200);
+const st = await state();
+check('Load restores the save and marks the run as practice', !(await visible('saves')) && st.session.practice && st.session.resumed_from.id === TAG_ID && st.speed === 0,
+  await ev(`document.getElementById('toast').textContent`));
+await tap('F9'); await sleep(800);
+await click(`#saves-body .sv-row:nth-child(${(await rowOf(TAG)) + 1}) [data-del]`); await sleep(500);
+check('Delete asks first', await visible('confirm'), (await ev(`document.getElementById('confirm-body').innerText`)).split('\n')[0]);
+await click('#cf-ok'); await sleep(800);
+check('Delete removes the save', !(await saves()).some((x) => x.id === TAG_ID));
+if (!hadQuick) await ev(`fetch('/api/saves/quick-save', {method: 'DELETE'})`);   // tidy up what this run made
+await tap('Escape'); await sleep(300);
+check('Esc closes Save / Load', !(await visible('saves')));
+await click('#btn-sessions'); await sleep(900);
+check('Sessions screen lists sessions', (await ev(`document.querySelectorAll('#sessions-body .sv-row').length`)) > 0);
+await click('#sessions-body [data-open="0"]'); await sleep(900);
+const body = await ev(`document.getElementById('sessions-body').innerText`);
+check('session opens to summary and timeline', ['What was done', 'What went well', 'What was flagged', 'Three things to improve', 'Timeline'].every((h) => body.includes(h)));
+await tap('Escape'); await sleep(300);
+await send('Page.reload'); await sleep(3000);
+
 // ---- full expert case
 if (FULL) {
   await click('#btn-watch'); await sleep(1200); await click('#hud-bottom [data-speed="20"]');
@@ -166,6 +220,18 @@ if (FULL) {
   check('expert case at 20x reaches the debrief', await ev(`!document.getElementById('debrief').classList.contains('hidden')`), `${Math.round((Date.now() - t0) / 1000)} s, ${phases.size} phases`);
   check('expert score 100', s.score.score === 100, `score ${s.score.score}, callouts ${s.score.callouts.made}/${s.score.callouts.due}`);
   await shot('debrief');
+  await click('#btn-summary'); await sleep(900);
+  check('debrief links to the session summary', (await ev(`document.getElementById('sessions-body').innerText`)).includes('Three things to improve'));
+  await tap('Escape'); await sleep(300);
+  // resume from the last auto-save and finish: the debrief must say practice
+  await tap('F9'); await sleep(900);
+  const ai = await ev(`[...document.querySelectorAll('.sv-row')].findIndex((r) => r.textContent.includes('Auto: Off bypass'))`);
+  check('auto-saves are labelled by phase', ai >= 0);
+  await click(`.sv-row:nth-child(${ai + 1}) [data-load]`); await sleep(1200);
+  await click('#hud-bottom [data-speed="20"]');
+  for (let i = 0; i < 60 && !(await ev(`!document.getElementById('debrief').classList.contains('hidden')`)); i++) await sleep(1000);
+  check('resumed run debrief is marked practice', (await ev(`document.getElementById('debrief-body').innerText`)).includes('Practice (resumed from save'));
+  await shot('debrief_practice');
 }
 
 check('no page errors', problems.length === 0, problems.slice(0, 3).join(' | '));

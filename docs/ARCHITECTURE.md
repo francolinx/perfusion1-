@@ -23,6 +23,32 @@
   - `{"type":"speed","x":N}` (0 pauses), `{"type":"autopilot","on":bool}`
 - `POST /api/reset`: `{"persona":ID,"operate_minutes":N}` starts a new case, paused.
 
+- `GET /api/state` also carries `session`: `{id, practice, resumed_from, autopilot_used}` (added with saves).
+
+Saves (one JSON file each under `saves/`, git-ignored):
+- `POST /api/save` `{"name", "description", "overwrite"?}`: saves the whole case now. A name that is already
+  taken answers 409 with `confirm: "overwrite"` and the existing save's details; send again with `overwrite: true`.
+- `GET /api/saves`: every save with name, description, persona, phase, case time, score, date and build.
+- `POST /api/load` `{"id", "force"?}`: replaces the running case with the save, paused. A save from a different
+  build (git commit) answers 409 with `confirm: "build"` and both versions; send `force: true` to load anyway.
+  A damaged or incompatible save answers 400 and the running case is untouched.
+- `DELETE /api/saves/{id}`.
+- An automatic save is written at the start of every phase from "Go on bypass" to "Off bypass", labelled
+  `Auto: <phase>`; the last 10 are kept.
+
+Session logs (one JSON file each under `logs/`, git-ignored):
+- `GET /api/sessions`: date, persona, score, case and real duration, status, practice flag.
+- `GET /api/sessions/{id}`: the full event log (every action with its case time and source, surgeon lines,
+  phase changes, findings, saves and loads, final score and checklist) and the summary.
+- The summary is built from the event log by fixed rules (`perfusion/sessionlog.py`): what was done in each
+  phase, what went well, what was flagged and when, three things to improve. A language model may polish the
+  wording later; it never changes the facts or the score.
+- A session that loaded a save is marked practice (resumed from save), so its score is not compared with clean
+  start-to-finish runs. A session is only written once the student (or the expert) does something.
+
+Saves are exact: a save holds every field of the case, the model and the expert autopilot, and loading it then
+running gives identical numbers to never having stopped (`tests/test_saves.py`).
+
 The surgeon owns two things the student cannot set: cannulation and the aortic cross-clamp.
 
 ## Model (perfusion/model.py)

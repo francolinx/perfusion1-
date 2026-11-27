@@ -75,3 +75,25 @@ input[type=number] { width: 110px; background: #0f1318; color: #fff; border: 1px
   #touch-btns button.on { background: rgba(59,130,214,0.55); }
   #touch-stick { display: block; position: fixed; left: 53px; bottom: 155px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.35); pointer-events: none; z-index: 3; }
 }
+
+/* save / load, sessions, confirm, toast */
+.modal.wide { width: min(900px, 100%); } .modal.small { width: min(460px, 100%); }
+#saves, #sessions { z-index: 12; } #confirm { z-index: 20; }
+.sv-new { display: grid; gap: 8px; margin: 8px 0 4px; }
+.sv-new label { display: grid; gap: 4px; font-size: 13px; color: #9aa3ad; }
+.sv-new input, .sv-new textarea { background: #0b0f14; color: #e8eaed; border: 1px solid rgba(255,255,255,0.18); border-radius: 7px; padding: 7px 9px; font: inherit; }
+.sv-list { display: grid; gap: 6px; }
+.sv-row { display: flex; gap: 10px; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.12); border-radius: 9px; padding: 8px 10px; }
+.sv-row.click { cursor: pointer; } .sv-row.click:hover { border-color: #3b82d6; }
+.sv-row.broken { opacity: 0.6; }
+.sv-main { min-width: 0; } .sv-desc { color: #c9d1d9; font-size: 13px; overflow-wrap: anywhere; } .sv-meta { color: #9aa3ad; font-size: 12px; margin-top: 2px; }
+.sv-btns { display: flex; gap: 6px; flex-shrink: 0; }
+.tag { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 6px; background: rgba(255,255,255,0.1); margin-left: 6px; }
+.tag.warn { background: rgba(214,165,49,0.25); color: #f0cf7a; }
+.find.good { border-left: 3px solid #3fae6f; }
+.timeline { max-height: 40vh; overflow: auto; font-size: 12.5px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 6px 8px; }
+.tl { padding: 2px 0; } .tl .t { color: #7f8a96; display: inline-block; width: 46px; font-variant-numeric: tabular-nums; }
+.tl.phase { color: #8fc1ff; margin-top: 4px; } .tl.line { color: #cfe8d8; }
+.sev { font-size: 11px; padding: 0 5px; border-radius: 5px; } .sev.minor { background: #6b5316; } .sev.major { background: #7a3a12; } .sev.critical { background: #7d1717; }
+#toast { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); background: rgba(10,14,19,0.92); border: 1px solid rgba(255,255,255,0.18); padding: 8px 14px; border-radius: 9px; font-size: 14px; opacity: 0; transition: opacity 0.25s; pointer-events: none; z-index: 25; max-width: min(640px, 92vw); text-align: center; }
+#toast.show { opacity: 1; }
