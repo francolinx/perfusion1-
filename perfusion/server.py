@@ -13,11 +13,13 @@ import mimetypes
 import os
 import threading
 import time
+import urllib.parse
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from .autopilot import Autopilot
 from .model import load_personas
+from .monitor import Clients, Monitor, SimMeter
 from .saves import SaveStore, restore, slug
 from .scenario import CALLOUTS, PHASES, PHASE_TITLES, Case
 from .sessionlog import SessionLog, SessionStore
@@ -41,6 +43,8 @@ class Session:
         self.saves = SaveStore(saves_dir or os.path.join(ROOT, "saves"))
         self.sessions = SessionStore(logs_dir or os.path.join(ROOT, "logs"))
         self.log = None
+        self.meter, self.clients = SimMeter(), Clients()
+        self.stopped = threading.Event()
         self.reset("standard_adult")
 
     # ---- case lifecycle ---------------------------------------------------------------------
@@ -99,21 +103,35 @@ class Session:
 
     def loop(self):
         last = time.monotonic()
-        while True:
+        while not self.stopped.is_set():
             time.sleep(TICK)
             now = time.monotonic()
+            lag = max(0.0, now - last - TICK)          # how late this tick woke up (dashboard)
             real, last = min(now - last, 0.25), now
             with self.lock:
                 case = self.case
                 self.debt += real * case.speed / case.sim.DT
                 n = int(self.debt)
                 self.debt -= n
-                self.advance(min(n, 2000))
+                n = min(n, 2000)
+                self.advance(n)
                 log = self.log
+            self.meter.record(now, n, case.sim.DT, lag)
             try:
                 log.flush()
             except OSError:
                 pass
+
+    def sim_status(self):
+        """The simulator row of /dashboard."""
+        with self.lock:
+            c = self.case
+            d = dict(phase=c.phase, phase_title=PHASE_TITLES[c.phase], speed=c.speed, case_time=round(c.t, 1),
+                     persona=c.persona.name, autopilot=bool(c.autopilot), session=self.log.id,
+                     practice=self.log.doc["practice"])
+        d.update(self.meter.read())
+        d["clients"] = self.clients.count()
+        return d
 
     def state(self):
         with self.lock:
@@ -205,6 +223,9 @@ class Session:
 
 
 SESSION = None
+MONITOR = Monitor()
+FEATURES = ["3D lab and expert autopilot", "save / load (F5, F9)", "session logs and summaries",
+            "smash mode (cosmetic)", "third-person view", "dashboard"]
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -232,7 +253,13 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path = self.path.split("?")[0]
         if path == "/api/state":
+            q = urllib.parse.parse_qs(self.path.partition("?")[2])
+            SESSION.clients.touch((q.get("c") or [self.client_address[0]])[0][:64])
             return self._send(200, SESSION.state())
+        if path == "/api/dashboard":
+            return self._send(200, MONITOR.snapshot(SESSION.sim_status, SESSION.saves.build, FEATURES))
+        if path == "/dashboard":
+            path = "/dashboard.html"
         if path == "/api/meta":
             return self._send(200, dict(
                 personas=[dict(id=p.id, name=p.name, desc=p.desc, weight=p.weight, height=p.height,
@@ -308,8 +335,10 @@ def main():
     srv = bind(a.host, a.port)
     SESSION = Session(saves_dir=a.saves_dir, logs_dir=a.logs_dir)
     threading.Thread(target=SESSION.loop, daemon=True).start()
+    MONITOR.start()
     url = f"http://localhost:{a.port}"
     print(f"perfusion1 running. Open {url} (or http://<this machine's IP>:{a.port} from another device).")
+    print(f"Dashboard: {url}/dashboard")
     if a.open:
         threading.Timer(0.8, lambda: webbrowser.open(url)).start()
     try:

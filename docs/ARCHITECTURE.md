@@ -49,6 +49,20 @@ Session logs (one JSON file each under `logs/`, git-ignored):
 Saves are exact: a save holds every field of the case, the model and the expert autopilot, and loading it then
 running gives identical numbers to never having stopped (`tests/test_saves.py`).
 
+Dashboard (`perfusion/monitor.py`, page `web/dashboard.html`):
+- `GET /dashboard`: the status page. It polls `GET /api/dashboard` once a second.
+- `GET /api/dashboard`: `{sim, services, system, build}`. `sim` has steps/s, real-time factor, tick lag (how
+  late the 20 Hz server loop wakes, in ms), speed, phase and connected clients (tabs that polled `/api/state`
+  in the last 5 s; the client tags its polls with `?c=<tab id>`). `system` reads `/proc/stat`, `/proc/meminfo`,
+  the disk holding the repo and `nvidia-smi`. `build` has the git branch and commit (read from `.git`, no git
+  program needed), the last `./run.sh --test` result (`logs/last_test.json`) and the live features.
+- Each AI service runs on its own and answers `GET /health` with JSON:
+  `{"model", "loaded", "memory_mb", "latency_ms", "tokens_per_s", "requests", "last_error"}` (any may be null).
+  Default addresses: ASR `127.0.0.1:9201`, surgeon LLM `:9202`, medical LLM `:9203`, TTS `:9204`; override with
+  `PERFUSION_ASR_URL`, `PERFUSION_SURGEON_URL`, `PERFUSION_MEDICAL_URL`, `PERFUSION_TTS_URL`. The server probes
+  them from a background thread with a 0.5 s timeout, so a slow or missing service never delays a page. Nothing
+  listening shows "not running"; a bad reply shows "error" with the reason.
+
 The surgeon owns two things the student cannot set: cannulation and the aortic cross-clamp.
 
 ## Model (perfusion/model.py)

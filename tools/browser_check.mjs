@@ -234,6 +234,17 @@ if (FULL) {
   await shot('debrief_practice');
 }
 
+// ---- dashboard page (a separate page; must render with no AI services running and keep refreshing)
+await send('Page.navigate', { url: URL_ + '/dashboard' }); await sleep(3500);
+const dash = await ev(`({ polls: window.P1_DASH?.polls || 0, failures: window.P1_DASH?.failures, rows: document.querySelectorAll('#models tbody tr').length,
+  status: [...document.querySelectorAll('#models tbody .pill')].map((p) => p.textContent), sim: document.getElementById('sim').innerText,
+  sys: document.getElementById('sys').innerText, build: document.getElementById('build').innerText })`);
+check('dashboard refreshes every second', dash.polls >= 3 && dash.failures === 0, `${dash.polls} polls in 3.5 s`);
+check('dashboard lists the four AI services', dash.rows === 4, dash.status.join(', '));
+check('dashboard shows simulator, system and build', ['Steps / s', 'Real-time factor', 'Tick lag', 'Clients'].every((k) => dash.sim.includes(k))
+  && ['CPU', 'Unified memory', 'GPU', 'Disk free'].every((k) => dash.sys.includes(k)) && dash.build.includes('Commit'));
+await shot('dashboard');
+
 check('no page errors', problems.length === 0, problems.slice(0, 3).join(' | '));
 console.log(failed ? `\n${failed} check(s) failed` : '\nall checks passed');
 done(failed ? 1 : 0);

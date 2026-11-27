@@ -6,6 +6,7 @@ import { buildAvatar } from './player.js';
 import { initSaves } from './saves.js';
 
 const $ = (id) => document.getElementById(id);
+const STATE_URL = '/api/state?c=' + Math.random().toString(36).slice(2, 10);   // per-tab id, so /dashboard can count connected clients
 const post = (p, body) => fetch(p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then((r) => r.json());
 export const act = (a) => post('/api/action', a);
 export const state = { S: null, META: null };
@@ -548,7 +549,7 @@ let focus = null;
 const savesUI = initSaves({
   getState: () => state.S, isCaseRunning: () => started,
   onLoaded: async (info) => {
-    const S = await fetch('/api/state').then((r) => r.json()); state.S = S;
+    const S = await fetch(STATE_URL).then((r) => r.json()); state.S = S;
     const p = state.META.personas.find((x) => x.id === S.persona.id);
     if (p) { const k = Math.cbrt(p.weight / 75); P.body.scale.set(Math.min(1.1, 0.9 + (p.height - 155) / 250), k, k); }
     $('start').classList.add('hidden'); $('debrief').classList.add('hidden');
@@ -755,7 +756,7 @@ async function boot() {
 }
 async function poll() {
   try {
-    const S = await fetch('/api/state').then((r) => r.json());
+    const S = await fetch(STATE_URL).then((r) => r.json());
     state.S = S; updateHud(S);
     if (openId) panels[openId].items.forEach((it) => it.update && it.update(S));
   } catch (e) { $('surgeon-line').textContent = 'Lost connection to the simulator. Is the server still running?'; }
