@@ -18,8 +18,10 @@ cd perfusion1-
 That is the whole install. It needs Python 3.9+ and a browser, nothing else: no pip, no npm,
 no internet (three.js is vendored). It opens `http://localhost:8080`. From a laptop, phone or
 headset on the same network, open `http://<spark-ip>:8080`.
-If another program already uses port 8080 (on the Spark used for bring-up, a local gateway did),
-the server says so; start it on another port with `PORT=9000 ./run.sh`.
+If another program already uses port 8080, the server stops with a plain message instead of a
+traceback: `Port 8080 is already in use by another program. Start on a free port instead, for
+example:  PORT=9000 ./run.sh`. On the DGX Spark used for development, a local gateway holds 8080,
+so the simulator runs there on port 9000.
 
 `./run.sh --test` runs the test suite and plays a full expert case headless.
 
@@ -37,11 +39,17 @@ the server says so; start it on another port with `PORT=9000 ./run.sh`.
   and every finding with its timestamp. The sequencing error from the lab video (bringing flow
   back up before the clamp is off) is one of the things it catches.
 
-Controls: W A S D to move, mouse to look (click the room first), E or click to use equipment,
-T to talk to the surgeon, Tab for every control panel, Esc to close. B toggles smash mode: a
-just-for-fun rage room with a baseball bat where the equipment breaks, with sound. It pauses the
-case, is never graded, and leaving it rebuilds the lab. On a phone: left pad moves,
-drag to look, Controls button for the panels.
+Controls: W A S D to move, mouse to look (click the room first), Space to jump, C or Ctrl to
+crouch, Shift or double-tap W to sprint, V to switch between first person and third person (behind
+and in front, so you can see yourself in scrubs). E or click to use equipment, T to talk to the
+surgeon, Tab for every control panel, Esc to close. B toggles smash mode: a just-for-fun rage room
+with a baseball bat (click or F to swing) where the equipment breaks, with sound. It pauses the
+case, is never graded, and leaving it rebuilds the lab. On a phone: left pad moves, drag to look,
+Jump / Crouch / View buttons, Controls button for the panels.
+
+Ctrl+W closes a browser tab and no page can stop that, so the page asks before leaving a running
+case. C is the safer crouch key. The surgeon's browser voice is a placeholder and starts off on
+desktop Linux (press Voice to turn it on); a local voice service will replace it.
 
 ## How it is built
 

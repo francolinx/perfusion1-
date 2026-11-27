@@ -62,7 +62,7 @@ export function initSmash({ scene, camera, room, onQuip, pause }) {
 
   // ---- what can break, and what it sounds like
   function breakable(m) {
-    if (!m.isMesh || !m.visible || m.userData.bat) return false;
+    if (!m.isMesh || !m.visible || m.userData.bat || m.userData.self) return false;
     if (m.userData.debris) return true;
     const g = m.geometry; if (!g.boundingSphere) g.computeBoundingSphere();
     return g.boundingSphere.radius * Math.max(m.scale.x, m.scale.y, m.scale.z) < 1.6;   // walls, floor and ceiling stay up
@@ -124,7 +124,7 @@ export function initSmash({ scene, camera, room, onQuip, pause }) {
       const list = who === 'patient' ? QUIPS.patient : who ? QUIPS.staff : QUIPS.gear;
       onQuip(list[Math.floor(Math.random() * list.length)]);
     }
-    hud.textContent = `Smash mode. Damage bill: $${S.bill.toLocaleString()} (${S.count} parts). Click or Space to swing.`;
+    hud.textContent = `Smash mode. Damage bill: $${S.bill.toLocaleString()} (${S.count} parts). Click or F to swing.`;
   }
 
   // ---- public controls
@@ -136,7 +136,7 @@ export function initSmash({ scene, camera, room, onQuip, pause }) {
     if (S.on) { location.reload(); return; }       // leaving smash mode rebuilds the lab
     S.on = true; bat.visible = true; pause();
     hud.classList.remove('hidden');
-    hud.textContent = 'Smash mode. The case is paused and nothing here is graded. Click or Space to swing.';
+    hud.textContent = 'Smash mode. The case is paused and nothing here is graded. Click or F to swing.';
     document.getElementById('btn-smash').textContent = 'Repair the lab (B)';
     document.getElementById('btn-smash').classList.add('danger');
     onQuip('Why are you holding a baseball bat?');
