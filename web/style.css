@@ -97,3 +97,17 @@ input[type=number] { width: 110px; background: #0f1318; color: #fff; border: 1px
 .sev { font-size: 11px; padding: 0 5px; border-radius: 5px; } .sev.minor { background: #6b5316; } .sev.major { background: #7a3a12; } .sev.critical { background: #7d1717; }
 #toast { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); background: rgba(10,14,19,0.92); border: 1px solid rgba(255,255,255,0.18); padding: 8px 14px; border-radius: 9px; font-size: 14px; opacity: 0; transition: opacity 0.25s; pointer-events: none; z-index: 25; max-width: min(640px, 92vw); text-align: center; }
 #toast.show { opacity: 1; }
+
+/* game layer: name, levels, rank, quiz, pump face */
+.namerow { justify-content: flex-start; flex-wrap: wrap; margin-bottom: 6px; }
+.namerow input[type=text] { background: #0f1318; color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 7px; padding: 8px 10px; font: inherit; width: 220px; }
+.chk { color: #9aa3ad; font-size: 13px; margin-left: auto; } .err { color: #ff8a8a; font-size: 13px; min-height: 4px; }
+.lvl-head { color: #9aa3ad; font-size: 12px; text-transform: none; margin: 10px 0 4px; } .lvl-head .lock { color: #d6a531; } .lvl-head .yes { color: #7fd6a4; }
+.persona.locked { opacity: 0.45; } .persona .best { float: right; font-weight: 500; color: #7fd6a4; font-size: 13px; }
+.rankline { padding: 8px 10px; border-radius: 8px; background: rgba(59,130,214,0.18); margin: 4px 0 8px; }
+.qz { margin: 8px 0 12px; } .qz label { display: block; padding: 3px 0; color: #d5dae0; } .yes { color: #7fd6a4; } .no { color: #ff8a8a; }
+.pumpface { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pumpface .seg { background: #0c1f3f; border: 1px solid #23457e; border-radius: 8px; padding: 6px 12px; text-align: right; }
+.pumpface .k { color: #9fc0ff; font-size: 12px; text-align: left; } .pumpface .n { font: 700 40px/1.1 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: #fff; font-variant-numeric: tabular-nums; }
+.pumpface .n.bad { color: #ff6b6b; } .pumpstatus { font: 600 13px ui-monospace, Menlo, Consolas, monospace; color: #9fc0ff; letter-spacing: 0.04em; } .pumpstatus.bad { color: #ff6b6b; }
+canvas.trend { width: 100%; height: 90px; border-radius: 8px; display: block; }

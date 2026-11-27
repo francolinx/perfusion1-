@@ -34,6 +34,19 @@ Ordered. Each item says where it has to be built.
 8. **Synthetic data export** for decision-support research: labeled trajectories from the
    autopilot with injected faults.
 
+## From the competitor review (Virmedex virCPB) and student feedback
+
+Done: student names, levels, leaderboard, run analysis, quiz, RPM beside L/min, graphics tiers.
+Still open:
+- Incident ladder: single faults per level (ACT drop, low reservoir, SvO2 drop, pressure fall and rise, kinked
+  arterial line, air, oxygenator failure), then combined faults.
+- Scored surgeon and anesthesia questions that must be answered, not only callouts.
+- Instructor view: cohort roster, most common findings, CSV export, scenario and quiz editing.
+- Real console detail: RPM or L/min control mode, bubble and level sensors that stop the pump, pressure limits.
+- Vendored CC0 textures and an HDRI, and modelled equipment and staff in place of primitives. Check every
+  asset licence; no Mixamo files in this repo.
+- Spaced repetition of missed quiz items.
+
 ## Evidence
 
 9. Face and content validity study with perfusionists, then a study of time to competency.

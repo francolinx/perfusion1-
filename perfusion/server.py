@@ -17,12 +17,13 @@ import urllib.parse
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+from . import leaderboard, quiz
 from .autopilot import Autopilot
 from .model import load_personas
 from .monitor import Clients, Monitor, SimMeter
 from .saves import SaveStore, restore, slug
 from .scenario import CALLOUTS, PHASES, PHASE_TITLES, Case
-from .sessionlog import SessionLog, SessionStore
+from .sessionlog import SessionLog, SessionStore, SERIES_EVERY
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WEB = os.path.join(ROOT, "web")
@@ -48,23 +49,27 @@ class Session:
         self.reset("standard_adult")
 
     # ---- case lifecycle ---------------------------------------------------------------------
-    def _install(self, case, pilot, practice=False, resumed_from=None, reason="new case"):
+    def _install(self, case, pilot, practice=False, resumed_from=None, reason="new case", student=None):
         """Swap in a case and start its session log. Caller holds the lock."""
+        if student is None:                    # a loaded save keeps whoever was at the controls
+            student = self.log.doc.get("student", "") if self.log else ""
         if self.log:
             self.log.end(self.case, reason)
         self.case, self.pilot = case, pilot
         self.debt = 0.0
-        self.log = SessionLog(self.sessions.folder, case.persona, self.saves.build, practice=practice, resumed_from=resumed_from)
+        self._next_sample = case.t
+        self.log = SessionLog(self.sessions.folder, case.persona, self.saves.build, practice=practice, resumed_from=resumed_from,
+                              student=leaderboard.clean_name(student))
         pilot.on_act = lambda a: self.log.add("action", self.case.t, source="autopilot", action=dict(a))
         self._seen = (case.phase, len(case.lines), len(case.findings))
         self._done_logged = case.phase == "DONE"
 
-    def reset(self, persona_id, operate_minutes=22.0, mistake=None):
+    def reset(self, persona_id, operate_minutes=22.0, mistake=None, student=""):
         with self.lock:
             case = Case(self.personas[persona_id], operate_minutes=float(operate_minutes))
             pilot = Autopilot(case, mistake=mistake)
             case.speed = 0.0          # paused until the student presses start
-            self._install(case, pilot)
+            self._install(case, pilot, student=student or "")
             self.log.add("start", case.t, persona=persona_id, operate_minutes=float(operate_minutes))
             self.log.add("line", case.t, text=case.lines[-1]["text"])
 
@@ -98,6 +103,11 @@ class Session:
             if case.autopilot:
                 self.pilot.step()
             case.tick()
+            if case.t >= self._next_sample:
+                self._next_sample = case.t + SERIES_EVERY
+                s = case.sim
+                self.log.sample([round(case.t, 1), round(s.qa, 2), round(s.rpm), round(s.pa, 1), round(s.do2i), round(s.temp, 2),
+                                 round(s.vr), round(s.svo2 * 100, 1), round(s.hct_p * 100, 1), round(s.line_p), round(s.cvp, 1)])
             if case.phase != self._seen[0] or len(case.lines) != self._seen[1] or len(case.findings) != self._seen[2]:
                 self._observe()
 
@@ -137,6 +147,7 @@ class Session:
         with self.lock:
             d = self.case.snapshot()
             d["session"] = dict(id=self.log.id, practice=self.log.doc["practice"], resumed_from=self.log.doc["resumed_from"],
+                                student=self.log.doc.get("student", ""),
                                 autopilot_used=self.log.doc["autopilot_used"])
             return d
 
@@ -222,9 +233,50 @@ class Session:
             raise ApiError(400, error=str(e))
 
 
+    # ---- leaderboard, levels, quiz ------------------------------------------------------------
+    def leaderboard(self, persona=None, since=None, student=None):
+        self.log.flush()
+        rows = leaderboard.load_rows(self.sessions.folder)
+        if persona and persona not in self.personas:
+            raise ApiError(400, error="unknown persona")
+        d = leaderboard.board(rows, persona=persona or None, student=student,
+                              since_ts=leaderboard.today_ts() if since == "today" else None)
+        d["levels"] = leaderboard.levels(rows, student)
+        d["pass_score"] = leaderboard.PASS_SCORE
+        d["personas"] = [dict(id=p.id, name=p.name) for p in self.personas.values()]
+        return d
+
+    def _finished(self, sid):
+        doc = self.session_detail(sid)
+        if doc.get("status") != "complete":
+            raise ApiError(409, error="The quiz opens when the case is finished.")
+        return doc
+
+    def quiz_get(self, sid):
+        doc = self._finished(sid)
+        return dict(session=sid, questions=quiz.questions(doc), result=doc.get("quiz"))
+
+    def quiz_post(self, sid, answers):
+        doc = self._finished(sid)
+        if doc.get("quiz"):
+            return dict(session=sid, result=doc["quiz"], already=True)     # one attempt per run
+        if not isinstance(answers, list):
+            raise ApiError(400, error="answers must be a list")
+        result = quiz.grade(doc, answers)
+        with self.lock:
+            if sid == self.log.id:
+                self.log.doc["quiz"] = result
+                self.log.dirty = True
+        try:
+            self.log.flush(force=True) if sid == self.log.id else self.sessions.update(sid, quiz=result)
+        except (OSError, ValueError) as e:
+            raise ApiError(400, error=str(e))
+        return dict(session=sid, result=result)
+
+
 SESSION = None
 MONITOR = Monitor()
-FEATURES = ["3D lab and expert autopilot", "save / load (F5, F9)", "session logs and summaries",
+FEATURES = ["student names, leaderboard, levels and quiz", "run analysis charts", "3D lab and expert autopilot", "save / load (F5, F9)", "session logs and summaries",
             "smash mode (cosmetic)", "third-person view", "dashboard"]
 
 
@@ -260,6 +312,14 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, MONITOR.snapshot(SESSION.sim_status, SESSION.saves.build, FEATURES))
         if path == "/dashboard":
             path = "/dashboard.html"
+        if path in ("/leaderboard", "/run"):
+            path += ".html"
+        if path == "/api/leaderboard":
+            q = urllib.parse.parse_qs(self.path.partition("?")[2])
+            one = lambda k: (q.get(k) or [None])[0]
+            return self._api(SESSION.leaderboard, one("persona"), one("since"), one("student"))
+        if path.startswith("/api/quiz/"):
+            return self._api(SESSION.quiz_get, path[len("/api/quiz/"):])
         if path == "/api/meta":
             return self._send(200, dict(
                 personas=[dict(id=p.id, name=p.name, desc=p.desc, weight=p.weight, height=p.height,
@@ -298,7 +358,9 @@ class Handler(BaseHTTPRequestHandler):
                 pid = body.get("persona", "standard_adult")
                 if pid not in SESSION.personas:
                     return self._send(400, dict(error="unknown persona"))
-                SESSION.reset(pid, body.get("operate_minutes", 22.0), body.get("mistake"))
+                SESSION.reset(pid, body.get("operate_minutes", 22.0), body.get("mistake"), body.get("student", ""))
+            elif self.path.startswith("/api/quiz/"):
+                return self._api(SESSION.quiz_post, self.path[len("/api/quiz/"):], body.get("answers"))
             elif self.path == "/api/save":
                 return self._api(SESSION.save, body.get("name"), body.get("description", ""), bool(body.get("overwrite")))
             elif self.path == "/api/load":

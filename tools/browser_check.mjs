@@ -22,6 +22,7 @@ const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'p1-chrome-'));
 const flags = ['--headless=new', `--user-data-dir=${profile}`, `--remote-debugging-port=${PORT}`, '--no-first-run',
   '--window-size=1600,900', 'about:blank'];
 if (process.argv.includes('--gpu')) flags.push('--use-angle=gl', '--ignore-gpu-blocklist');
+if (process.getuid?.() === 0) flags.push('--no-sandbox');      // Chrome refuses to run as root otherwise (containers, CI)
 const chrome = spawn(CHROME, flags, { stdio: 'ignore', detached: true });   // own process group, so every Chrome child can be stopped
 const killChrome = () => { try { process.kill(-chrome.pid, 'SIGKILL'); } catch {} };
 process.on('exit', () => { killChrome(); fs.rmSync(profile, { recursive: true, force: true }); });
@@ -67,14 +68,30 @@ const fps = (ms) => ev(`new Promise((res) => { let n = 0; const t0 = performance
 const state = () => ev(`fetch('/api/state').then((r) => r.json())`);
 
 await send('Runtime.enable'); send('Inspector.enable'); await send('Page.enable');
-await send('Page.navigate', { url: URL_ }); await sleep(3000);
+// without a GPU the high tier is a slideshow in software rendering, so the timing checks pin the plain tier
+const MAIN = URL_ + (process.argv.includes('--gpu') ? '/' : '/?gfx=low');
+await send('Page.navigate', { url: MAIN }); await sleep(3000);
 check('page loads, patient list shows', (await ev(`document.querySelectorAll('#persona-list .persona').length`)) === 10);
 const renderer = await ev(`(() => { const g = document.createElement('canvas').getContext('webgl2'); const e = g && g.getExtension('WEBGL_debug_renderer_info'); return g ? (e ? g.getParameter(e.UNMASKED_RENDERER_WEBGL) : 'webgl2') : 'none'; })()`);
 check('WebGL2 available', renderer !== 'none', renderer);
 check('browser voice starts off on desktop Linux', !/Linux/.test(await ev('navigator.userAgent')) || (await ev(`document.getElementById('btn-voice').textContent`)) === 'Voice: off');
 
+// ---- name is required, levels gate the harder patients
+const setName = (n) => ev(`(() => { const e = document.getElementById('student-name'); e.value = ${JSON.stringify(n)}; e.dispatchEvent(new Event('input')); })()`);
+await setName(''); await sleep(500);
+await click('#btn-start'); await sleep(600);
+check('a run cannot start without a name', !(await ev(`document.getElementById('start').classList.contains('hidden')`)) && /name/i.test(await ev(`document.getElementById('start-error').textContent`)));
+await setName('Check Bot ' + Date.now().toString(36).slice(-4)); await sleep(900);
+check('patients are grouped into levels with later levels locked', (await ev(`document.querySelectorAll('#persona-list .lvl-head').length`)) === 4 && (await ev(`document.querySelectorAll('#persona-list .persona.locked').length`)) === 9);
+await click('#persona-list .persona.locked'); await sleep(200); await click('#btn-start'); await sleep(600);
+check('a locked patient cannot be started', !(await ev(`document.getElementById('start').classList.contains('hidden')`)) && /locked/i.test(await ev(`document.getElementById('start-error').textContent`)));
+await click('#persona-list .persona:not(.locked)'); await sleep(200);
+check('graphics tier is shown and the addon modules loaded', /^Graphics: (low|med|high)$/.test(await ev(`document.getElementById('btn-gfx').textContent`)) && (await ev(`!!window.P1.gfx`)));
+
 // ---- start a manual case; controls
 await click('#btn-start'); await sleep(1500);
+check('the student name is on the session', /^Check Bot/.test((await state()).session.student));
+check('pump RPM is in the always-on readouts', (await ev(`[...document.querySelectorAll('#vitals .k')].map((e) => e.textContent).join('|')`)).includes('Pump RPM'));
 check('start screen closes', await ev(`document.getElementById('start').classList.contains('hidden')`));
 await place(0.9, 1.6, 0.72, -0.16);
 await ev(`document.querySelector('#hud-bottom [data-speed="20"]').focus()`);
@@ -220,6 +237,8 @@ if (FULL) {
   check('expert case at 20x reaches the debrief', await ev(`!document.getElementById('debrief').classList.contains('hidden')`), `${Math.round((Date.now() - t0) / 1000)} s, ${phases.size} phases`);
   check('expert score 100', s.score.score === 100, `score ${s.score.score}, callouts ${s.score.callouts.made}/${s.score.callouts.due}`);
   await shot('debrief');
+  check('debrief shows standing, leaderboard and analysis links, and a quiz', (await ev(`!!document.getElementById('btn-board') && !!document.getElementById('btn-analyze')`)) && (await ev(`document.querySelectorAll('#quiz-box .qz').length`)) === 4);
+  check('expert runs are not ranked', (await ev(`document.getElementById('debrief-game').innerText`)).includes('not ranked'));
   await click('#btn-summary'); await sleep(900);
   check('debrief links to the session summary', (await ev(`document.getElementById('sessions-body').innerText`)).includes('Three things to improve'));
   await tap('Escape'); await sleep(300);
@@ -232,6 +251,16 @@ if (FULL) {
   for (let i = 0; i < 60 && !(await ev(`!document.getElementById('debrief').classList.contains('hidden')`)); i++) await sleep(1000);
   check('resumed run debrief is marked practice', (await ev(`document.getElementById('debrief-body').innerText`)).includes('Practice (resumed from save'));
   await shot('debrief_practice');
+}
+
+// ---- leaderboard and run analysis pages
+await send('Page.navigate', { url: URL_ + '/leaderboard' }); await sleep(1800);
+check('leaderboard page renders levels and the board', (await ev(`document.querySelectorAll('#levels .lvl').length`)) === 4 && (await ev(`!!document.getElementById('rows')`)));
+const lastRun = await ev(`fetch('/api/sessions').then((r) => r.json()).then((d) => (d.sessions.find((s) => s.status === 'complete') || {}).id || '')`);
+if (lastRun) {
+  await send('Page.navigate', { url: URL_ + '/run?id=' + lastRun }); await sleep(2200);
+  check('run analysis draws its charts and quiz', (await ev(`document.querySelectorAll('canvas.chart').length`)) === 5 && (await ev(`document.getElementById('quiz').children.length`)) > 0);
+  await shot('run_analysis');
 }
 
 // ---- dashboard page (a separate page; must render with no AI services running and keep refreshing)

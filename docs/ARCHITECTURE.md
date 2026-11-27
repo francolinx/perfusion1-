@@ -65,6 +65,23 @@ Dashboard (`perfusion/monitor.py`, page `web/dashboard.html`):
 
 The surgeon owns two things the student cannot set: cannulation and the aortic cross-clamp.
 
+## Game layer
+
+- `POST /api/reset` takes `student`; the cleaned name is stored on the session log.
+- The session log also records a time series every 5 seconds of case time (`series_keys`, `series`).
+- `GET /api/leaderboard?persona=&since=today&student=`: ranked rows, the student's best and rank, and levels.
+  Only finished, named, hand-flown runs that were not resumed from a save are ranked. Order: score, then
+  fewer criticals, fewer findings, more time in range, more callouts, shorter case, earlier run.
+- `GET /api/quiz/<session>` returns four questions without answers; `POST` grades them once and stores the
+  result on the session log. Items are chosen by the run's findings, worst first, then by a hash of the id.
+- Pages: `/leaderboard`, `/run?id=<session>`.
+
+## Rendering tiers (web/gfx.js)
+
+high: ambient occlusion, bloom, 4x MSAA, refractive clear plastic. med: bloom and MSAA. low: plain render at a
+reduced pixel ratio, no lighting bake. The tier drops one step after 4 seconds under about 33 fps unless the
+URL pins it with `?gfx=`. All of it is display only; nothing here touches the model or the score.
+
 ## Model (perfusion/model.py)
 
 Lumped parameters, explicit Euler at 20 ms. Flows in L/min, volumes in mL, pressures in mmHg.

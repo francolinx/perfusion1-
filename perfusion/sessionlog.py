@@ -19,13 +19,17 @@ CALLOUT_LABEL = dict(CALLOUTS)
 SEV_RANK = dict(critical=0, major=1, minor=2)
 
 
+SERIES_KEYS = ("t", "flow", "rpm", "map", "do2i", "temp", "res", "svo2", "hct", "line_p", "cvp")
+SERIES_EVERY = 5.0      # seconds of case time between samples
+
+
 def mmss(t):
     t = int(t or 0)
     return f"{t // 60}:{t % 60:02d}"
 
 
 class SessionLog:
-    def __init__(self, folder, persona, build, practice=False, resumed_from=None):
+    def __init__(self, folder, persona, build, practice=False, resumed_from=None, student=""):
         self.folder = folder
         stamp = time.strftime("%Y%m%d-%H%M%S")
         sid, n = f"{stamp}-{persona.id}", 1
@@ -35,6 +39,7 @@ class SessionLog:
                         started_at=time.strftime("%Y-%m-%dT%H:%M:%S%z"), started_ts=time.time(),
                         ended_at=None, ended_ts=None, status="running", end_reason=None,
                         practice=practice, resumed_from=resumed_from, autopilot_used=False, build=build,
+                        student=student, series_keys=list(SERIES_KEYS), series=[], quiz=None,
                         case_time_start=None, case_time_end=None, final=None, events=[], summary=None)
         self.active = False          # nothing is written until the session actually starts
         self._lock = threading.Lock()  # the sim loop and HTTP threads both append and flush
@@ -60,6 +65,12 @@ class SessionLog:
         if kind in ("save", "load") or (kind == "action" and kw.get("action", {}).get("type") != "speed"):
             self.active = True       # a speed change alone (pause, 20x) does not make a session worth keeping
         self.dirty = True
+
+    def sample(self, row):
+        """One row of the run's time series (see SERIES_KEYS), for the run analysis charts."""
+        with self._lock:
+            self.doc["series"].append(row)
+            self.dirty = True
 
     def flush(self, force=False):
         with self._lock:
@@ -100,6 +111,7 @@ class SessionLog:
 def listing(doc):
     fin = doc.get("final") or {}
     return dict(id=doc["id"], started_at=doc["started_at"], started_ts=doc["started_ts"], persona=doc["persona"],
+                student=doc.get("student", ""),
                 status=doc["status"], practice=doc["practice"], resumed_from=doc.get("resumed_from"),
                 autopilot_used=doc.get("autopilot_used", False), score=fin.get("score"), phase=fin.get("phase"),
                 case_minutes=round(((doc.get("case_time_end") or 0) - (doc.get("case_time_start") or 0)) / 60, 1),
@@ -281,3 +293,14 @@ class SessionStore:
             raise ValueError("bad session id")
         with open(os.path.join(self.folder, sid + ".json")) as f:
             return json.load(f)
+
+    def update(self, sid, **fields):
+        """Set top-level fields on a stored session (used for the quiz result). Atomic replace."""
+        doc = self.read(sid)
+        doc.update(fields)
+        path = os.path.join(self.folder, sid + ".json")
+        tmp = f"{path}.{os.getpid()}.{threading.get_ident()}.tmp"
+        with open(tmp, "w") as f:
+            json.dump(doc, f, separators=(",", ":"))
+        os.replace(tmp, path)
+        return doc

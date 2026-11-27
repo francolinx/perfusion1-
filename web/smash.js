@@ -70,7 +70,7 @@ export function initSmash({ scene, camera, room, onQuip, pause }) {
   function kindOf(m) {
     if (m.userData.person) return 'body';
     const mt = m.material;
-    if (mt.isMeshBasicMaterial || (mt.transparent && mt.opacity < 0.9)) return 'glass';
+    if (mt.isMeshBasicMaterial || mt.transmission > 0 || (mt.transparent && mt.opacity < 0.9)) return 'glass';
     if (mt.metalness > 0.5) return 'metal';
     return 'plastic';
   }

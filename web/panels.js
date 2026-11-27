@@ -4,6 +4,15 @@
 const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; };
 const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
+// rolling 2 minute history of pump speed and flow for the pump panel, sampled once a second
+const trend = { t: 0, rpm: [], flow: [] };
+export function recordTrend(S) {
+  const now = Date.now();
+  if (now - trend.t < 1000 || !(S.speed > 0)) return;
+  trend.t = now; trend.rpm.push(S.rpm); trend.flow.push(S.flow);
+  if (trend.rpm.length > 120) { trend.rpm.shift(); trend.flow.shift(); }
+}
+
 export function buildPanels(act, state) {
   const set = (key, value) => act({ type: 'set', key, value });
 
@@ -28,6 +37,25 @@ export function buildPanels(act, state) {
     const w = el('div', 'read'); body.appendChild(w);
     return { update: (S) => { w.innerHTML = fn(S).map(([k, v, c]) => `<div class="v ${c || ''}"><div class="k">${k}</div><div class="n">${v}</div></div>`).join(''); } };
   }
+  // the two numbers a centrifugal console shows side by side, plus their recent history
+  function pumpFace(body) {
+    const w = el('div', 'pumpface', '<div class="seg"><div class="k">RPM</div><div class="n" data-k="rpm">0</div></div><div class="seg"><div class="k">L/min</div><div class="n" data-k="flow">0.00</div></div>');
+    const cv = el('canvas', 'trend'); cv.width = 840; cv.height = 180;
+    const st = el('div', 'pumpstatus');
+    body.append(w, st, cv);
+    const g = cv.getContext('2d');
+    return { update: (S) => {
+      w.querySelector('[data-k=rpm]').textContent = Math.round(S.rpm);
+      const f = w.querySelector('[data-k=flow]'); f.textContent = S.flow.toFixed(2); f.classList.toggle('bad', S.flow < -0.1);
+      st.textContent = S.flow < -0.1 ? 'BACKFLOW' : S.controls.art_clamp ? (S.rpm > 300 ? 'LINE CLAMPED, PUMP SPINNING' : 'LINE CLAMPED') : S.line_p > 300 ? 'PRESSURE HIGH' : `CI ${S.ci.toFixed(2)}  target ${S.target_flow.toFixed(1)} L/min`;
+      st.className = 'pumpstatus' + (S.flow < -0.1 || S.line_p > 300 ? ' bad' : '');
+      g.fillStyle = '#0c1f3f'; g.fillRect(0, 0, 840, 180);
+      g.strokeStyle = 'rgba(255,255,255,0.1)'; for (let i = 1; i < 4; i++) { g.beginPath(); g.moveTo(0, i * 45); g.lineTo(840, i * 45); g.stroke(); }
+      const line = (arr, max, col) => { g.strokeStyle = col; g.lineWidth = 3; g.beginPath(); arr.forEach((v, i) => { const x = 840 - (arr.length - 1 - i) * 7, y = 172 - Math.max(0, Math.min(1, v / max)) * 160; i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); };
+      line(trend.rpm, 4500, '#8ab4ff'); line(trend.flow, 7, '#6fe3a1');
+      g.font = '22px system-ui, sans-serif'; g.fillStyle = '#8ab4ff'; g.fillText('RPM', 10, 24); g.fillStyle = '#6fe3a1'; g.fillText('L/min', 70, 24); g.fillStyle = '#7f93a8'; g.fillText('last 2 min', 730, 24);
+    } };
+  }
   function note(body, text) { body.appendChild(el('div', 'note', text)); return {}; }
   function number(body, label, value, unit, go, btn) {
     const w = el('div', 'btns'), inp = el('input'); Object.assign(inp, { type: 'number', value, min: 0 });
@@ -38,12 +66,13 @@ export function buildPanels(act, state) {
 
   return {
     pump: { title: 'Pump console', build: (b) => [
+      pumpFace(b),
       read(b, (S) => [['Flow L/min', S.flow.toFixed(2), S.flow < -0.1 ? 'bad' : ''], ['Target', S.target_flow.toFixed(1)], ['Line pressure', S.line_p, S.line_p > 300 ? 'bad' : '']]),
       slider(b, 'Pump speed', 'rpm_set', 0, 4500, 10, (v) => `${v} RPM`),
       buttons(b, [['-100', () => set('rpm_set', state.S.controls.rpm_set - 100)], ['+100', () => set('rpm_set', state.S.controls.rpm_set + 100)],
         ['-500', () => set('rpm_set', state.S.controls.rpm_set - 500)], ['+500', () => set('rpm_set', state.S.controls.rpm_set + 500)]]),
       buttons(b, [['Arterial line clamped', () => set('art_clamp', true), (S) => S.controls.art_clamp], ['Arterial line open', () => set('art_clamp', false), (S) => !S.controls.art_clamp]]),
-      note(b, 'A centrifugal pump only makes pressure. Spin it up before you open the arterial line, and clamp the line before you stop, or blood runs backward.'),
+      note(b, 'A centrifugal pump only makes pressure, so RPM is what you set and L/min is what you get. The same RPM gives less flow when resistance rises. Spin it up before you open the arterial line, and clamp the line before you stop, or blood runs backward.'),
     ] },
     venous: { title: 'Venous clamp', build: (b) => [
       read(b, (S) => [['Drainage L/min', S.qv.toFixed(2)], ['CVP', S.cvp.toFixed(1)], ['Reservoir mL', S.res, S.res < 300 ? 'bad' : '']]),
