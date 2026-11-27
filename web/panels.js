@@ -1,0 +1,122 @@
+// Control panels for each piece of equipment. Each panel builds DOM controls that send
+// actions to the server and refresh from the polled state.
+
+const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; };
+const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+
+export function buildPanels(act, state) {
+  const set = (key, value) => act({ type: 'set', key, value });
+
+  function slider(body, label, key, min, max, step, show, scale = 1) {
+    const w = el('div', 'ctl'), top = el('div', 'top', `<span>${label}</span><b></b>`), inp = el('input');
+    Object.assign(inp, { type: 'range', min, max, step });
+    let busy = 0, sent = 0;
+    inp.oninput = () => {
+      busy = Date.now(); top.lastChild.textContent = show(Number(inp.value));
+      if (Date.now() - sent > 70) { sent = Date.now(); set(key, Number(inp.value) / scale); }
+    };
+    inp.onchange = () => set(key, Number(inp.value) / scale);
+    w.append(top, inp); body.appendChild(w);
+    return { update: (S) => { if (Date.now() - busy > 600) { inp.value = S.controls[key] * scale; top.lastChild.textContent = show(Number(inp.value)); } } };
+  }
+  function buttons(body, defs) {
+    const w = el('div', 'btns'); body.appendChild(w);
+    const items = defs.map(([label, fn, isOn, cls]) => { const b = el('button', cls || '', label); b.onclick = fn; w.appendChild(b); return { b, isOn }; });
+    return { update: (S) => items.forEach(({ b, isOn }) => isOn && b.classList.toggle('on', !!isOn(S))) };
+  }
+  function read(body, fn) {
+    const w = el('div', 'read'); body.appendChild(w);
+    return { update: (S) => { w.innerHTML = fn(S).map(([k, v, c]) => `<div class="v ${c || ''}"><div class="k">${k}</div><div class="n">${v}</div></div>`).join(''); } };
+  }
+  function note(body, text) { body.appendChild(el('div', 'note', text)); return {}; }
+  function number(body, label, value, unit, go, btn) {
+    const w = el('div', 'btns'), inp = el('input'); Object.assign(inp, { type: 'number', value, min: 0 });
+    const b = el('button', 'primary', btn); b.onclick = () => { const v = Number(inp.value); if (v > 0) go(v); };
+    w.append(el('span', '', label), inp, el('span', 'note', unit), b); body.appendChild(w);
+    return { inp };
+  }
+
+  return {
+    pump: { title: 'Pump console', build: (b) => [
+      read(b, (S) => [['Flow L/min', S.flow.toFixed(2), S.flow < -0.1 ? 'bad' : ''], ['Target', S.target_flow.toFixed(1)], ['Line pressure', S.line_p, S.line_p > 300 ? 'bad' : '']]),
+      slider(b, 'Pump speed', 'rpm_set', 0, 4500, 10, (v) => `${v} RPM`),
+      buttons(b, [['-100', () => set('rpm_set', state.S.controls.rpm_set - 100)], ['+100', () => set('rpm_set', state.S.controls.rpm_set + 100)],
+        ['-500', () => set('rpm_set', state.S.controls.rpm_set - 500)], ['+500', () => set('rpm_set', state.S.controls.rpm_set + 500)]]),
+      buttons(b, [['Arterial line clamped', () => set('art_clamp', true), (S) => S.controls.art_clamp], ['Arterial line open', () => set('art_clamp', false), (S) => !S.controls.art_clamp]]),
+      note(b, 'A centrifugal pump only makes pressure. Spin it up before you open the arterial line, and clamp the line before you stop, or blood runs backward.'),
+    ] },
+    venous: { title: 'Venous clamp', build: (b) => [
+      read(b, (S) => [['Drainage L/min', S.qv.toFixed(2)], ['CVP', S.cvp.toFixed(1)], ['Reservoir mL', S.res, S.res < 300 ? 'bad' : '']]),
+      slider(b, 'Venous line occlusion', 'ven_occl', 0, 100, 1, (v) => `${v}% closed`, 100),
+      buttons(b, [['Fully open', () => set('ven_occl', 0)], ['Half', () => set('ven_occl', 0.5)], ['Fully clamped', () => set('ven_occl', 1)]]),
+      note(b, 'Closing this keeps blood in the patient. That fills the heart for weaning, and it drops your reservoir.'),
+    ] },
+    gas: { title: 'Gas blender and vaporizer', build: (b) => [
+      read(b, (S) => [['PaCO2', Math.round(S.paco2), S.paco2 > 45 || S.paco2 < 35 ? 'warn' : ''], ['PaO2', S.pao2, S.pao2 < 150 ? 'warn' : ''], ['MAP', Math.round(S.map)]]),
+      slider(b, 'Sweep gas flow (removes CO2)', 'sweep', 0, 80, 1, (v) => `${(v / 10).toFixed(1)} L/min`, 10),
+      slider(b, 'Oxygen fraction (sets PaO2)', 'fio2', 21, 100, 1, (v) => `${v}%`, 100),
+      slider(b, 'Anesthetic vaporizer (lowers pressure)', 'iso', 0, 30, 1, (v) => `${(v / 10).toFixed(1)}%`, 10),
+    ] },
+    hc: { title: 'Heater-cooler', build: (b) => [
+      read(b, (S) => [['Water C', S.t_water.toFixed(1)], ['Arterial blood C', S.t_art.toFixed(1), S.t_art > 37.5 ? 'bad' : ''], ['Patient C', S.temp.toFixed(1)]]),
+      slider(b, 'Water set point', 'water_set', 150, 400, 5, (v) => `${(v / 10).toFixed(1)} C`, 10),
+      note(b, 'Keep the water within 10 C of the blood, and never send blood back over 37.5 C.'),
+    ] },
+    cp: { title: 'Cardioplegia', build: (b) => [
+      read(b, (S) => [['This dose mL', S.cp_dose], ['Line pressure', S.cp_pressure, S.cp_pressure > 300 ? 'bad' : ''], ['Sinus pressure', S.csp.toFixed(0), S.csp > 40 ? 'bad' : ''],
+        ['Total mL', S.cp_total], ['Since last dose', S.xclamp ? mmss(S.since_cp) : '--', S.since_cp > 1200 ? 'warn' : ''], ['Rhythm', S.rhythm]]),
+      buttons(b, [['Antegrade (aortic root)', () => set('cp_route', 'ante'), (S) => S.controls.cp_route === 'ante'], ['Retrograde (coronary sinus)', () => set('cp_route', 'retro'), (S) => S.controls.cp_route === 'retro']]),
+      buttons(b, [['High-K cold', () => set('cp_type', 'highK'), (S) => S.controls.cp_type === 'highK'], ['Low-K cold', () => set('cp_type', 'lowK'), (S) => S.controls.cp_type === 'lowK'],
+        ['Hot shot', () => set('cp_type', 'hot'), (S) => S.controls.cp_type === 'hot']]),
+      slider(b, 'Delivery flow', 'cp_flow', 0, 500, 10, (v) => `${v} mL/min`),
+      buttons(b, [['Start delivery', () => set('cp_on', true), (S) => S.controls.cp_on], ['Stop', () => set('cp_on', false), (S) => !S.controls.cp_on]]),
+      buttons(b, [['Root vent on', () => set('root_vent', true), (S) => S.controls.root_vent], ['Root vent off', () => set('root_vent', false), (S) => !S.controls.root_vent]]),
+      note(b, 'Vent off while giving antegrade so it does not steal the dose. Vent on the rest of the clamp time so the ventricle stays empty.'),
+    ] },
+    res: { title: 'Reservoir and suckers', build: (b) => [
+      read(b, (S) => [['Reservoir mL', S.res, S.res < 300 ? 'bad' : ''], ['Hct %', S.hct.toFixed(0)], ['MAP', Math.round(S.map)]]),
+      buttons(b, [['Transfuse 100 mL to patient', () => act({ type: 'transfuse', ml: 100 })], ['Add 250 mL crystalloid', () => act({ type: 'volume', ml: 250, kind: 'crystalloid' })],
+        ['Add 1 unit red cells', () => act({ type: 'volume', ml: 300, kind: 'prbc' })]]),
+      buttons(b, [['Suckers on', () => set('sucker', true), (S) => S.controls.sucker], ['Suckers off', () => set('sucker', false), (S) => !S.controls.sucker]]),
+      note(b, 'If this runs empty the pump sends air to the patient. Suckers must be off before protamine.'),
+    ] },
+    meds: { title: 'Drug cart', build: (b) => {
+      const w = state.S ? state.S.persona.weight : 75;
+      return [
+        read(b, (S) => [['Heparin given', S.hep_total + ' U'], ['Protamine given', S.prot_total + ' mg'], ['Last ACT', S.last_act ? S.last_act[1] + ' s' : '--']]),
+        number(b, 'Heparin', '', 'units', (v) => act({ type: 'heparin', units: v }), 'Give'),
+        number(b, 'Protamine', '', 'mg', (v) => act({ type: 'protamine', mg: v }), 'Give'),
+        buttons(b, [['Phenylephrine 100 mcg (raises pressure)', () => act({ type: 'phenylephrine', mcg: 100 })],
+          ['Epinephrine infusion', () => set('epi', !state.S.controls.epi), (S) => S.controls.epi]]),
+        note(b, `Patient weight ${w} kg. Say the units out loud: 300 what?`),
+      ];
+    } },
+    lab: { title: 'ACT and blood gas analyzer', build: (b) => [
+      buttons(b, [['Run ACT', () => act({ type: 'measure', what: 'act' }), null, 'primary'], ['Run blood gas', () => act({ type: 'measure', what: 'abg' }), null, 'primary']]),
+      read(b, (S) => {
+        const a = S.last_abg && S.last_abg[1];
+        return [['ACT s', S.last_act ? S.last_act[1] : '--', S.last_act && S.last_act[1] < 400 ? 'bad' : ''], ['Status', S.labs_pending ? 'running' : 'ready'], ['pH', a ? a.ph : '--'],
+          ['PaCO2', a ? a.paco2 : '--'], ['PaO2', a ? a.pao2 : '--'], ['K+', a ? a.k : '--', a && a.k > 6 ? 'bad' : ''],
+          ['Hct %', a ? a.hct : '--'], ['SvO2 %', a ? a.svo2 : '--'], ['Lactate', a ? a.lactate : '--']];
+      }),
+      note(b, 'Results take a few seconds. ACT over 480 before bypass; under 400 on bypass is an emergency.'),
+    ] },
+    vent: { title: 'Ventilator', build: (b) => [
+      buttons(b, [['Ventilator on', () => set('ventilator', true), (S) => S.controls.ventilator], ['Ventilator off', () => set('ventilator', false), (S) => !S.controls.ventilator]]),
+      read(b, (S) => [['SaO2 %', S.sao2.toFixed(0), S.sao2 < 92 ? 'bad' : ''], ['Pump flow', S.flow.toFixed(2)], ['Heart output', S.qh.toFixed(2)]]),
+      note(b, 'Off once the pump is doing all the work. Back on before you wean, or the heart pumps blue blood.'),
+    ] },
+    talk: { title: 'Talk to the surgeon', build: (b) => {
+      const S = state.S, items = [note(b, 'Closed-loop communication is graded. Say what you did when you have done it.')];
+      const w = el('div', 'btns'); b.appendChild(w);
+      state.META.callouts.forEach((c) => {
+        const btn = el('button', S && S.expected_callout === c.id ? 'primary' : '', c.label);
+        btn.onclick = () => { act({ type: 'callout', id: c.id }); btn.classList.add('on'); };
+        w.appendChild(btn);
+      });
+      const log = el('div', 'note'); b.appendChild(log);
+      items.push({ update: (S2) => { log.innerHTML = S2.lines.slice(-4).map((l) => `Surgeon: ${l.text}`).join('<br>'); } });
+      return items;
+    } },
+  };
+}

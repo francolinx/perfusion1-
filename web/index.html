@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>perfusion1 - bypass simulator</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="view"></canvas>
+<div id="cross"></div>
+<div id="hint"></div>
+
+<div id="hud-left" class="card">
+  <div class="row"><span id="phase-title" class="title">Before bypass</span><span id="score-chip" class="chip">100</span></div>
+  <div id="surgeon-line" class="surgeon"></div>
+  <ul id="objectives"></ul>
+</div>
+
+<div id="hud-right" class="card">
+  <div class="grid" id="vitals"></div>
+  <div id="alarms"></div>
+</div>
+
+<div id="hud-bottom" class="card">
+  <span class="lbl">Time</span>
+  <button data-speed="0">Pause</button><button data-speed="1">1x</button><button data-speed="5">5x</button><button data-speed="20">20x</button>
+  <span class="sep"></span>
+  <button id="btn-auto">Expert autopilot: off</button>
+  <button id="btn-tablet">Controls (Tab)</button>
+  <button id="btn-talk">Talk (T)</button>
+  <button id="btn-voice">Voice: on</button>
+  <button id="btn-smash">Smash mode (B)</button>
+  <span id="clock" class="lbl"></span>
+</div>
+
+<div id="smash-hud" class="card hidden"></div>
+<div id="tablet" class="card hidden"></div>
+<div id="panel" class="card hidden"><div class="row"><span id="panel-title" class="title"></span><button id="panel-close">Close (Esc)</button></div><div id="panel-body"></div></div>
+
+<div id="touch-move" class="touch"></div><div id="touch-stick" class="touch"></div>
+
+<div id="start" class="overlay">
+  <div class="modal">
+    <h1>perfusion1</h1>
+    <p class="sub">Run a full heart-lung machine case in a walk-around sim lab. Educational model, not clinically validated.</p>
+    <div id="persona-list"></div>
+    <div class="row gap">
+      <button id="btn-start" class="primary">Start case</button>
+      <button id="btn-watch">Watch the expert run it</button>
+    </div>
+    <p class="help"><b>Move</b> W A S D, <b>look</b> mouse (click the room first), <b>use equipment</b> walk up and press E or click, <b>talk to the surgeon</b> T, <b>all controls</b> Tab, <b>smash mode</b> B (just for fun: a bat, and everything breaks). On a phone: drag left side to move, right side to look, and use the Controls button.</p>
+  </div>
+</div>
+<div id="debrief" class="overlay hidden"><div class="modal" id="debrief-body"></div></div>
+
+<script type="importmap">{"imports": {"three": "./vendor/three.module.min.js"}}</script>
+<script type="module" src="main.js"></script>
+</body>
+</html>
