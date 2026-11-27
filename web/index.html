@@ -33,6 +33,7 @@
   <button id="btn-voice">Voice: on</button>
   <button id="btn-saves">Save / Load (F9)</button>
   <button id="btn-sessions">Sessions</button>
+  <button id="btn-gfx">Graphics: high</button>
   <button id="btn-smash">Smash mode (B)</button>
   <span id="clock" class="lbl"></span>
 </div>
@@ -49,12 +50,16 @@
   <div class="modal">
     <h1>perfusion1</h1>
     <p class="sub">Run a full heart-lung machine case in a walk-around sim lab. Educational model, not clinically validated.</p>
+    <div class="row namerow"><label for="student-name">Your name</label><input id="student-name" type="text" maxlength="24" placeholder="Name or nickname" autocomplete="off">
+      <label class="chk"><input id="unlock-all" type="checkbox"> Unlock all levels (instructor)</label></div>
+    <div id="start-error" class="err"></div>
     <div id="persona-list"></div>
     <div class="row gap">
       <button id="btn-start" class="primary">Start case</button>
       <button id="btn-watch">Watch the expert run it</button>
       <button id="btn-load-start">Load a save (F9)</button>
       <button id="btn-sessions-start">Past sessions</button>
+      <button id="btn-board-start">Leaderboard</button>
     </div>
     <p class="help"><b>Move</b> W A S D, <b>look</b> mouse (click the room first), <b>jump</b> Space, <b>crouch</b> C or Ctrl, <b>sprint</b> Shift or double-tap W, <b>third person</b> V, <b>use equipment</b> walk up and press E or click, <b>talk to the surgeon</b> T, <b>all controls</b> Tab, <b>quick-save</b> F5, <b>save / load</b> F9, <b>smash mode</b> B (just for fun: a bat, and everything breaks; click or F to swing). On a phone: drag left side to move, right side to look, Jump / Crouch / View buttons, and the Controls button.</p>
   </div>
@@ -65,7 +70,7 @@
 <div id="confirm" class="overlay hidden"><div class="modal small" id="confirm-body"></div></div>
 <div id="toast"></div>
 
-<script type="importmap">{"imports": {"three": "./vendor/three.module.min.js"}}</script>
+<script type="importmap">{"imports": {"three": "./vendor/three.module.min.js", "three/addons/": "./vendor/addons/"}}</script>
 <script type="module" src="main.js"></script>
 </body>
 </html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>perfusion1 - run analysis</title><link rel="icon" href="data:,"><link rel="stylesheet" href="pages.css">
+</head>
+<body><main>
+<h1 id="title">Run analysis</h1>
+<p class="sub" id="sub"><a href="/leaderboard">Leaderboard</a> &middot; <a href="/">Simulator</a></p>
+<div id="tiles" class="tiles"></div>
+<div id="notes"></div>
+<h2>The run over time</h2>
+<p class="muted">Coloured vertical lines mark findings (yellow minor, orange major, red critical). Grey lines are phase changes. Green bands are the ranges the simulator scores as in range. Teaching values, not clinical reference values.</p>
+<div id="charts"></div>
+<h2>What was flagged</h2><div id="findings"></div>
+<h2>Summary</h2><div class="card"><pre id="summary"></pre></div>
+<h2>Checklist</h2><div id="check" class="check"></div>
+<h2>Quiz</h2><div id="quiz" class="card"></div>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const mmss = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+const SEV = { minor: '#d6a531', major: '#e2742d', critical: '#e23a3a' };
+const CHARTS = [
+  { title: 'Pump speed and flow', series: [['rpm', 'RPM', '#8ab4ff', 'right'], ['flow', 'Flow L/min', '#6fe3a1', 'left']], left: [0, 7], right: [0, 4500] },
+  { title: 'Mean arterial pressure (mmHg)', series: [['map', 'MAP', '#ff7a7a', 'left']], left: [0, 130], band: [50, 80] },
+  { title: 'Oxygen delivery index (mL/min/m2) and venous saturation (%)', series: [['do2i', 'DO2i', '#ffd24d', 'left'], ['svo2', 'SvO2 %', '#b79cff', 'right']], left: [0, 600], right: [0, 100], band: [280, 600] },
+  { title: 'Patient temperature (C)', series: [['temp', 'Temp', '#ffa25a', 'left']], left: [30, 38] },
+  { title: 'Reservoir level (mL) and hematocrit (%)', series: [['res', 'Reservoir', '#ff9dbb', 'left'], ['hct', 'Hct %', '#9fe0e0', 'right']], left: [0, 3000], right: [0, 50], band: [300, 3000] },
+];
+function draw(cv, spec, doc) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2), W = cv.clientWidth, H = cv.clientHeight;
+  cv.width = W * dpr; cv.height = H * dpr; const g = cv.getContext('2d'); g.scale(dpr, dpr);
+  const keys = doc.series_keys, rows = doc.series, L = 46, R = spec.right ? 46 : 12, T = 26, B = 22;
+  const t0 = rows[0][0], t1 = Math.max(rows[rows.length - 1][0], t0 + 1);
+  const X = (t) => L + ((t - t0) / (t1 - t0)) * (W - L - R), Y = (v, [lo, hi]) => T + (1 - (Math.min(hi, Math.max(lo, v)) - lo) / (hi - lo)) * (H - T - B);
+  g.font = '12px system-ui, sans-serif'; g.textBaseline = 'middle';
+  if (spec.band) { g.fillStyle = 'rgba(63,160,110,0.14)'; g.fillRect(L, Y(spec.band[1], spec.left), W - L - R, Y(spec.band[0], spec.left) - Y(spec.band[1], spec.left)); }
+  g.strokeStyle = 'rgba(255,255,255,0.08)'; g.fillStyle = '#8b97a3'; g.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = T + (i / 4) * (H - T - B); g.beginPath(); g.moveTo(L, y); g.lineTo(W - R, y); g.stroke();
+    const lv = spec.left[1] - (i / 4) * (spec.left[1] - spec.left[0]); g.textAlign = 'right'; g.fillText(lv % 1 ? lv.toFixed(1) : lv, L - 6, y);
+    if (spec.right) { const rv = spec.right[1] - (i / 4) * (spec.right[1] - spec.right[0]); g.textAlign = 'left'; g.fillText(Math.round(rv), W - R + 6, y); }
+  }
+  g.textAlign = 'center';
+  const step = Math.max(300, Math.ceil((t1 - t0) / 8 / 300) * 300);
+  for (let t = Math.ceil(t0 / step) * step; t <= t1; t += step) g.fillText(Math.round(t / 60) + ' min', X(t), H - 9);
+  for (const e of doc.events) if (e.kind === 'phase') { g.strokeStyle = 'rgba(255,255,255,0.18)'; g.setLineDash([3, 4]); g.beginPath(); g.moveTo(X(e.t), T); g.lineTo(X(e.t), H - B); g.stroke(); g.setLineDash([]); }
+  for (const f of (doc.final && doc.final.findings) || []) { g.strokeStyle = SEV[f.sev] || '#fff'; g.lineWidth = 2; g.beginPath(); g.moveTo(X(f.t), T); g.lineTo(X(f.t), H - B); g.stroke(); }
+  let lx = L;
+  for (const [key, label, color, side] of spec.series) {
+    const k = keys.indexOf(key), rng = side === 'right' ? spec.right : spec.left;
+    g.strokeStyle = color; g.lineWidth = 1.8; g.beginPath();
+    rows.forEach((r, i) => (i ? g.lineTo(X(r[0]), Y(r[k], rng)) : g.moveTo(X(r[0]), Y(r[k], rng)))); g.stroke();
+    g.fillStyle = color; g.textAlign = 'left'; g.fillRect(lx, 9, 12, 3); g.fillText(label + (side === 'right' ? ' (right axis)' : ''), lx + 16, 11); lx += g.measureText(label + (side === 'right' ? ' (right axis)' : '')).width + 40;
+  }
+}
+async function quizUI(id) {
+  const box = $('quiz');
+  const q = await fetch('/api/quiz/' + encodeURIComponent(id)).then((r) => r.json());
+  if (q.error) { box.innerHTML = `<span class="muted">${esc(q.error)}</span>`; return; }
+  const show = (res) => { box.innerHTML = `<b>${res.score} of ${res.total} correct</b>` + res.items.map((it) => `<div class="find ${it.correct ? '' : 'major'}"><b>${esc(it.q)}</b><br><span class="${it.correct ? 'yes' : 'no'}">${it.correct ? 'Correct' : 'Not quite'}.</span> ${esc(it.answer_text)}. <span class="muted">${esc(it.why)}</span></div>`).join(''); };
+  if (q.result) return show(q.result);
+  box.innerHTML = q.questions.map((it, i) => `<div style="margin-bottom:12px"><b>${i + 1}. ${esc(it.q)}</b>${it.options.map((o, k) => `<label style="display:block;padding:4px 0"><input type="radio" name="q${i}" value="${k}"> ${esc(o)}</label>`).join('')}</div>`).join('') + '<button id="send">Check answers</button> <span id="qerr" class="err"></span>';
+  $('send').onclick = async () => {
+    const ans = q.questions.map((_, i) => { const c = box.querySelector(`input[name=q${i}]:checked`); return c ? Number(c.value) : null; });
+    if (ans.some((a) => a === null)) { $('qerr').textContent = 'Answer every question first.'; return; }
+    const r = await fetch('/api/quiz/' + encodeURIComponent(id), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ answers: ans }) }).then((x) => x.json());
+    if (r.result) show(r.result); else $('qerr').textContent = r.error || 'Could not save the quiz.';
+  };
+}
+async function main() {
+  const id = new URLSearchParams(location.search).get('id');
+  let doc;
+  try { doc = await fetch('/api/sessions/' + encodeURIComponent(id || '')).then((r) => r.json()); } catch (e) { doc = { error: 'Cannot reach the simulator.' }; }
+  if (!doc || doc.error) { $('title').textContent = 'Run not found'; $('notes').innerHTML = `<p class="err">${esc((doc && doc.error) || 'No run with that id.')}</p>`; return; }
+  const fin = doc.final || {}, who = doc.student || (doc.autopilot_used ? 'Expert autopilot' : 'Unnamed');
+  $('title').textContent = `${who}: ${doc.persona.name}`;
+  $('sub').innerHTML = `${esc((doc.started_at || '').slice(0, 16).replace('T', ' '))} &middot; <a href="/leaderboard">Leaderboard</a> &middot; <a href="/">Simulator</a>`;
+  const tile = (k, v) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div></div>`;
+  $('tiles').innerHTML = tile('Score', fin.score != null ? fin.score : '--') + tile('Findings', (fin.findings || []).length) + tile('Pressure in range', (fin.map_in_range != null ? fin.map_in_range : '--') + '%') +
+    tile('O2 delivery on target', (fin.do2_in_range != null ? fin.do2_in_range : '--') + '%') + tile('Callouts', fin.callouts ? `${fin.callouts.made}/${fin.callouts.due}` : '--') +
+    tile('Case time', mmss((doc.case_time_end || 0) - (doc.case_time_start || 0)));
+  const notes = [];
+  if (doc.status !== 'complete') notes.push('This run was not finished, so it has no final score.');
+  if (doc.practice) notes.push('Practice run (resumed from a save): not ranked.');
+  if (doc.autopilot_used) notes.push('The expert autopilot flew some or all of this run: not ranked.');
+  $('notes').innerHTML = notes.map((n) => `<div class="find minor">${esc(n)}</div>`).join('');
+  if (doc.series && doc.series.length > 1) {
+    $('charts').innerHTML = CHARTS.map((c, i) => `<div><b>${esc(c.title)}</b><canvas class="chart" id="c${i}"></canvas></div>`).join('');
+    const redraw = () => CHARTS.forEach((c, i) => draw($('c' + i), c, doc)); redraw(); window.addEventListener('resize', redraw);
+  } else $('charts').innerHTML = '<p class="muted">This run was recorded before charts were added, so it has no time series.</p>';
+  const f = fin.findings || [];
+  $('findings').innerHTML = f.length ? f.map((x) => `<div class="find ${esc(x.sev)}"><b>${esc(x.sev)}</b> at ${mmss(x.t)} (${esc(x.phase)}): ${esc(x.msg)}</div>`).join('') : '<div class="find">Nothing flagged.</div>';
+  $('summary').textContent = (doc.summary && doc.summary.text) || 'No summary yet.';
+  $('check').innerHTML = (fin.checklist || []).map((c) => `<div class="${c.done ? 'yes' : 'no'}">${c.done ? 'done' : 'missed'}: ${esc(c.label)}</div>`).join('');
+  quizUI(doc.id);
+}
+main();
+</script>
+</body></html>

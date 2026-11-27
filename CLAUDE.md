@@ -26,6 +26,10 @@ Open 3D cardiopulmonary bypass trainer. Read `README.md`, `docs/ARCHITECTURE.md`
   debrief prose, never decide the score.
 - Every model or rule change needs a test in `tests/test_sim.py`, and the expert autopilot must
   still finish every persona with no critical findings.
+- The leaderboard ranks only clean student runs (finished, named, no autopilot, not resumed from a save) by a
+  fixed rule in `leaderboard.rank_key`. Quiz answers must restate rules or constants the simulator enforces,
+  and every quiz tag must be a finding code the simulator can raise (a test checks this).
+- Do not copy another product's screens, wording, scenarios or art. Match features only.
 - Educational use only. Do not present model numbers as clinical reference values. Constants are
   teaching approximations pending review by a certified clinical perfusionist.
 - Use `Co-Authored-By` trailers as configured; commit on a branch and open a pull request.
@@ -39,6 +43,11 @@ Open 3D cardiopulmonary bypass trainer. Read `README.md`, `docs/ARCHITECTURE.md`
 - Server and API: `perfusion/server.py`
 - 3D room, HUD, input: `web/main.js`; equipment control panels: `web/panels.js`
 - Smash mode (cosmetic rage room, client only, never graded): `web/smash.js`
+- Rendering quality (image-based light, bloom, ambient occlusion, tiers that step down when slow): `web/gfx.js`;
+  three.js addon modules are vendored in `web/vendor/addons/` and resolved by the importmap in `web/index.html`
+- Student name, level locks, rank and quiz in the debrief: `web/game.js`; leaderboard ranking and levels:
+  `perfusion/leaderboard.py`; quiz bank and grading: `perfusion/quiz.py`; pages `web/leaderboard.html`,
+  `web/run.html` (run analysis charts from the session log's time series), shared `web/pages.css`
 - Player avatar and third-person body (cosmetic, client only): `web/player.js`
 - Save / load (exact case state, saves/ folder): `perfusion/saves.py`; session logs and the rule-based
   summary (logs/ folder): `perfusion/sessionlog.py`; their screens: `web/saves.js`

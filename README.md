@@ -43,6 +43,14 @@ tokens per second, requests and last error, or "not running"; CPU, unified memor
 - **Ten patients**: standard adult (the 75 kg case from the lab video), small anemic,
   large adult, low ejection fraction, kidney disease, heparin resistance, aortic insufficiency,
   vasoplegia, hypertension, Jehovah's Witness. `docs/BENCHMARK.md` has the 100-run benchmark.
+- **Names, levels and a leaderboard**: each student flies under a name. Patients are grouped into four
+  levels that unlock in order (pass mark 70 with no critical finding). `/leaderboard` ranks clean runs,
+  and every row opens `/run`, an analysis page with charts of pump RPM, flow, pressure, oxygen delivery,
+  temperature and reservoir level over the case, with each finding marked where it happened.
+- **Pump RPM and L/min side by side**, always on screen and on the pump panel with a 2 minute trend.
+- **A four-question quiz after each run**, picked from what went wrong in that run.
+- **Graphics tiers**: image-based lighting, soft shadows, bloom and ambient occlusion on desktop GPUs,
+  stepping down by itself on slower machines. `?gfx=high`, `?gfx=med` or `?gfx=low` pins a tier.
 - **Debrief**: score, checklist, time in range for pressure and oxygen delivery, callouts made,
   and every finding with its timestamp. The sequencing error from the lab video (bringing flow
   back up before the clamp is off) is one of the things it catches.

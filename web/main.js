@@ -4,6 +4,10 @@ import { buildPanels } from './panels.js';
 import { initSmash } from './smash.js';
 import { buildAvatar } from './player.js';
 import { initSaves } from './saves.js';
+import { initGame } from './game.js';
+import { recordTrend } from './panels.js';
+import { initGfx, pickTier } from './gfx.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 const $ = (id) => document.getElementById(id);
 const STATE_URL = '/api/state?c=' + Math.random().toString(36).slice(2, 10);   // per-tab id, so /dashboard can count connected clients
@@ -14,11 +18,11 @@ export const state = { S: null, META: null };
 // ---------------------------------------------------------------- renderer
 const canvas = $('view');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+const TIER = pickTier(), HQ = TIER !== 'low', GLASS = TIER === 'high';   // materials are built for the starting tier
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = 0.92;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1a1f26);
 const camera = new THREE.PerspectiveCamera(70, 1, 0.05, 60);
@@ -28,13 +32,16 @@ const player = { x: 0.9, z: 1.6, yaw: 0.72, pitch: -0.16, h: 1.65, y: 0, vy: 0, 
 const EYE = 1.65, EYE_CROUCH = 1.28, GRAVITY = 24, JUMP_V = 5.4;          // jump apex about 0.6 m
 const WALK = 2.3, SPRINT = 4.2, SNEAK = 0.75, FOV = 70, FOV_SPRINT = 78;
 
+const gfx = initGfx({ renderer, scene, camera, tier: TIER, onTier: (t) => { const b = $('btn-gfx'); if (b) b.textContent = 'Graphics: ' + t; } });
 function resize() {
-  renderer.setSize(window.innerWidth, window.innerHeight, false);
+  gfx.resize(window.innerWidth, window.innerHeight);
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 }
 window.addEventListener('resize', resize);
 resize();
+$('btn-gfx').textContent = 'Graphics: ' + gfx.tier;
+$('btn-gfx').onclick = () => gfx.next();
 
 // ---------------------------------------------------------------- helpers
 const mat = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.7, metalness: 0.05, ...o });
@@ -45,7 +52,16 @@ function add(parent, geo, material, x = 0, y = 0, z = 0, shadow = true) {
   parent.add(m);
   return m;
 }
-const box = (p, w, h, d, m, x, y, z) => add(p, new THREE.BoxGeometry(w, h, d), m, x, y, z);
+// boxes get softened edges on the better tiers: it is what stops everything reading as a crate
+function boxGeo(w, h, d) {
+  const s = Math.min(w, h, d);
+  return HQ && s >= 0.05 && Math.max(w, h, d) <= 2.6 ? new RoundedBoxGeometry(w, h, d, 2, Math.min(0.03, s * 0.22)) : new THREE.BoxGeometry(w, h, d);
+}
+const box = (p, w, h, d, m, x, y, z) => add(p, boxGeo(w, h, d), m, x, y, z);
+// clear plastic: real refraction on the high tier, plain transparency elsewhere
+const glass = (color, opacity, o = {}) => (GLASS
+  ? new THREE.MeshPhysicalMaterial({ color, transmission: 1, thickness: 0.02, ior: 1.5, roughness: 0.05, metalness: 0, envMapIntensity: 1.4, ...o })
+  : mat(color, { transparent: true, opacity, roughness: 0.08, depthWrite: false, ...o }));
 const cyl = (p, rt, rb, h, m, x, y, z, seg = 28) => add(p, new THREE.CylinderGeometry(rt, rb, h, seg), m, x, y, z);
 function canvasTex(w, h) {
   const c = document.createElement('canvas'); c.width = w; c.height = h;
@@ -81,7 +97,7 @@ const block = (x0, x1, z0, z1) => obstacles.push([x0, x1, z0, z1]);
     }
   }
   f.t.wrapS = f.t.wrapT = THREE.RepeatWrapping; f.t.repeat.set(3.5, 2.5);
-  const floor = add(scene, new THREE.PlaneGeometry(14, 10), mat(0xffffff, { map: f.t, roughness: 0.55 }), 0, 0, 0, false);
+  const floor = add(scene, new THREE.PlaneGeometry(14, 10), mat(0xd6cfc6, { map: f.t, roughness: 0.36, envMapIntensity: 0.6 }), 0, 0, 0, false);
   floor.rotation.x = -Math.PI / 2;
   // ceiling tiles with light panels
   const c = canvasTex(512, 512), cg = c.ctx;
@@ -91,10 +107,11 @@ const block = (x0, x1, z0, z1) => obstacles.push([x0, x1, z0, z1]);
   c.t.wrapS = c.t.wrapT = THREE.RepeatWrapping; c.t.repeat.set(5, 3.5);
   const ceil = add(scene, new THREE.PlaneGeometry(14, 10), mat(0xffffff, { map: c.t }), 0, ROOM.h, 0, false);
   ceil.rotation.x = Math.PI / 2;
-  const lightMat = new THREE.MeshBasicMaterial({ color: 0xfffbe8 });
-  for (const lx of [-4.5, -1.5, 1.5, 4.5]) for (const lz of [-3, 0, 3]) {
-    const p = add(scene, new THREE.CircleGeometry(0.16, 20), lightMat, lx, ROOM.h - 0.01, lz, false);
+  const lightMat = new THREE.MeshBasicMaterial({ color: 0xfffdf2 }), bezel = mat(0xc9ccc8, { metalness: 0.3, roughness: 0.5 });
+  for (const lx of [-4.5, -1.5, 1.5, 4.5]) for (const lz of [-3, 0, 3]) {    // recessed LED panels
+    const p = add(scene, new THREE.PlaneGeometry(1.12, 0.52), lightMat, lx, ROOM.h - 0.012, lz, false);
     p.rotation.x = Math.PI / 2;
+    const b = add(scene, new THREE.PlaneGeometry(1.22, 0.62), bezel, lx, ROOM.h - 0.008, lz, false); b.rotation.x = Math.PI / 2;
   }
   // walls
   const wall = mat(0xe6e2d8), navy = mat(0x1d2c4d), trim = mat(0xb9a98a);
@@ -134,14 +151,23 @@ const block = (x0, x1, z0, z1) => obstacles.push([x0, x1, z0, z1]);
   // supply bins along the wall
   for (let i = 0; i < 4; i++) box(scene, 0.7, 0.3, 0.45, white, 1.0 + i * 0.85, 0.15, 4.5);
   // lights
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a7a66, 0.95));
-  const sun = new THREE.DirectionalLight(0xfff4e0, 1.5);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a7a66, 0.34));
+  gfx.fill = new THREE.HemisphereLight(0xffffff, 0x9a8a76, scene.environment ? 0 : 0.5); scene.add(gfx.fill);   // stands in for image-based light on the low tier
+  const sun = new THREE.DirectionalLight(0xfff4e0, 0.95);
   sun.position.set(2.5, 6, 3.5); sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
   Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 0.5, far: 20 });
   sun.shadow.bias = -0.0005;
   scene.add(sun);
-  const fill = new THREE.PointLight(0xfff0d8, 14, 9); fill.position.set(1, 2.8, -1); scene.add(fill);
+  const fill = new THREE.PointLight(0xfff0d8, 5, 9); fill.position.set(1, 2.8, -1); scene.add(fill);
+  // set dressing: door, wall clock, baseboards
+  const doorM = mat(0x8c6a4a, { roughness: 0.6 }), frameM = mat(0xd8d2c4);
+  box(scene, 0.06, 2.1, 1.0, doorM, 6.99, 1.05, 2.6); box(scene, 0.08, 2.2, 0.08, frameM, 6.98, 1.1, 2.06); box(scene, 0.08, 2.2, 0.08, frameM, 6.98, 1.1, 3.14);
+  box(scene, 0.08, 0.08, 1.16, frameM, 6.98, 2.2, 2.6); cyl(scene, 0.02, 0.02, 0.12, mat(0xb9bec4, { metalness: 0.8, roughness: 0.3 }), 6.93, 1.0, 2.25).rotation.z = Math.PI / 2;
+  for (const [bx, bz, bw, bd] of [[0, 4.98, 14, 0.04], [-6.98, 0, 0.04, 10], [6.98, -1.2, 0.04, 6.4]]) box(scene, bw, 0.12, bd, trim, bx, 0.06, bz);
+  const clock = cyl(scene, 0.17, 0.17, 0.03, mat(0xf4f4f0), -0.4, 2.45, -4.98, 36); clock.rotation.x = Math.PI / 2;
+  cyl(scene, 0.18, 0.18, 0.02, mat(0x22262b), -0.4, 2.45, -4.99, 36).rotation.x = Math.PI / 2;
+  box(scene, 0.012, 0.11, 0.006, mat(0x111111), -0.4, 2.49, -4.96); box(scene, 0.09, 0.012, 0.006, mat(0x111111), -0.36, 2.45, -4.96);
 })();
 
 // ---------------------------------------------------------------- tubing
@@ -156,7 +182,9 @@ const tubes = {};
 function tube(name, pts, r = 0.013) {
   const curve = new THREE.CatmullRomCurve3(pts.map((p) => new THREE.Vector3(...p)));
   const map = flowTex.clone(); map.needsUpdate = true; map.repeat.set(Math.round(curve.getLength() * 9), 1);
-  const m = add(scene, new THREE.TubeGeometry(curve, 80, r, 10), mat(0xe8a0a8, { map, roughness: 0.3, transparent: true, opacity: 0.92 }));
+  const tm = HQ ? new THREE.MeshPhysicalMaterial({ color: 0xe8a0a8, map, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.08, transparent: true, opacity: 0.95 })
+    : mat(0xe8a0a8, { map, roughness: 0.3, transparent: true, opacity: 0.92 });
+  const m = add(scene, new THREE.TubeGeometry(curve, 96, r, 14), tm);
   (tubes[name] = tubes[name] || []).push({ m, map });
 }
 const PRIME = new THREE.Color(0xf0a6ae), DARK = new THREE.Color(0x5a0c1c), BRIGHT = new THREE.Color(0xe01f2d), PLEGE = new THREE.Color(0xd9722a);
@@ -203,19 +231,20 @@ const P = {};  // animated parts
   box(hlm, 0.3, 0.03, 0.04, black, -0.22, 1.0, 0.0);
   cyl(hlm, 0.168, 0.168, 0.06, mat(0xf2c21a, { roughness: 0.35 }), -0.05, 1.06, 0.16);
   for (let i = 0; i < 6; i++) cyl(hlm, 0.012, 0.012, 0.04, mat(i % 2 ? 0x2f6fd1 : 0xffffff), -0.05 + Math.cos(i) * 0.1, 1.11, 0.16 + Math.sin(i) * 0.1);
-  const shell = mat(0xdfeaf2, { transparent: true, opacity: 0.22, roughness: 0.05, side: THREE.DoubleSide, depthWrite: false });
+  const shell = glass(0xeaf3fa, 0.22, GLASS ? {} : { side: THREE.DoubleSide });
   cyl(hlm, 0.155, 0.12, 0.3, shell, -0.05, 0.88, 0.16);
   cyl(hlm, 0.12, 0.03, 0.12, shell, -0.05, 0.67, 0.16);
-  cyl(hlm, 0.07, 0.07, 0.26, mat(0xf2c21a, { transparent: true, opacity: 0.55 }), -0.05, 0.9, 0.16);
-  P.fluid = cyl(hlm, 0.148, 0.118, 0.3, mat(0xb01828, { transparent: true, opacity: 0.85, roughness: 0.15 }), -0.05, 0.88, 0.16);
-  P.fluidTip = cyl(hlm, 0.116, 0.03, 0.115, mat(0xb01828, { transparent: true, opacity: 0.85, roughness: 0.15 }), -0.05, 0.67, 0.16);
+  cyl(hlm, 0.07, 0.07, 0.26, mat(0xf2c21a, GLASS ? { roughness: 0.5 } : { transparent: true, opacity: 0.55 }), -0.05, 0.9, 0.16);
+  const bloodM = () => mat(0xb01828, GLASS ? { roughness: 0.12 } : { transparent: true, opacity: 0.85, roughness: 0.15 });
+  P.fluid = cyl(hlm, 0.148, 0.118, 0.3, bloodM(), -0.05, 0.88, 0.16);
+  P.fluidTip = cyl(hlm, 0.116, 0.03, 0.115, bloodM(), -0.05, 0.67, 0.16);
   // oxygenator (white drum, clear end)
   const ox = cyl(hlm, 0.1, 0.1, 0.22, white, -0.3, 0.46, 0.22); ox.rotation.z = Math.PI / 2;
   P.oxyCap = cyl(hlm, 0.102, 0.102, 0.06, mat(0xe9a6ae, { transparent: true, opacity: 0.7 }), -0.16, 0.46, 0.22); P.oxyCap.rotation.z = Math.PI / 2;
   box(hlm, 0.2, 0.03, 0.08, steel, -0.3, 0.6, 0.12);
   // centrifugal pump: blue drive, clear cone, spinning impeller
   cyl(hlm, 0.075, 0.075, 0.2, mat(0x5b84b8, { roughness: 0.4 }), 0.22, 0.42, 0.3);
-  cyl(hlm, 0.03, 0.075, 0.08, mat(0xf0f4f8, { transparent: true, opacity: 0.35, roughness: 0.05 }), 0.22, 0.56, 0.3);
+  cyl(hlm, 0.03, 0.075, 0.08, glass(0xf0f4f8, 0.35), 0.22, 0.56, 0.3);
   P.impeller = new THREE.Group(); P.impeller.position.set(0.22, 0.54, 0.3); hlm.add(P.impeller);
   for (let i = 0; i < 4; i++) { const b = box(P.impeller, 0.11, 0.025, 0.012, mat(0xc0283a), 0, 0, 0); b.rotation.y = (i * Math.PI) / 4; }
   // alarm beacon
@@ -277,14 +306,45 @@ function person(x, z, rotY, scrub, name) {
   box(g, 0.44, 0.62, 0.24, s, 0, 1.11, 0);
   g.armL = box(g, 0.13, 0.56, 0.14, s, -0.3, 1.12, 0.06); g.armR = box(g, 0.13, 0.56, 0.14, s, 0.3, 1.12, 0.06);
   g.armL.rotation.x = g.armR.rotation.x = -0.9; g.armL.position.z = g.armR.position.z = 0.22;
-  g.head = box(g, 0.24, 0.26, 0.24, skin, 0, 1.56, 0);
-  box(g, 0.26, 0.1, 0.26, mat(0x6fb7cf), 0, 1.69, 0);       // cap
-  box(g, 0.25, 0.1, 0.03, mat(0xdfeef5), 0, 1.5, 0.125);     // mask
-  box(g, 0.05, 0.03, 0.01, sh, -0.06, 1.6, 0.125); box(g, 0.05, 0.03, 0.01, sh, 0.06, 1.6, 0.125);
+  // head with cap, mask and eyes as its children, so they turn together
+  g.head = add(g, new THREE.SphereGeometry(0.135, 24, 18), skin, 0, 1.57, 0); g.head.scale.set(0.94, 1.06, 1);
+  const capM = mat(0x6fb7cf, { roughness: 0.9 });
+  add(g.head, new THREE.SphereGeometry(0.142, 24, 12, 0, Math.PI * 2, 0, Math.PI * 0.46), capM, 0, 0.012, -0.004);
+  const mask = add(g.head, new THREE.SphereGeometry(0.139, 24, 10, Math.PI * 0.22, Math.PI * 0.56, Math.PI * 0.52, Math.PI * 0.3), mat(0xdfeef5, { roughness: 0.95 }), 0, 0, 0.004);
+  mask.rotation.y = -Math.PI / 2;
+  for (const ex of [-0.05, 0.05]) add(g.head, new THREE.SphereGeometry(0.014, 10, 8), sh, ex, 0.03, 0.124, false);
+  cyl(g, 0.055, 0.065, 0.08, skin, 0, 1.44, 0, 14);          // neck
   block(x - 0.3, x + 0.3, z - 0.25, z + 0.25);
   g.name = name; g.traverse((m) => { m.userData.person = name; });
   return g;
 }
+// surgical lights on ceiling arms, a mayo stand with instruments and an IV pole
+(function dressOR() {
+  const steel = mat(0xb4bcc5, { metalness: 0.85, roughness: 0.25 }), white = mat(0xf2f4f6, { roughness: 0.35 });
+  const lamp = new THREE.MeshBasicMaterial({ color: 0xf1ede0 });
+  for (const [lx, lz, tilt] of [[1.95, -0.95, 0.28], [2.95, -1.5, -0.22]]) {
+    cyl(scene, 0.04, 0.04, 0.5, steel, lx, ROOM.h - 0.25, lz);
+    cyl(scene, 0.025, 0.025, 0.36, steel, lx, 2.52, lz);
+    const head = new THREE.Group(); head.position.set(lx, 2.3, lz); head.rotation.z = tilt; scene.add(head);
+    cyl(head, 0.34, 0.3, 0.09, white, 0, 0, 0, 40);
+    const face = add(head, new THREE.CircleGeometry(0.28, 40), lamp, 0, -0.047, 0, false); face.rotation.x = Math.PI / 2;
+    cyl(head, 0.03, 0.03, 0.14, steel, 0, -0.1, 0, 12);
+    const spot = new THREE.SpotLight(0xfff6e6, 7, 5, 0.5, 0.7, 1.4);
+    spot.position.set(lx, 2.22, lz); spot.target.position.set(TABLE.x + 0.1, 1.05, TABLE.z);
+    if (HQ && lx < 2.5) { spot.castShadow = true; spot.shadow.mapSize.set(1024, 1024); spot.shadow.bias = -0.0008; }
+    scene.add(spot, spot.target);
+  }
+  const mayo = new THREE.Group(); mayo.position.set(3.25, 0, -0.35); scene.add(mayo);
+  cyl(mayo, 0.02, 0.02, 1.0, steel, 0.22, 0.5, 0); box(mayo, 0.5, 0.03, 0.06, steel, 0, 0.03, 0); box(mayo, 0.06, 0.03, 0.4, steel, -0.22, 0.03, 0);
+  box(mayo, 0.62, 0.025, 0.42, steel, -0.05, 1.01, 0); box(mayo, 0.58, 0.012, 0.38, mat(0x2f7fb8, { roughness: 0.95 }), -0.05, 1.028, 0);
+  for (let i = 0; i < 6; i++) box(mayo, 0.012, 0.008, 0.16 + (i % 3) * 0.02, steel, -0.26 + i * 0.07, 1.04, 0.02 * (i % 2));
+  block(2.9, 3.55, -0.6, -0.1);
+  const iv = new THREE.Group(); iv.position.set(4.95, 0, -0.55); scene.add(iv);
+  cyl(iv, 0.015, 0.015, 2.0, steel, 0, 1.0, 0); for (let i = 0; i < 5; i++) { const leg = box(iv, 0.3, 0.02, 0.03, steel, 0, 0.03, 0); leg.rotation.y = (i * Math.PI * 2) / 5; leg.translateX(0.14); }
+  box(iv, 0.3, 0.012, 0.012, steel, 0, 1.98, 0);
+  for (const bx of [-0.12, 0.12]) box(iv, 0.11, 0.2, 0.035, glass(0xdff1fb, 0.55), bx, 1.83, 0);
+  cyl(scene, 0.17, 0.14, 0.26, steel, 1.35, 0.17, -0.2, 24);       // kick bucket
+})();
 const surgeon = person(2.5, -1.95, 0, 0x2e8b6f, 'surgeon');
 const assistant = person(1.75, -1.95, 0.15, 0x3b6ea8, 'assistant');
 const anesth = person(4.35, -2.05, -0.6, 0x7b5aa6, 'anesthesia');
@@ -295,7 +355,7 @@ bubbleSprite.scale.set(1.9, 0.55, 1); bubbleSprite.position.set(2.5, 2.25, -1.95
 // anesthesia machine with ventilator bellows
 const an = new THREE.Group(); an.position.set(4.5, 0, -1.2); scene.add(an);
 box(an, 0.6, 1.25, 0.55, mat(0xcfd6dd, { roughness: 0.45 }), 0, 0.63, 0);
-cyl(an, 0.09, 0.09, 0.26, mat(0xffffff, { transparent: true, opacity: 0.3 }), -0.15, 1.4, 0.05);
+cyl(an, 0.09, 0.09, 0.26, glass(0xffffff, 0.3), -0.15, 1.4, 0.05);
 P.bellows = cyl(an, 0.075, 0.075, 0.2, mat(0x222a33), -0.15, 1.37, 0.05);
 P.anScreen = screen(an, 0.3, 0.2, 256, 170, 0.12, 1.42, 0.05); P.anScreen.mesh.rotation.y = -Math.PI / 2 + 0.5;
 block(4.15, 4.85, -1.52, -0.88);
@@ -458,6 +518,7 @@ function drawBubble(line) {
 const VITALS = [
   ['MAP', (S) => fmt(S.map), (S) => (S.on_bypass && (S.map < 45 || S.map > 90) ? 'warn' : '')],
   ['Flow L/min', (S) => fmt(S.flow, 2), (S) => (S.flow < -0.1 ? 'bad' : '')],
+  ['Pump RPM', (S) => fmt(S.rpm), (S) => (S.rpm > 4000 ? 'warn' : '')],
   ['Cardiac index', (S) => fmt(S.ci, 2), () => ''],
   ['SvO2 %', (S) => fmt(S.svo2), (S) => (S.svo2 < 60 ? 'warn' : '')],
   ['O2 delivery', (S) => fmt(S.do2i), (S) => (S.on_bypass && S.do2i < 270 ? 'warn' : '')],
@@ -520,6 +581,7 @@ function showDebrief(S) {
   $('debrief').classList.remove('hidden');
   $('btn-again').onclick = () => { $('debrief').classList.add('hidden'); $('start').classList.remove('hidden'); started = false; };
   $('btn-summary').onclick = () => savesUI.openSessions(S.session && S.session.id);
+  game.debrief(S);
 }
 
 // ---------------------------------------------------------------- panels, input
@@ -673,7 +735,7 @@ function findFocus() {
   fwd.copy(lookDir); let best = null, bestA = 0.3;
   for (const it of interact) {
     to.copy(it.pos).sub(eye); const d = to.length();
-    it.sprite.material.opacity = d < 6 ? 1 : 0.35;
+    it.sprite.material.opacity = d < 4.2 ? 1 : 0.14;
     if (d > 2.8) continue;
     const a = fwd.angleTo(to);
     if (a < bestA) { bestA = a; best = it; }
@@ -729,17 +791,14 @@ function updateScene(S, dt, now) {
 
 // ---------------------------------------------------------------- start screen
 let personaSel = 'standard_adult';
+const game = initGame({ $, state, onSelect: (id) => { personaSel = id; } });
 async function boot() {
   state.META = await fetch('/api/meta').then((r) => r.json());
-  const list = $('persona-list');
-  state.META.personas.forEach((p) => {
-    const d = document.createElement('div'); d.className = 'persona' + (p.id === personaSel ? ' sel' : '');
-    d.innerHTML = `<b>${p.name}</b><span>${p.desc}</span>`;
-    d.onclick = () => { personaSel = p.id; list.querySelectorAll('.persona').forEach((x) => x.classList.remove('sel')); d.classList.add('sel'); };
-    list.appendChild(d);
-  });
+  game.render(); game.refresh();
   const begin = async (watch) => {
-    await post('/api/reset', { persona: personaSel });
+    const student = watch ? '' : game.ready();          // the expert's runs carry no name and are never ranked
+    if (student === null) return;
+    await post('/api/reset', { persona: personaSel, student });
     const p = state.META.personas.find((x) => x.id === personaSel); const k = Math.cbrt(p.weight / 75);
     P.body.scale.set(Math.min(1.1, 0.9 + (p.height - 155) / 250), k, k);
     debriefShown = false; started = true; lastLineN = -1;
@@ -757,7 +816,7 @@ async function boot() {
 async function poll() {
   try {
     const S = await fetch(STATE_URL).then((r) => r.json());
-    state.S = S; updateHud(S);
+    state.S = S; updateHud(S); recordTrend(S);
     if (openId) panels[openId].items.forEach((it) => it.update && it.update(S));
   } catch (e) { $('surgeon-line').textContent = 'Lost connection to the simulator. Is the server still running?'; }
   setTimeout(poll, 100);
@@ -796,7 +855,7 @@ function placeCamera(dt) {
 // ---------------------------------------------------------------- main loop
 let last = performance.now(), screenT = 0;
 function frame(nowMs) {
-  const dt = Math.min(0.05, (nowMs - last) / 1000); last = nowMs; const now = nowMs / 1000;
+  const real = (nowMs - last) / 1000, dt = Math.min(0.05, real); last = nowMs; const now = nowMs / 1000;
   movePlayer(dt);
   placeCamera(dt);
   findFocus();
@@ -809,9 +868,9 @@ function frame(nowMs) {
     if (screenT > 0.07) { screenT = 0; drawScreens(S); }
   }
   smash.update(dt);
-  renderer.render(scene, camera);
+  gfx.render(dt, real);
   requestAnimationFrame(frame);
 }
-window.P1 = { player, camera, openPanel, closePanel, state, smash, avatar, cycleView, focused: () => focus && focus.id, savesUI };
+window.P1 = { gfx, player, camera, openPanel, closePanel, state, smash, avatar, cycleView, focused: () => focus && focus.id, savesUI };
 boot();
 requestAnimationFrame(frame);

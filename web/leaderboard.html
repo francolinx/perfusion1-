@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>perfusion1 - leaderboard</title><link rel="icon" href="data:,"><link rel="stylesheet" href="pages.css">
+</head>
+<body><main>
+<h1>Leaderboard</h1>
+<p class="sub">Clean start-to-finish runs flown by a student. Expert autopilot runs and runs resumed from a save are not ranked. <a href="/">Back to the simulator</a></p>
+<div class="bar">
+  <input id="who" placeholder="Your name" maxlength="24" aria-label="Your name">
+  <select id="persona" aria-label="Patient"><option value="">All patients</option></select>
+  <button id="all" class="on">All time</button><button id="today">Today</button>
+</div>
+<div id="me" class="tiles"></div>
+<h2>Top runs</h2>
+<div class="card" style="padding:4px 8px"><table>
+  <thead><tr><th>#</th><th>Student</th><th class="hide-s">Patient</th><th class="n">Score</th><th class="n hide-s">Findings</th><th class="n hide-s">In range</th><th class="n hide-s">Callouts</th><th class="n">Case</th><th class="hide-s">When</th></tr></thead>
+  <tbody id="rows"></tbody></table>
+  <p id="empty" class="muted" style="padding:10px;display:none">No ranked runs yet. Finish a case under your own name to get on the board.</p>
+</div>
+<h2>Levels</h2>
+<div id="levels" class="levels"></div>
+<p class="muted" id="rule"></p>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let since = '', personaNames = {};
+try { $('who').value = new URLSearchParams(location.search).get('student') || localStorage.getItem('p1_student') || ''; } catch (e) {}
+async function load() {
+  const q = new URLSearchParams();
+  if ($('persona').value) q.set('persona', $('persona').value);
+  if (since) q.set('since', since);
+  if ($('who').value.trim()) q.set('student', $('who').value.trim());
+  let d;
+  try { d = await fetch('/api/leaderboard?' + q).then((r) => r.json()); } catch (e) { $('rows').innerHTML = ''; $('empty').style.display = 'block'; $('empty').textContent = 'Cannot reach the simulator.'; return; }
+  if ($('persona').options.length === 1) d.personas.forEach((p) => { personaNames[p.id] = p.name; const o = document.createElement('option'); o.value = p.id; o.textContent = p.name; $('persona').appendChild(o); });
+  const medal = (r) => (r === 1 ? 'gold' : r === 2 ? 'silver' : r === 3 ? 'bronze' : '');
+  $('rows').innerHTML = d.rows.map((r) => `<tr class="row ${r.mine ? 'mine' : ''}" data-id="${esc(r.id)}">
+    <td class="rank ${medal(r.rank)}">${r.rank}</td><td>${esc(r.student)}</td><td class="hide-s">${esc(r.persona_name)}</td>
+    <td class="n score">${r.score}</td><td class="n hide-s">${r.findings}${r.critical ? ' (' + r.critical + ' critical)' : ''}</td>
+    <td class="n hide-s">${Math.round((r.map_in + r.do2_in) / 2)}%</td><td class="n hide-s">${r.callouts_made}/${r.callouts_due}</td>
+    <td class="n">${r.case_minutes.toFixed(0)} min</td><td class="hide-s muted">${esc((r.started_at || '').slice(0, 16).replace('T', ' '))}</td></tr>`).join('');
+  $('empty').style.display = d.rows.length ? 'none' : 'block';
+  document.querySelectorAll('tr.row').forEach((tr) => (tr.onclick = () => (location.href = '/run?id=' + encodeURIComponent(tr.dataset.id))));
+  const b = d.best;
+  $('me').innerHTML = $('who').value.trim() ? (b
+    ? `<div class="tile"><div class="k">Your rank</div><div class="v">#${b.rank} <span class="muted" style="font-size:14px">of ${d.total}</span></div></div>
+       <div class="tile"><div class="k">Personal best</div><div class="v">${b.score}</div></div>
+       <div class="tile"><div class="k">Ranked runs</div><div class="v">${d.runs}</div></div>
+       <div class="tile"><div class="k">Best run</div><div class="v" style="font-size:16px"><a href="/run?id=${encodeURIComponent(b.id)}">Analyze it</a></div></div>`
+    : `<div class="tile"><div class="k">${esc($('who').value.trim())}</div><div class="v" style="font-size:16px">No ranked runs in this view yet</div></div>`) : '';
+  $('levels').innerHTML = d.levels.map((l) => `<div class="lvl ${l.unlocked ? '' : 'locked'}"><b>${esc(l.title)} ${l.passed ? '<span class="yes">passed</span>' : l.unlocked ? '' : '<span>locked</span>'}</b>
+    ${l.personas.map((p) => `<span>${esc(personaNames[p] || p)}${l.best[p] != null ? ': best ' + l.best[p] : ''}</span>`).join('<br>')}</div>`).join('');
+  $('rule').textContent = `A level opens after one run on the level before it scoring ${d.pass_score} or more with no critical finding. Ties on score break on fewer findings, more time in range, more callouts, then the shorter case.`;
+}
+$('who').oninput = () => { try { localStorage.setItem('p1_student', $('who').value.trim()); } catch (e) {} clearTimeout(load.t); load.t = setTimeout(load, 250); };
+$('persona').onchange = load;
+$('all').onclick = () => { since = ''; $('all').classList.add('on'); $('today').classList.remove('on'); load(); };
+$('today').onclick = () => { since = 'today'; $('today').classList.add('on'); $('all').classList.remove('on'); load(); };
+load();
+</script>
+</body></html>

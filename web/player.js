@@ -1,13 +1,14 @@
 // The student's own body: a blocky figure in scrubs, seen in third-person view (V).
 // Cosmetic only. It reads the player's position and pose; it never touches the case.
 import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 export function buildAvatar(scene) {
   const mat = (c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.85, metalness: 0.02 });
   const scrub = mat(0x2f6f9f), scrubDark = mat(0x285f88), skin = mat(0xcf9a76), shoe = mat(0x1d1d1f);
   const root = new THREE.Group(); root.name = 'player'; scene.add(root);
   const part = (parent, w, h, d, m, x, y, z) => {
-    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m);
+    const mesh = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, Math.min(0.035, Math.min(w, h, d) * 0.25)), m);
     mesh.position.set(x, y, z); mesh.castShadow = true; mesh.receiveShadow = true; parent.add(mesh); return mesh;
   };
   // a pivot is an empty group at a joint, so limbs swing from the hip or shoulder, not their middle
