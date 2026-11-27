@@ -84,6 +84,8 @@ class Sim:
         self.c = dict(rpm_set=0.0, art_clamp=True, ven_occl=1.0, sweep=2.0, fio2=0.8,
                       water_set=37.0, cp_route="ante", cp_type="highK", cp_flow=250.0,
                       cp_on=False, root_vent=False, sucker=False, ventilator=True, epi=False, iso=1.0)
+        # instructor-controlled (perfusion/instructor.py); neutral values change nothing
+        self.inst = dict(svr=1.0, contract=1.0, metabolic=1.0, bleed=0.0, oxy=1.0, art_kink=0.0, ven_block=0.0)
         # surgeon-controlled
         self.cannulated = False
         self.xclamp = False
@@ -239,14 +241,14 @@ class Sim:
         else:
             dp = head - self.pa
             if dp >= 0:
-                kq = PUMP_B + R_CANN
+                kq = PUMP_B + R_CANN * (1.0 + self.inst["art_kink"])
                 qa = (-R_CIRC + math.sqrt(R_CIRC ** 2 + 4 * kq * dp)) / (2 * kq)
             else:
                 qa = dp / R_RETRO
                 if qa < -0.3:
                     self.emit("retrograde", "major",
                               "Arterial line open with the pump too slow: blood is running backward out of the patient.")
-            self.line_p = self.pa + R_CANN * qa * abs(qa) + 0.35 * R_CIRC * qa
+            self.line_p = self.pa + R_CANN * (1.0 + self.inst["art_kink"]) * qa * abs(qa) + 0.35 * R_CIRC * qa
         self.qa = qa
 
         # venous drainage (gravity siphon)
@@ -255,13 +257,14 @@ class Sim:
             qv = max(0.0, (SIPHON + cvp) / self.r_ven) * (1.0 - c["ven_occl"]) * clamp((cvp + 1.0) / 3.0, 0.0, 1.0)
         else:
             qv = 0.0
+        qv *= 1.0 - self.inst["ven_block"]
         if self.vr >= RES_MAX:
             qv = min(qv, max(qa, 0.0))
         self.qv = qv
 
         # heart
         self._heart(dt, dtm)
-        contract = p.ef * (1.0 - self.injury) * (1.5 if c["epi"] else 1.0) * clamp(1.0 - 0.06 * (33.0 - self.temp), 0.4, 1.0)
+        contract = p.ef * self.inst["contract"] * (1.0 - self.injury) * (1.5 if c["epi"] else 1.0) * clamp(1.0 - 0.06 * (33.0 - self.temp), 0.4, 1.0)
         qh = contract * self.co_base * clamp((cvp - 2.0) / 4.0, 0.0, 1.4) if self.rhythm in ("sinus", "brady") else 0.0
         if self.rhythm == "brady":
             qh *= 0.3
@@ -275,7 +278,7 @@ class Sim:
         hct_a = self.hct_p
         visc = 0.55 + 0.45 * clamp(hct_a / p.hct, 0.3, 1.3)
         gas_w = max(qa, 0.0) / max(qa + qh, 0.05) if qa > 0 else 0.0     # anesthetic vapor reaches the patient via the oxygenator
-        svr = self.svr0 * visc * (1.0 + 0.02 * (37.0 - self.temp)) * max(0.3, 1.0 + self.pressor) * (1.0 - 0.15 * (c["iso"] - 1.0) * gas_w)
+        svr = self.svr0 * self.inst["svr"] * visc * (1.0 + 0.02 * (37.0 - self.temp)) * max(0.3, 1.0 + self.pressor) * (1.0 - 0.15 * (c["iso"] - 1.0) * gas_w)
         self.svr = svr
         self.pa += (qh + qa - (self.pa - cvp) / svr) / C_ART * dtm
         self.pa = clamp(self.pa, 3.0, 300.0)
@@ -286,7 +289,7 @@ class Sim:
         # volumes (mL/min)
         bleed = 30.0 if (self.cannulated and self.hep > 1000 and self.act_true > 250) else 0.0
         q_suck = bleed if c["sucker"] else 0.0
-        lost = bleed - q_suck
+        lost = bleed - q_suck + self.inst["bleed"]
         q_vent = 0.0
         if c["root_vent"] and self.xclamp:
             q_vent = 120.0 if (c["cp_on"] and c["cp_route"] == "ante") else 25.0
@@ -403,7 +406,7 @@ class Sim:
 
     def _gas(self, dt, hct_a):
         c = self.c
-        vo2_demand = 110.0 * self.bsa * 2.2 ** ((self.temp - 37.0) / 10.0)
+        vo2_demand = 110.0 * self.bsa * 2.2 ** ((self.temp - 37.0) / 10.0) * self.inst["metabolic"]
         qa = max(self.qa, 0.0)
         qtot = qa + self.qh
         # oxygenator outlet

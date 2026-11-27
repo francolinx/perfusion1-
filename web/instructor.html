@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>perfusion1 - instructor</title><link rel="icon" href="data:,"><link rel="stylesheet" href="pages.css">
+<style>
+  main { max-width: 1180px; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 14px; align-items: start; }
+  .card h2 { margin: 0 0 8px; font-size: 16px; }
+  .knob { margin: 10px 0 14px; } .knob .top { display: flex; justify-content: space-between; gap: 8px; }
+  .knob input[type=range] { width: 100%; padding: 0; margin: 6px 0 2px; accent-color: #3b82d6; }
+  .knob small, .hint { color: #9aa3ad; font-size: 12px; display: block; }
+  .knob.changed .val { color: #f0c36a; font-weight: 700; }
+  .btns { display: flex; flex-wrap: wrap; gap: 6px; } .btns button { flex: 1 1 auto; }
+  .tiles { grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); } .tile .v { font-size: 20px; }
+  .tile.bad .v { color: #ff8a8a; } .tile.warn .v { color: #f0c36a; }
+  #say { width: 100%; } .log div { padding: 3px 0; border-top: 1px solid rgba(255,255,255,0.07); font-size: 13px; }
+  .banner { position: sticky; top: 0; z-index: 2; background: #0b0d10; padding: 8px 0; }
+</style>
+</head>
+<body><main>
+<h1>Instructor panel</h1>
+<p class="sub">Change the patient and the circuit while the student runs the case. The student sees only the result on their monitors. A run you change is marked instructor-led and is not ranked. <a href="/">Simulator</a> &middot; <a href="/leaderboard">Leaderboard</a></p>
+<div class="banner"><div id="status" class="find">Connecting...</div></div>
+
+<h2>Live case</h2>
+<div id="tiles" class="tiles"></div>
+<p class="hint" style="margin-top:6px">True values the student cannot see: <span id="true"></span></p>
+<div id="alarms"></div>
+
+<div class="cols" style="margin-top:16px">
+  <div class="card"><h2>Patient</h2><div id="k-patient"></div>
+    <b>Heart rhythm</b><div class="btns" id="rhythms" style="margin-top:6px"></div>
+    <small class="hint">The surgeon defibrillates after the clamp comes off. Before that, a rhythm you set stays until the model or you change it.</small></div>
+  <div class="card"><h2>Circuit faults</h2><div id="k-circuit"></div>
+    <b>One-off events</b><div class="btns" id="events" style="margin-top:6px"></div><small class="hint" id="event-help"></small></div>
+  <div class="card"><h2>Pace and voice</h2>
+    <b>Time factor</b><div class="btns" id="speeds" style="margin:6px 0 14px"></div>
+    <b>Speak as the surgeon</b>
+    <div class="bar"><input id="say" maxlength="200" placeholder="e.g. Pressure is dropping, what is going on?"></div>
+    <div class="btns"><button id="say-go">Say it</button><button id="neutral">Reset my changes</button></div>
+    <h2 style="margin-top:16px">What you changed</h2><div id="log" class="log"><span class="muted">Nothing yet.</span></div></div>
+</div>
+
+<h2>Student's score so far</h2>
+<div id="score" class="card"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const mmss = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+let meta = null, dragging = null;
+async function send(op) {
+  const r = await fetch('/api/instructor', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(op) }).then((x) => x.json()).catch(() => ({ error: 'Cannot reach the simulator.' }));
+  if (r.error) { $('status').className = 'find critical'; $('status').textContent = r.error; }
+  poll();
+}
+function build() {
+  for (const k of meta.knobs) {
+    const step = k.max > 20 ? 10 : 0.05, d = document.createElement('div'); d.className = 'knob'; d.id = 'knob-' + k.id;
+    d.innerHTML = `<div class="top"><b>${esc(k.label)}</b><span class="val"></span></div>
+      <input type="range" min="${k.min}" max="${k.max}" step="${step}" value="${k.neutral}" aria-label="${esc(k.label)}"><small>${esc(k.help)}</small>`;
+    const inp = d.querySelector('input');
+    inp.oninput = () => { dragging = k.id; d.querySelector('.val').textContent = fmt(k, Number(inp.value)); };
+    inp.onchange = () => { dragging = null; send({ op: 'knob', id: k.id, value: Number(inp.value) }); };
+    $('k-' + k.group).appendChild(d);
+  }
+  $('rhythms').innerHTML = meta.rhythms.map((r) => `<button data-r="${r}">${r === 'vf' ? 'V-fib' : r === 'brady' ? 'Slow' : r[0].toUpperCase() + r.slice(1)}</button>`).join('');
+  $('rhythms').querySelectorAll('button').forEach((b) => (b.onclick = () => send({ op: 'rhythm', value: b.dataset.r })));
+  $('events').innerHTML = meta.events.map((e) => `<button data-e="${e.id}" title="${esc(e.help)}">${esc(e.label)}</button>`).join('');
+  $('events').querySelectorAll('button').forEach((b) => (b.onclick = () => send({ op: 'event', id: b.dataset.e })));
+  $('event-help').textContent = meta.events.map((e) => `${e.label}: ${e.help}`).join(' ');
+  $('speeds').innerHTML = meta.speeds.map((x) => `<button data-x="${x}">${x === 0 ? 'Pause' : x + 'x'}</button>`).join('');
+  $('speeds').querySelectorAll('button').forEach((b) => (b.onclick = () => send({ op: 'speed', value: Number(b.dataset.x) })));
+  const say = () => { const t = $('say').value.trim(); if (t) { send({ op: 'say', text: t }); $('say').value = ''; } };
+  $('say-go').onclick = say; $('say').onkeydown = (e) => { if (e.key === 'Enter') say(); };
+  $('neutral').onclick = () => send({ op: 'neutral' });
+}
+const fmt = (k, v) => (k.unit === 'x' ? v.toFixed(2) + ' x normal' : k.unit ? `${Math.round(v)} ${k.unit}` : Math.round(v * 100) + '% blocked');
+async function poll() {
+  let S; try { S = await fetch('/api/instructor').then((r) => r.json()); } catch (e) { $('status').className = 'find critical'; $('status').textContent = 'Cannot reach the simulator.'; return; }
+  const I = S.instructor, who = S.session.student || 'No student name';
+  $('status').className = 'find ' + (I.used ? 'minor' : 'good');
+  $('status').innerHTML = `<b>${esc(who)}</b> &middot; ${esc(S.persona.name)} &middot; ${esc(S.phase_title)} &middot; case ${mmss(S.t)} &middot; ${S.speed === 0 ? 'paused' : S.speed + 'x'}${S.autopilot ? ' &middot; expert autopilot on' : ''} &middot; ${I.used ? 'instructor-led (not ranked)' : 'no instructor changes yet'}`;
+  const tile = (k, v, c) => `<div class="tile ${c || ''}"><div class="k">${k}</div><div class="v">${v}</div></div>`;
+  $('tiles').innerHTML = tile('Flow L/min', S.flow.toFixed(2)) + tile('Pump RPM', S.rpm) + tile('Pressure', Math.round(S.map), S.map < 50 || S.map > 80 ? 'warn' : '') +
+    tile('CVP', S.cvp) + tile('Line pressure', S.line_p, S.line_p > 300 ? 'bad' : '') + tile('Reservoir mL', S.res, S.res < 300 ? 'bad' : '') +
+    tile('SvO2 %', Math.round(S.svo2), S.svo2 < 65 ? 'warn' : '') + tile('O2 delivery', S.do2i, S.do2i < 280 && S.on_bypass ? 'warn' : '') +
+    tile('PaO2 / CO2', `${S.pao2} / ${Math.round(S.paco2)}`) + tile('Temp C', S.temp) + tile('Hct %', S.hct) + tile('K+', S.k) + tile('Rhythm', S.rhythm) +
+    tile('Score', S.score.score, S.score.score < 80 ? 'bad' : '');
+  const T = I.true;
+  $('true').textContent = `ACT ${T.act} s, heparin on board ${T.hep} units, oxygen uptake ${T.vo2} mL/min, arrest level ${T.arrest}, heart injury ${T.injury}, patient blood volume ${T.blood_volume} mL, lactate ${T.lactate}.`;
+  $('alarms').innerHTML = S.alarms.map(([sev, msg]) => `<div class="find ${sev === 'crit' || sev === 'critical' ? 'critical' : 'minor'}">${esc(msg)}</div>`).join('');
+  for (const k of meta.knobs) {
+    const d = $('knob-' + k.id), v = I.knobs[k.id];
+    if (dragging !== k.id) { d.querySelector('input').value = v; d.querySelector('.val').textContent = fmt(k, v); }
+    d.classList.toggle('changed', Math.abs(v - k.neutral) > 1e-6);
+  }
+  $('rhythms').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.r === S.rhythm));
+  $('speeds').querySelectorAll('button').forEach((b) => b.classList.toggle('on', Number(b.dataset.x) === S.speed));
+  $('log').innerHTML = S.session.notes.length ? S.session.notes.slice().reverse().map((n) => `<div>${mmss(n.t)} ${esc(n.note)}</div>`).join('') : '<span class="muted">Nothing yet.</span>';
+  const f = S.score.findings || [];
+  $('score').innerHTML = `<b>${S.score.score}</b> (${esc(S.score.outcome)}), callouts ${S.score.callouts.made} of ${S.score.callouts.due}.` +
+    (f.length ? f.slice(-6).reverse().map((x) => `<div class="find ${esc(x.sev)}"><b>${esc(x.sev)}</b> at ${mmss(x.t)}: ${esc(x.msg)}</div>`).join('') : '<div class="find good">Nothing flagged so far.</div>');
+}
+(async () => { meta = await fetch('/api/instructor/meta').then((r) => r.json()); build(); poll(); setInterval(poll, 1000); })();
+</script>
+</main></body></html>

@@ -30,7 +30,7 @@ def row_of(doc):
     fin = doc.get("final") or {}
     student = clean_name(doc.get("student"))
     if doc.get("status") != "complete" or fin.get("phase") != "DONE" or doc.get("practice") \
-            or doc.get("autopilot_used") or not student:
+            or doc.get("autopilot_used") or doc.get("instructor_used") or not student:
         return None
     f = fin.get("findings") or []
     co = fin.get("callouts") or {}

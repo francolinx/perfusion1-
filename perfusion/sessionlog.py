@@ -38,7 +38,7 @@ class SessionLog:
         self.doc = dict(id=sid, persona=dict(id=persona.id, name=persona.name, weight=persona.weight),
                         started_at=time.strftime("%Y-%m-%dT%H:%M:%S%z"), started_ts=time.time(),
                         ended_at=None, ended_ts=None, status="running", end_reason=None,
-                        practice=practice, resumed_from=resumed_from, autopilot_used=False, build=build,
+                        practice=practice, resumed_from=resumed_from, autopilot_used=False, instructor_used=False, build=build,
                         student=student, series_keys=list(SERIES_KEYS), series=[], quiz=None,
                         case_time_start=None, case_time_end=None, final=None, events=[], summary=None)
         self.active = False          # nothing is written until the session actually starts
@@ -113,7 +113,7 @@ def listing(doc):
     return dict(id=doc["id"], started_at=doc["started_at"], started_ts=doc["started_ts"], persona=doc["persona"],
                 student=doc.get("student", ""),
                 status=doc["status"], practice=doc["practice"], resumed_from=doc.get("resumed_from"),
-                autopilot_used=doc.get("autopilot_used", False), score=fin.get("score"), phase=fin.get("phase"),
+                autopilot_used=doc.get("autopilot_used", False), instructor_used=doc.get("instructor_used", False), score=fin.get("score"), phase=fin.get("phase"),
                 case_minutes=round(((doc.get("case_time_end") or 0) - (doc.get("case_time_start") or 0)) / 60, 1),
                 wall_minutes=round(((doc.get("ended_ts") or time.time()) - doc["started_ts"]) / 60, 1))
 
@@ -259,6 +259,8 @@ def summarize(doc, objectives=None):
         head += f" Score {fin['score']} with {fin['critical']} critical, ended in {PHASE_TITLES.get(fin['phase'], fin['phase'])}."
     if doc.get("practice"):
         head += " Practice (resumed from save): this score is not compared with clean start-to-finish runs."
+    if doc.get("instructor_used"):
+        head += " An instructor changed the patient or the circuit during the run, so it is not ranked."
     if doc.get("autopilot_used"):
         head += " The expert autopilot made some or all of the moves."
     lines = [head, "", "What was done:"] + ["- " + p["text"] for p in phase_text]
