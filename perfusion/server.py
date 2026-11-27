@@ -19,6 +19,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from . import instructor, leaderboard, quiz
 from .autopilot import Autopilot
+from .guide import guide
 from .model import load_personas
 from .monitor import Clients, Monitor, SimMeter
 from .saves import SaveStore, restore, slug
@@ -28,6 +29,9 @@ from .sessionlog import SessionLog, SessionStore, SERIES_EVERY
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WEB = os.path.join(ROOT, "web")
 TICK = 0.05
+VITALS_EVERY = 15.0                 # seconds of case time between trend points in the session log
+VITALS_KEYS = ("map", "flow", "do2i", "temp", "hct", "svo2", "on_bypass")
+BENCHMARK = os.path.join(ROOT, "docs", "benchmark.json")
 
 
 class ApiError(Exception):
@@ -65,6 +69,7 @@ class Session:
         pilot.on_act = lambda a: self.log.add("action", self.case.t, source="autopilot", action=dict(a))
         self._seen = (case.phase, len(case.lines), len(case.findings))
         self._done_logged = case.phase == "DONE"
+        self._next_vitals = case.t
 
     def reset(self, persona_id, operate_minutes=22.0, mistake=None, student=""):
         with self.lock:
@@ -98,6 +103,13 @@ class Session:
             self._done_logged = True
             self.log.end(c, "case complete")
 
+    def _log_vitals(self):
+        """A trend point for the debrief chart every VITALS_EVERY s of case time. Logging only. Caller holds the lock."""
+        c, s = self.case, self.case.sim
+        self._next_vitals = c.t + VITALS_EVERY
+        snap = s.snapshot()
+        self.log.add("vitals", c.t, phase=c.phase, **{k: snap.get(k) for k in VITALS_KEYS})
+
     def advance(self, n):
         """Run n model steps (the expert first, if it is driving). Caller holds the lock."""
         case = self.case
@@ -112,6 +124,8 @@ class Session:
                                  round(s.vr), round(s.svo2 * 100, 1), round(s.hct_p * 100, 1), round(s.line_p), round(s.cvp, 1)])
             if case.phase != self._seen[0] or len(case.lines) != self._seen[1] or len(case.findings) != self._seen[2]:
                 self._observe()
+            if case.t >= self._next_vitals and case.phase != "DONE":
+                self._log_vitals()
 
     def loop(self):
         last = time.monotonic()
@@ -301,6 +315,24 @@ FEATURES = ["student names, leaderboard, levels and quiz", "run analysis charts"
             "smash mode (cosmetic)", "third-person view", "dashboard"]
 
 
+def expert_benchmark(persona_id, path=BENCHMARK):
+    """The expert autopilot's averages for one patient from docs/benchmark.json, or {available: False}."""
+    try:
+        with open(path) as f:
+            rows = [r for r in json.load(f) if r.get("persona") == persona_id and r.get("band") == "expert" and r.get("finished")]
+    except (OSError, ValueError, AttributeError, TypeError):
+        rows = []
+    if not rows:
+        return dict(available=False, persona=persona_id)
+    avg = lambda k: round(sum(r[k] for r in rows) / len(rows), 1)
+    try:
+        return dict(available=True, persona=persona_id, runs=len(rows), score=avg("score"), map_in_range=avg("map_in"),
+                    do2_in_range=avg("do2_in"), case_min=avg("case_min"), bypass_min=avg("bypass_min"), clamp_min=avg("clamp_min"),
+                    note="Expert autopilot on the training model (docs/BENCHMARK.md). Not clinical reference values.")
+    except (KeyError, TypeError, ZeroDivisionError):
+        return dict(available=False, persona=persona_id)
+
+
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
@@ -352,6 +384,12 @@ class Handler(BaseHTTPRequestHandler):
                 callouts=[dict(id=i, label=l) for i, l in CALLOUTS],
                 phases=[dict(id=p, title=PHASE_TITLES[p]) for p in PHASES],
                 build=SESSION.saves.build))
+        if path == "/api/guide":
+            with SESSION.lock:
+                return self._send(200, guide(SESSION.case))
+        if path == "/api/benchmark":
+            q = urllib.parse.parse_qs(self.path.partition("?")[2])
+            return self._send(200, expert_benchmark((q.get("persona") or [""])[0]))
         if path == "/api/saves":
             return self._send(200, dict(saves=SESSION.saves.list(), build=SESSION.saves.build))
         if path == "/api/sessions":

@@ -1,5 +1,6 @@
 // Save / Load screen (F9, quick-save F5) and the Sessions screen. Talks to /api/save, /api/saves,
 // /api/load, DELETE /api/saves/{id}, /api/sessions. All confirmations are in-page, never browser dialogs.
+import { trendCharts } from './charts.js';
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const mmss = (s) => `${Math.floor((s || 0) / 60)}:${String(Math.floor((s || 0) % 60)).padStart(2, '0')}`;
@@ -123,7 +124,7 @@ export function initSaves({ getState, isCaseRunning, onLoaded }) {
     const { status, data: d } = await call('GET', '/api/sessions/' + encodeURIComponent(id));
     if (status !== 200) { toast('Could not open that session.'); return; }
     const sm = d.summary || {};
-    const shown = (e, all) => all || !(e.kind === 'action' && ['set', 'speed'].includes(e.action?.type));
+    const shown = (e, all) => e.kind !== 'vitals' && (all || !(e.kind === 'action' && ['set', 'speed'].includes(e.action?.type)));
     const timeline = (all) => d.events.filter((e) => shown(e, all)).map((e) => `<div class="tl ${e.kind}"><span class="t">${mmss(e.t)}</span> ${KIND[e.kind] ? (e.kind === 'finding' ? KIND.finding(e) : esc(KIND[e.kind](e))) : esc(e.kind)}</div>`).join('');
     $('sessions-body').innerHTML = `
       <div class="row"><button id="ss-back">Back</button><button id="ss-close">Close (Esc)</button></div>
@@ -134,6 +135,7 @@ export function initSaves({ getState, isCaseRunning, onLoaded }) {
       <h3>What went well</h3>${(sm.went_well || []).map((w) => `<div class="find good">${esc(w)}</div>`).join('') || '<div class="find">Not enough of the case was run to say.</div>'}
       <h3>What was flagged</h3>${(sm.flagged || []).map((f) => `<div class="find major">${esc(f)}</div>`).join('') || '<div class="find">Nothing.</div>'}
       <h3>Three things to improve</h3>${(sm.improve || []).map((x, i) => `<div class="find minor"><b>${i + 1}.</b> ${esc(x.what)}${x.how ? `<br><span class="sub">${esc(x.how)}</span>` : ''}</div>`).join('') || '<div class="find">Nothing to improve on this run.</div>'}
+      <h3>Trends</h3>${trendCharts(d.events)}
       <div class="row"><h3>Timeline</h3><label class="lbl"><input type="checkbox" id="ss-all"> show every control change</label></div>
       <div class="timeline" id="ss-tl">${timeline(false)}</div>`;
     $('ss-back').onclick = renderSessions; $('ss-close').onclick = close;
