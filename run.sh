@@ -13,9 +13,7 @@ if sys.version_info < (3, 9):
     sys.exit(f"Python 3.9 or newer is required (found {sys.version.split()[0]}).")
 PYEOF
 if [[ "${1:-}" == "--test" ]]; then
-  "$PY" -m unittest discover -s tests
-  "$PY" scripts/play_case.py
-  exit 0
+  exec "$PY" scripts/run_tests.py      # unit tests + expert case (must score 100); result in logs/last_test.json
 fi
 OPEN="--open"
 [[ -z "${DISPLAY:-}${WAYLAND_DISPLAY:-}" && "$(uname)" == "Linux" ]] && OPEN=""   # headless / over SSH: just print the URL

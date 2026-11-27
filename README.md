@@ -23,7 +23,15 @@ traceback: `Port 8080 is already in use by another program. Start on a free port
 example:  PORT=9000 ./run.sh`. On the DGX Spark used for development, a local gateway holds 8080,
 so the simulator runs there on port 9000.
 
-`./run.sh --test` runs the test suite and plays a full expert case headless.
+`./run.sh --test` runs the test suite and plays a full expert case headless. It fails unless every test
+passes and the expert scores 100 with no critical findings, and records the result for the dashboard.
+
+`http://localhost:8080/dashboard` is a live status page, separate from the simulator, refreshed every
+second: simulator steps per second, real-time factor, tick lag, speed, phase and connected browsers; one row
+per local AI service (speech recognition, surgeon LLM, medical LLM, voice) with model, port, memory, latency,
+tokens per second, requests and last error, or "not running"; CPU, unified memory, GPU use and temperature
+(from `nvidia-smi`) and disk; and the git branch and commit, the last test run and the live features. It reads
+`/proc` and `nvidia-smi` directly, so it needs nothing installed.
 
 ## What the first demo does
 

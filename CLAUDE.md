@@ -6,7 +6,9 @@ Open 3D cardiopulmonary bypass trainer. Read `README.md`, `docs/ARCHITECTURE.md`
 ## Commands
 
 - Run: `./run.sh` (serves http://localhost:8080; `PORT=9000 ./run.sh` to change port)
-- Test: `./run.sh --test` or `python3 -m unittest discover -s tests -v`
+- Test: `./run.sh --test` (the gate: all tests pass and the expert case scores 100; writes `logs/last_test.json`)
+  or `python3 -m unittest discover -s tests -v`
+- Dashboard: `http://localhost:9000/dashboard` (simulator, AI services, machine, build)
 - Browser check (headless, no window, needs Node 22 and Chrome): `node tools/browser_check.mjs --url http://localhost:9000 --gpu`
   (`--full` also plays the expert case to the debrief). Keep browser tests headless. Point it at a
   scratch server (`--port 9100 --saves-dir ... --logs-dir ...`): it resets the shared case.
@@ -40,6 +42,7 @@ Open 3D cardiopulmonary bypass trainer. Read `README.md`, `docs/ARCHITECTURE.md`
 - Player avatar and third-person body (cosmetic, client only): `web/player.js`
 - Save / load (exact case state, saves/ folder): `perfusion/saves.py`; session logs and the rule-based
   summary (logs/ folder): `perfusion/sessionlog.py`; their screens: `web/saves.js`
+- Dashboard readings (stdlib: /proc, nvidia-smi, service /health): `perfusion/monitor.py`; page: `web/dashboard.html`
 
 ## Next work
 

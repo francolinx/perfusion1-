@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>perfusion1 dashboard</title>
+<link rel="icon" href="data:,">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; background: #0b0d10; color: #e8eaed; font: 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); flex-wrap: wrap; }
+header h1 { font-size: 17px; margin: 0; font-weight: 600; }
+header a { color: #8ab4f8; }
+#conn { margin-left: auto; font-size: 12px; color: #9aa3ad; }
+#conn.down { color: #ff6b6b; font-weight: 600; }
+main { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 12px; padding: 12px 16px; }
+section { background: rgba(16, 20, 26, 0.9); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 10px 12px; min-width: 0; }
+section.wide { grid-column: 1 / -1; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: #9aa3ad; margin: 0 0 8px; font-weight: 600; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 6px; }
+.t { background: rgba(255,255,255,0.05); border-radius: 6px; padding: 5px 8px; }
+.t .k { font-size: 11px; color: #9aa3ad; } .t .n { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.t.warn .n { color: #ffb84d; } .t.bad .n { color: #ff6b6b; } .t.good .n { color: #6fd39b; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 5px 8px; border-bottom: 1px solid rgba(255,255,255,0.07); white-space: nowrap; }
+th { color: #9aa3ad; font-weight: 500; font-size: 12px; }
+td.err { white-space: normal; color: #ffb3b3; max-width: 320px; }
+.pill { display: inline-block; border-radius: 999px; padding: 1px 9px; font-size: 12px; font-weight: 600; background: #3a3f46; }
+.pill.loaded, .pill.pass { background: #1f6f43; } .pill.loading, .pill.not-responding { background: #8a6d1a; }
+.pill.error, .pill.fail { background: #8a2323; } .pill.not-running { background: #3a3f46; color: #c5cad1; }
+ul { margin: 6px 0 0; padding-left: 18px; color: #c5cad1; }
+.muted { color: #9aa3ad; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>perfusion1 dashboard</h1>
+  <a href="/">Open the simulator</a>
+  <span id="conn">connecting...</span>
+</header>
+<main>
+  <section><h2>Simulator</h2><div id="sim" class="tiles"></div></section>
+  <section><h2>System</h2><div id="sys" class="tiles"></div></section>
+  <section class="wide"><h2>AI models</h2><div class="scroll"><table id="models"><thead><tr>
+    <th>Service</th><th>Status</th><th>Model</th><th>Port</th><th>Memory</th><th>Latency</th><th>Tokens/s</th><th>Requests</th><th>Last error</th>
+  </tr></thead><tbody></tbody></table></div>
+  <p class="muted">Each service reports through its own /health endpoint. "not running" means nothing is listening on its port.</p></section>
+  <section class="wide"><h2>Build</h2><div id="build" class="tiles"></div><ul id="features"></ul></section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const dash = (v, unit = '', digits) => (v === null || v === undefined || v === '' || Number.isNaN(v)) ? '-' :
+  (typeof v === 'number' && digits !== undefined ? v.toFixed(digits) : v) + unit;
+const tile = (k, v, cls = '') => `<div class="t ${cls}"><div class="k">${esc(k)}</div><div class="n">${esc(v)}</div></div>`;
+const ago = (ts) => { if (!ts) return '-'; const s = Math.max(0, Date.now() / 1000 - ts); return s < 90 ? `${Math.round(s)} s ago` : s < 5400 ? `${Math.round(s / 60)} min ago` : s < 172800 ? `${Math.round(s / 3600)} h ago` : `${Math.round(s / 86400)} days ago`; };
+const lvl = (v, warn, bad) => v === null || v === undefined ? '' : v >= bad ? 'bad' : v >= warn ? 'warn' : '';
+
+function renderSim(s) {
+  if (!s || s.error) { $('sim').innerHTML = tile('Simulator', s?.error ? 'error' : 'unavailable', 'bad'); return; }
+  const rtfWant = s.speed || 0, rtf = s.real_time_factor;
+  const behind = rtfWant > 0 && rtf !== null && rtf < rtfWant * 0.9;
+  $('sim').innerHTML = [
+    tile('Steps / s', dash(s.steps_per_s, '', 0)),
+    tile('Real-time factor', rtf === null ? '-' : rtf.toFixed(2) + 'x', behind ? 'warn' : ''),
+    tile('Tick lag', dash(s.tick_lag_ms, ' ms', 1), lvl(s.tick_lag_ms, 10, 50)),
+    tile('Speed', s.speed ? s.speed + 'x' : 'paused'),
+    tile('Phase', s.phase_title || s.phase),
+    tile('Case time', s.case_time === undefined ? '-' : `${Math.floor(s.case_time / 60)}:${String(Math.floor(s.case_time % 60)).padStart(2, '0')}`),
+    tile('Clients', dash(s.clients)),
+    tile('Driver', s.autopilot ? 'expert' : 'student'),
+    tile('Patient', s.persona || '-'),
+  ].join('');
+}
+
+function renderSys(y) {
+  if (!y || y.error) { $('sys').innerHTML = tile('System', 'unavailable', 'bad'); return; }
+  const m = y.memory, d = y.disk, g = y.gpu || {};
+  const gpu = g.available && g.gpus && g.gpus[0];
+  const t = [
+    tile('CPU', dash(y.cpu_pct, ' %', 0), lvl(y.cpu_pct, 80, 95)),
+    tile('Load (1 min)', y.load ? `${y.load[0]} / ${y.cpu_count}` : '-'),
+    tile('Unified memory', m ? `${m.used_gb} / ${m.total_gb} GB` : '-', m ? lvl(m.used_pct, 85, 95) : ''),
+    tile('GPU', gpu ? dash(gpu.util_pct, ' %', 0) : 'unavailable', gpu ? '' : 'warn'),
+    tile('GPU temp', gpu ? dash(gpu.temp_c, ' °C', 0) : '-', gpu ? lvl(gpu.temp_c, 80, 90) : ''),
+    tile('GPU power', gpu ? dash(gpu.power_w, ' W', 0) : '-'),
+    tile('Disk free', d ? `${d.free_gb} GB` : '-', d ? lvl(d.used_pct, 90, 97) : ''),
+  ];
+  if (gpu && gpu.mem_used_mb !== null) t.push(tile('GPU memory', `${Math.round(gpu.mem_used_mb / 1024)} GB`));
+  $('sys').innerHTML = t.join('') + (g.available ? '' : `<div class="muted">${esc(g.error || 'nvidia-smi unavailable')}</div>`);
+}
+
+function renderModels(rows) {
+  const tb = $('models').querySelector('tbody');
+  if (!Array.isArray(rows) || !rows.length) { tb.innerHTML = '<tr><td colspan="9" class="muted">No services configured.</td></tr>'; return; }
+  tb.innerHTML = rows.map((r) => {
+    const cls = String(r.status || 'not running').replace(/\s+/g, '-');
+    const err = r.last_error || r.detail || '';
+    return `<tr><td>${esc(r.label || r.id)}</td><td><span class="pill ${esc(cls)}">${esc(r.status || 'not running')}</span></td>
+      <td>${esc(dash(r.model))}</td><td>${esc(dash(r.port))}</td>
+      <td>${esc(r.memory_mb === null || r.memory_mb === undefined ? '-' : (r.memory_mb >= 1024 ? (r.memory_mb / 1024).toFixed(1) + ' GB' : Math.round(r.memory_mb) + ' MB'))}</td>
+      <td>${esc(dash(r.latency_ms, ' ms', 0))}</td><td>${esc(dash(r.tokens_per_s, '', 1))}</td><td>${esc(dash(r.requests))}</td>
+      <td class="err">${esc(err)}</td></tr>`;
+  }).join('');
+}
+
+function renderBuild(b) {
+  b = b || {};
+  const v = b.version || {}, t = b.tests;
+  $('build').innerHTML = [
+    tile('Branch', v.branch || '(detached)'),
+    tile('Commit', v.commit || 'unknown'),
+    t ? tile('Last test run', t.ok ? `passed, ${t.tests_run} tests` : `FAILED (${t.failures + t.errors} of ${t.tests_run})`, t.ok ? 'good' : 'bad')
+      : tile('Last test run', 'not run yet'),
+    t ? tile('Expert case', `score ${t.expert?.score}, critical ${t.expert?.critical}`, t.expert?.score === 100 ? 'good' : 'bad') : '',
+    t ? tile('Tested', ago(t.ts) + (t.build && t.build.commit !== v.commit ? ` (commit ${t.build.commit})` : '')) : '',
+  ].join('');
+  $('features').innerHTML = (b.features || []).map((f) => `<li>${esc(f)}</li>`).join('');
+}
+
+let failures = 0;
+async function poll() {
+  try {
+    const r = await fetch('/api/dashboard', { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    for (const [fn, v] of [[renderSim, d.sim], [renderSys, d.system], [renderModels, d.services], [renderBuild, d.build]]) {
+      try { fn(v); } catch (e) { console.warn('dashboard section', e); }
+    }
+    failures = 0;
+    $('conn').className = '';
+    $('conn').textContent = 'updated ' + new Date().toLocaleTimeString();
+  } catch (e) {
+    failures++;
+    $('conn').className = 'down';
+    $('conn').textContent = 'simulator server not reachable, retrying...';
+  }
+  window.P1_DASH = { polls: (window.P1_DASH?.polls || 0) + 1, failures };
+}
+poll();
+setInterval(poll, 1000);
+</script>
+</body>
+</html>
