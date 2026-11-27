@@ -110,7 +110,9 @@ Ordered by how often it came up in the runs. Each needs its rule, its test and, 
    and `defib` actions (10, 20, 30 J), surgeon prompts, critical `wean_no_rhythm` / `wean_no_pulse`; drug
    timing and shock handling scored under rubric F1c.*
 3. **Weaning by volume**: fill in bites, watch for the dicrotic notch, the surgeon asks for volume back,
-   CVP and pressure targets, holds at three-quarter, half and quarter flow.
+   CVP and pressure targets, holds at three-quarter, half and quarter flow. *Built: `notch` in the model and on
+   the monitor, bite and take-back buttons, surgeon targets and "take 200 back"; big bites, no notch,
+   overfilling and skipped holds scored under rubric F2a, F2c, F3b and F4b.*
 4. **Surgeon questions that are scored**: height and weight, high and low flow, heparin dose, hematocrit after
    dilution, current flow, clamp time, bypass time, reservoir volume. Unlocks rubric B1.
 5. **Before bypass**: divide the loop, ACT over 300 to cannulate, advance the arterial line, the pulsatile line

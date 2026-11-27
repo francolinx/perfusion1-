@@ -411,6 +411,84 @@ class TestRhythmBeforeWeaning(unittest.TestCase):
         self.assertEqual(c.sim.rhythm, "sinus")
 
 
+def tick_until(c, cond, seconds=300, pilot=None):
+    for _ in range(int(seconds / c.sim.DT)):
+        if cond():
+            return True
+        if pilot:
+            pilot.step()
+        c.tick()
+    return cond()
+
+
+class TestWeanByVolume(unittest.TestCase):
+    """docs/LAB_SESSION_NOTES.md item 3: fill in bites until the dicrotic notch, CVP and pressure targets, volume back."""
+
+    def test_dicrotic_notch_needs_an_ejecting_heart(self):
+        c = case_at_wean(); s = c.sim
+        self.assertFalse(s.notch)                                       # empty heart on full bypass
+        s.set("ven_occl", 0.45); s.transfuse(150); settle(s, 20)
+        self.assertTrue(s.pulse >= 8 and s.notch and s.snapshot()["notch"])
+        s.rhythm = "vf"; s.step(); self.assertFalse(s.notch)
+
+    def test_take_back_returns_volume_to_the_reservoir(self):
+        s = Sim(P["standard_adult"]); v0, r0 = s.vp, s.vr
+        s.take_back(200); settle(s, 40)
+        self.assertAlmostEqual(s.vr - r0, 200, delta=2)
+        self.assertAlmostEqual(v0 - s.vp, 200, delta=5)                 # plus a little urine
+        self.assertEqual(s.takeback_left, 0)
+        s.vp = s.vu - 50; s.take_back(300); s.step()
+        self.assertEqual(s.takeback_left, 0)                            # nothing to drain from an empty patient
+        with self.assertRaises(ValueError):
+            Case(P["standard_adult"]).action(dict(type="take_back", ml=5000))
+
+    def test_big_bites_are_scored(self):
+        c = case_at_wean()
+        c.action(dict(type="transfuse", ml=150))
+        self.assertNotIn("big_bite", [f["code"] for f in c.findings])
+        c.action(dict(type="transfuse", ml=150))                        # a second bite before the first is in
+        self.assertEqual(c.findings[-1]["code"], "big_bite")
+        c = case_at_wean(); c.action(dict(type="transfuse", ml=400))
+        self.assertIn("Gave 400 mL at once", c.findings[-1]["msg"])
+
+    def test_coming_down_before_the_notch_is_scored(self):
+        c = case_at_wean(); s = c.sim
+        s.set("ven_occl", 0.3)
+        self.assertTrue(tick_until(c, lambda: s.pulse >= 3.5, 60))
+        s.set("rpm_set", 1200)
+        self.assertTrue(tick_until(c, lambda: c.flags.get("wean_started"), 30))
+        codes = [f["code"] for f in c.findings]
+        self.assertIn("wean_no_notch", codes); self.assertNotIn("wean_no_pulse", codes)
+
+    def test_overfilling_brings_take_200_back_then_a_finding(self):
+        c = case_at_wean(); s = c.sim
+        s.set("ven_occl", 0.7)
+        for _ in range(4):
+            s.transfuse(200); settle(s, 1)
+        self.assertTrue(tick_until(c, lambda: c.flags.get("tb_ask"), 120))
+        self.assertIn("Take 200 back", c.lines[-1]["text"])
+        c.action(dict(type="take_back", ml=200))
+        self.assertIsNone(c.flags.get("tb_ask"))
+        self.assertTrue(tick_until(c, lambda: any(f["code"] == "overfilled" for f in c.findings), 120))
+
+    def test_skipping_a_hold_level_is_scored(self):
+        from perfusion.autopilot import Autopilot
+        c = case_at_wean(); pilot = Autopilot(c)
+        self.assertTrue(tick_until(c, lambda: c.flags.get("wean_started"), 300, pilot))
+        c.sim.set("ven_occl", 0.75); c.sim.set("rpm_set", 1750)         # heart kept full, straight past three-quarter flow
+        self.assertTrue(tick_until(c, lambda: any(f["code"] == "wean_skipped_step" for f in c.findings), 60))
+        f = [f for f in c.findings if f["code"] == "wean_skipped_step"][0]
+        self.assertEqual(f["step"], 0)
+        self.assertIn("I asked for three-quarter flow", " ".join(l["text"] for l in c.lines[-3:]))
+
+    def test_expert_fills_in_bites_and_holds_each_level(self):
+        case = run("standard_adult")
+        items = rubric_items(case)
+        for k in ("F2a", "F2b", "F2c", "F3a", "F3b", "F4a", "F4b"):
+            self.assertEqual(items[k]["status"], "full", (k, items[k]["why"]))
+        self.assertFalse([f for f in case.findings if f["code"] in ("big_bite", "overfilled", "wean_no_notch", "wean_skipped_step")])
+
+
 class TestCase_(unittest.TestCase):
     def test_expert_plays_clean_case_every_persona(self):
         for pid in P:

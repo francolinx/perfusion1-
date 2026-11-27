@@ -118,6 +118,11 @@ Lumped parameters, explicit Euler at 20 ms. Flows in L/min, volumes in mL, press
   `reperfusion` rhythm (sinus for most). A shock converts fibrillation if its energy reaches `shock_needed()`
   (20 J, 10 J after lidocaine and magnesium, 10 J more if cold); a flat heart restarts 30 s after calcium or
   60 s after epinephrine. The scenario makes starting to wean with no rhythm or no pulse a critical finding.
+- **Weaning by volume**: a bite (`transfuse`) only fills the heart with the venous line partly clamped, as in
+  the lab. `notch` is true once the beating heart's pulse pressure reaches `NOTCH_PULSE`; the monitor draws the
+  dicrotic notch only then. `take_back` drains volume from the patient to the reservoir. The scenario scores
+  bites over 250 mL, coming down before the notch, CVP over 14 for 45 s (after the surgeon's "take 200 back")
+  and skipping a hold level.
 - **Anticoagulation**: heparin with a 100 minute half-life, ACT linear in units/kg with a
   per-patient sensitivity, protamine 1 mg per 100 units. Protamine with the pump or suckers
   running clots the circuit.

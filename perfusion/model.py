@@ -80,6 +80,7 @@ ALARM_LIMITS = dict(line_p=300, cp_pressure=300, csp=40)
 DRUGS = dict(lidocaine="Lidocaine 100 mg", magnesium="Magnesium 2 g", esmolol="Esmolol 50 mg", calcium="Calcium 1 g")
 DEFIB_J = (10, 20, 30)          # internal paddles: start low, raise the energy if fibrillation persists
 DEFIB_THRESHOLD = 20.0          # joules needed to convert; 10 after lidocaine and magnesium; +10 if the heart is cold
+NOTCH_PULSE = 8.0               # arterial pulse pressure from which the trace shows a dicrotic notch (heart ejecting)
 K_FLAT = 5.5                    # potassium above this at reperfusion: the heart comes back flat
 CP_WASHOUT_MIN = 18.0  # time constant of cardioplegia washout while clamped; activity returns ~22 min after a full dose
 
@@ -146,6 +147,7 @@ class Sim:
         self.csp = 0.0
         self.line_p = 0.0
         self.transfuse_left = 0.0
+        self.takeback_left = 0.0   # mL still to drain back from the patient to the reservoir ("take 200 back")
         self.oxy_eff = 1.0
         self.clot_risk = 0.0
         self.air = False
@@ -238,6 +240,14 @@ class Sim:
 
     def transfuse(self, ml):
         self.transfuse_left += clamp(float(ml), 0, 500)
+
+    def take_back(self, ml):
+        """Drain volume back from the patient into the reservoir, at up to 400 mL/min."""
+        self.takeback_left += max(0.0, float(ml))
+
+    @property
+    def notch(self):
+        return self.rhythm in ("sinus", "brady") and self.pulse >= NOTCH_PULSE
 
     def measure(self, kind):
         self.pending.append((self.t + 6.0, kind))
@@ -354,8 +364,14 @@ class Sim:
         if self.transfuse_left > 0 and self.vr > 5:
             q_tx = min(400.0, self.transfuse_left / dtm, self.vr / dtm)
             self.transfuse_left -= q_tx * dtm
+        q_tb = 0.0
+        if self.takeback_left > 0 and (self.cvp <= 0.0 or self.vr >= RES_MAX - 5):
+            self.takeback_left = 0.0                 # patient empty or reservoir full: stop draining
+        if self.takeback_left > 0:
+            q_tb = min(400.0, self.takeback_left / dtm)
+            self.takeback_left -= q_tb * dtm
         hp, hc = self.hct_p, self.hct_c
-        p_to_c = qv * 1000.0 + q_vent + q_suck + max(-qa, 0.0) * 1000.0
+        p_to_c = qv * 1000.0 + q_vent + q_suck + max(-qa, 0.0) * 1000.0 + q_tb
         c_to_p = max(qa, 0.0) * 1000.0 + 0.8 * q_cp + q_tx
         self.vp += (c_to_p + 0.2 * q_cp - p_to_c - lost - u) * dtm
         self.vr = clamp(self.vr + (p_to_c - c_to_p) * dtm, 0.0, RES_MAX)
@@ -624,6 +640,7 @@ class Sim:
             urine_ml=r(self.urine_ml), urine_rate=r(self.urine_rate), last_act2=self.last_act2,
             t_cp_water=r(self.t_cp_water, 1), rollers=self.rollers(), mode=self.mode, limits=dict(ALARM_LIMITS),
             sucker_return=r(self.q_suck / 1000.0, 3), vent_return=r(self.q_vent / 1000.0, 3),
+            notch=self.notch, transfusing=r(self.transfuse_left), taking_back=r(self.takeback_left),
             t=r(self.t, 1), map=r(self.pa, 1), cvp=r(self.cvp, 1), pulse=r(self.pulse, 1),
             rhythm=self.rhythm, hr=0 if self.rhythm in ("asystole", "vf") else (40 if self.rhythm == "brady" else 78),
             flow=r(self.qa, 2), ci=r(max(self.qa, 0) / self.bsa, 2), qh=r(self.qh, 2), qv=r(self.qv, 2),

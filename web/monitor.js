@@ -15,7 +15,8 @@ function ecgShape(p, rhythm, t) {
   return gs(0.18, 0.025, 0.12) - gs(0.27, 0.008, 0.12) + gs(0.29, 0.01, 1.0) - gs(0.315, 0.01, 0.22) + gs(0.5, 0.045, 0.25);
 }
 // 0..1 pressure pulse with a dicrotic notch; the PA pulse is rounder and a little later
-const artShape = (p) => (p < 0.12 ? p / 0.12 : Math.exp(-(p - 0.12) * 3.2)) + 0.12 * Math.exp(-((p - 0.42) ** 2) / 0.002);
+// the notch is drawn only when the model says the heart is ejecting enough to close the aortic valve with one (S.notch)
+const artShape = (p, notch) => (p < 0.12 ? p / 0.12 : Math.exp(-(p - 0.12) * 3.2)) + (notch ? 0.12 * Math.exp(-((p - 0.42) ** 2) / 0.002) : 0);
 const paShape = (p) => (p < 0.16 ? p / 0.16 : Math.exp(-(p - 0.16) * 2.6)) + 0.06 * Math.exp(-((p - 0.45) ** 2) / 0.003);
 
 export function sampleWaves(S, dt) {
@@ -26,7 +27,7 @@ export function sampleWaves(S, dt) {
     const i = wave.i = (wave.i + 1) % N, p = (wave.ph + ((k + 1) / n) * ((dt * hr) / 60)) % 1;
     wave.ecg[i] = ecgShape(p, S.rhythm, t + k * 0.008);
     // mean + pulse pressure x (shape - its mean): the trace's peak and trough sit near systolic and diastolic
-    wave.art[i] = S.map + (beating ? artPP * (artShape(p) - 0.42) : 0) + Math.sin(t * 40 + k) * 0.25;
+    wave.art[i] = S.map + (beating ? artPP * (artShape(p, S.notch) - 0.42) : 0) + Math.sin(t * 40 + k) * 0.25;
     wave.pa[i] = S.pap + (beating ? paPP * (paShape(p) - 0.40) : 0) + Math.sin(t * 3.1 + k * 0.05) * 0.3;
     wave.cvp[i] = S.cvp + (beating ? Math.sin(p * 6.28) * 0.8 : 0);
   }

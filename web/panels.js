@@ -79,6 +79,12 @@ export function buildPanels(act, state) {
       slider(b, 'Venous line occlusion', 'ven_occl', 0, 100, 1, (v) => `${v}% closed`, 100),
       buttons(b, [['Fully open', () => set('ven_occl', 0)], ['Half', () => set('ven_occl', 0.5)], ['Fully clamped', () => set('ven_occl', 1)]]),
       note(b, 'Closing this keeps blood in the patient. That fills the heart for weaning, and it drops your reservoir.'),
+      read(b, (S) => [['CVP', S.cvp.toFixed(1), S.cvp > 14 ? 'bad' : ''], ['MAP', Math.round(S.map), S.map > 95 ? 'warn' : ''],
+        ['Dicrotic notch', S.notch ? 'yes' : 'no', S.notch ? '' : 'warn'], ['Pulse pressure', Math.round(S.art_sys - S.art_dia)],
+        ['Bite going in', S.transfusing ? S.transfusing + ' mL' : '--'], ['Taking back', S.taking_back ? S.taking_back + ' mL' : '--']]),
+      buttons(b, [['Give a 100 mL bite', () => act({ type: 'transfuse', ml: 100 })], ['Give a 200 mL bite', () => act({ type: 'transfuse', ml: 200 })],
+        ['Take back 100 mL', () => act({ type: 'take_back', ml: 100 })], ['Take back 200 mL', () => act({ type: 'take_back', ml: 200 })]]),
+      note(b, 'Weaning: partly clamp, then fill in bites of 100 to 200 mL until the dicrotic notch shows on the arterial trace (400 to 600 mL is usually enough). CVP no more than 14, pressure 75 to 80. Then three-quarter flow and hold, half and hold, quarter and hold.'),
     ] },
     gas: { title: 'Gas blender and vaporizer', build: (b) => [
       read(b, (S) => [['PaCO2', Math.round(S.paco2), S.paco2 > 45 || S.paco2 < 35 ? 'warn' : ''], ['PaO2', S.pao2, S.pao2 < 150 ? 'warn' : ''], ['MAP', Math.round(S.map)]]),
