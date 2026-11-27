@@ -68,6 +68,10 @@ class Case:
         last = self.timers.get(key)
         if last is not None and (once or self.t - last < cooldown):
             return
+        n = self.timers.get("n_" + code, 0)
+        if n >= 3:                      # a repeating problem is penalised at most three times
+            return
+        self.timers["n_" + code] = n + 1
         self.timers[key] = self.t
         self.findings.append(dict(code=code, sev=sev, msg=msg, t=round(self.t, 1), phase=self.phase))
 
@@ -103,14 +107,17 @@ class Case:
         elif kind == "heparin":
             s.give_heparin(a.get("units", 0))
         elif kind == "protamine":
-            if self.phase != "POST":
+            # the model raises its own critical event if the pump or suckers are running, so only
+            # add a scenario finding when it would not (one error, one penalty)
+            will_clot = s.qa > 0.2 or s.c["sucker"] or s.rpm > 300
+            if self.phase != "POST" and not will_clot:
                 self.find("protamine_early", "critical", "Protamine given before the patient was off bypass.")
-            if s.c["sucker"]:
-                self.find("sucker_on_protamine", "critical", "Protamine given with the pump suckers still on.")
             s.give_protamine(a.get("mg", 0))
         elif kind == "phenylephrine":
             s.give_phenylephrine(a.get("mcg", 100))
         elif kind == "volume":
+            if a.get("kind") == "prbc" and self.persona.no_transfusion:
+                self.find("transfusion_refused", "critical", "Red cells given to a patient who refused blood products.")
             s.add_volume(a.get("ml", 250), a.get("kind", "crystalloid"))
         elif kind == "transfuse":
             s.transfuse(a.get("ml", 100))
@@ -222,9 +229,13 @@ class Case:
             self.credits.add("gases_in_range")
             self.say(f"Good. Cool to {self.persona.target_temp:.0f} degrees.")
             self.goto("COOL")
-        elif self.t - self.phase_t0 > 240 and not self.flags.get("stab_nag"):
+        elif self.t - self.phase_t0 > 180 and not self.flags.get("stab_nag"):
             self.flags["stab_nag"] = True
             self.say("I need gases in range, pressure between 50 and 80, and good oxygen delivery before we cool.")
+        elif self.t - self.phase_t0 > 420:
+            self.find("unstable_bypass", "major", "Bypass was never stabilised: the surgeon went ahead without gases, pressure and oxygen delivery in range.")
+            self.say(f"We cannot wait any longer. Cool to {self.persona.target_temp:.0f} degrees.")
+            self.goto("COOL")
 
     def ph_COOL(self):
         s = self.sim
@@ -320,8 +331,8 @@ class Case:
             self.flags["redosed"] = True
         if self.flags.get("redosed") and not s.c["cp_on"]:
             self.credits.add("redose")
-        if self.held("h_cp_late", s.since_cp > 1500, 1):
-            self.find("cp_interval", "major", "More than 25 minutes since the last cardioplegia dose.")
+        if self.held("h_cp_late", s.since_cp > 1200, 1):
+            self.find("cp_interval", "major", "More than 20 minutes since the last cardioplegia dose.")
             if not self.flags.get("cp_nag"):
                 self.flags["cp_nag"] = True
                 self.say("This heart is starting to move. How long since the last dose?")
@@ -399,6 +410,10 @@ class Case:
             elif self.held("h_hypo", s.pa < 60, 12):
                 self.timers.pop("h_hypo", None)
                 self.say("Patient is looking hypotensive. Give more volume." if s.vr > 100 else "Pressure is low and you are out of volume.")
+            if el > 480:
+                self.flags["prot_asked"] = True
+                self.find("unstable_off_bypass", "major", "Patient was still unstable eight minutes after coming off bypass.")
+                self.say("We are not getting anywhere. Suckers off, give protamine, and we will sort the pressure out.")
             if self.held("h_fail", s.pa < 45, 90):
                 self.find("failed_wean", "major", "Patient did not tolerate coming off bypass: consider inotrope before weaning.")
                 self.timers.pop("h_fail", None)
@@ -455,7 +470,7 @@ class Case:
         o = {
             "PRE": [f"Give heparin: 300 to 400 units per kg ({300*self.persona.weight:.0f} to {400*self.persona.weight:.0f} units)",
                     "Run an ACT at the analyzer and confirm it is over 480 seconds"],
-            "INITIATE": ["Spin the pump to about 1500 RPM, then unclamp the arterial line",
+            "INITIATE": ["Spin the pump until its pressure beats the patient's (about 1500 RPM, more if pressure is high), then unclamp the arterial line",
                          "Open the venous clamp", f"Bring flow up to about {tf:.1f} L/min",
                          "Turn the ventilator off once you are at full flow"],
             "STABILIZE": ["Run a blood gas", "Sweep gas: CO2 35 to 45. Oxygen: PaO2 150 to 400",

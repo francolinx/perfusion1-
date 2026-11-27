@@ -1,0 +1,6996 @@
+[
+ {
+  "persona": "standard_adult",
+  "band": "expert",
+  "seed": 45942,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 50.796666666625306,
+  "bypass_min": 50.246666666625806,
+  "clamp_min": 40.87166666663433,
+  "end_map": 79.06236152269354,
+  "end_cvp": 6.436556467791961,
+  "end_res": 1213.8216865536253,
+  "injury": 0.0643363333333298,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.171666666666663,
+   "STABILIZE": 0.203333333333329,
+   "COOL": 6.9939999999980484,
+   "CLAMP_ON": 0.1756666666665069,
+   "ANTEGRADE": 4.0066666666630235,
+   "RETROGRADE": 1.325999999998794,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6389999999976,
+   "REWARM": 10.727333333323577,
+   "CLAMP_OFF": 1.3746666666654164,
+   "WEAN": 0.7229999999993424,
+   "POST": 0.3546666666663441
+  },
+  "errs": [],
+  "wall_s": 1.6023472220000485,
+  "steps": 152390,
+  "min_res": 1109.5445363399222,
+  "min_map": 43.310958319528126,
+  "max_map": 108.46723199561966,
+  "min_do2i": 321.41670909441007,
+  "min_svo2": 0.5948376849702681,
+  "max_k": 4.747318131960245,
+  "min_hct": 0.2987695838457284,
+  "max_line": 236.20630198552138,
+  "max_lactate": 1.0254036862284055,
+  "min_ph": 7.379612598724525,
+  "max_paco2": 42.522852806161026,
+  "min_paco2": 37.49011367898105,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "standard_adult",
+  "band": "strong",
+  "seed": 45943,
+  "finished": true,
+  "stuck_in": null,
+  "score": 94,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 12,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 51.15333333329165,
+  "bypass_min": 50.566666666625515,
+  "clamp_min": 41.05466666663416,
+  "end_map": 77.60542016490186,
+  "end_cvp": 6.347110232159648,
+  "end_res": 1222.0616434503718,
+  "injury": 0.06504266666666124,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.202333333333329,
+   "STABILIZE": 0.1956666666666625,
+   "COOL": 7.06799999999796,
+   "CLAMP_ON": 0.20566666666647962,
+   "ANTEGRADE": 4.008999999996354,
+   "RETROGRADE": 1.3393333333321151,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.640666666664265,
+   "REWARM": 10.862666666656787,
+   "CLAMP_OFF": 1.38166666666541,
+   "WEAN": 0.7756666666659612,
+   "POST": 0.37199999999966166
+  },
+  "errs": [
+   "protamine_half"
+  ],
+  "wall_s": 1.6226551409999956,
+  "steps": 153460,
+  "min_res": 1138.5541932820506,
+  "min_map": 52.06456898531941,
+  "max_map": 102.37884769552738,
+  "min_do2i": 323.41263642610966,
+  "min_svo2": 0.5927005994836779,
+  "max_k": 4.7480523968452575,
+  "min_hct": 0.29874578837531907,
+  "max_line": 229.07492962487174,
+  "max_lactate": 1.022117611561726,
+  "min_ph": 7.3795337460690575,
+  "max_paco2": 42.558281741367836,
+  "min_paco2": 37.47123333874714,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "standard_adult",
+  "band": "strong",
+  "seed": 45944,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 50.81066666662529,
+  "bypass_min": 50.257999999959125,
+  "clamp_min": 40.880999999967656,
+  "end_map": 78.98265902474355,
+  "end_cvp": 6.426717259133929,
+  "end_res": 1214.7116074196056,
+  "injury": 0.06436033333332981,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.17433333333332962,
+   "STABILIZE": 0.20266666666666236,
+   "COOL": 6.999999999998041,
+   "CLAMP_ON": 0.1733333333331757,
+   "ANTEGRADE": 4.006333333329691,
+   "RETROGRADE": 1.325999999998794,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6389999999976,
+   "REWARM": 10.733333333323571,
+   "CLAMP_OFF": 1.3776666666654136,
+   "WEAN": 0.7226666666660094,
+   "POST": 0.3546666666663441
+  },
+  "errs": [],
+  "wall_s": 1.5896884869999894,
+  "steps": 152432,
+  "min_res": 1109.7880962508505,
+  "min_map": 42.807987438126396,
+  "max_map": 108.38786521294661,
+  "min_do2i": 324.0822129456112,
+  "min_svo2": 0.596120846672713,
+  "max_k": 4.747318131960245,
+  "min_hct": 0.29876849923899856,
+  "max_line": 235.9848105062016,
+  "max_lactate": 1.0258860411032966,
+  "min_ph": 7.379593225116412,
+  "max_paco2": 42.51358849819884,
+  "min_paco2": 37.4641486475403,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "standard_adult",
+  "band": "strong",
+  "seed": 45945,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 50.560666666625515,
+  "bypass_min": 49.99866666662603,
+  "clamp_min": 40.69366666663449,
+  "end_map": 78.93573335256382,
+  "end_cvp": 6.453211531458782,
+  "end_res": 1212.0455135204331,
+  "injury": 0.06398633333332973,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.1703333333333297,
+   "STABILIZE": 0.22899999999999512,
+   "COOL": 6.890666666664787,
+   "CLAMP_ON": 0.17466666666650782,
+   "ANTEGRADE": 4.0086666666630215,
+   "RETROGRADE": 1.325333333332128,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.639666666664266,
+   "REWARM": 10.54066666665708,
+   "CLAMP_OFF": 1.3909999999987348,
+   "WEAN": 0.7279999999993378,
+   "POST": 0.36199999999967075
+  },
+  "errs": [],
+  "wall_s": 1.8054384470000286,
+  "steps": 151682,
+  "min_res": 1094.6188080506963,
+  "min_map": 43.35722628795993,
+  "max_map": 112.33277976823167,
+  "min_do2i": 323.99573117155,
+  "min_svo2": 0.5990895844600826,
+  "max_k": 4.747173503206091,
+  "min_hct": 0.298774738844259,
+  "max_line": 245.03831967262713,
+  "max_lactate": 1.0245651178860102,
+  "min_ph": 7.3796281416536775,
+  "max_paco2": 42.518234018918584,
+  "min_paco2": 37.469869266659856,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "standard_adult",
+  "band": "average",
+  "seed": 45946,
+  "finished": true,
+  "stuck_in": null,
+  "score": 74,
+  "critical": 1,
+  "findings": [
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "suckers_off",
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 10,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 50.75533333329201,
+  "bypass_min": 50.15999999995922,
+  "clamp_min": 40.75166666663444,
+  "end_map": 75.75737734288484,
+  "end_cvp": 6.9112537124837035,
+  "end_res": 1167.1612954177904,
+  "injury": 0.06537633333332248,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2476666666666614,
+   "STABILIZE": 0.19566666666666427,
+   "COOL": 6.7266666666648955,
+   "CLAMP_ON": 0.2916666666664014,
+   "ANTEGRADE": 4.0303333333296685,
+   "RETROGRADE": 1.3439999999987777,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6476666666642585,
+   "REWARM": 10.419333333323857,
+   "CLAMP_OFF": 1.4723333333319943,
+   "WEAN": 0.9026666666658457,
+   "POST": 0.3766666666663241
+  },
+  "errs": [
+   "ignore_gases",
+   "protamine_half",
+   "sucker_on_protamine"
+  ],
+  "wall_s": 1.6181277059999957,
+  "steps": 152266,
+  "min_res": 1176.5483008465221,
+  "min_map": 51.15273519532654,
+  "max_map": 99.27655647619957,
+  "min_do2i": 336.2799446926629,
+  "min_svo2": 0.5819233489843698,
+  "max_k": 4.747755889709229,
+  "min_hct": 0.2987475915084867,
+  "max_line": 238.8632107498334,
+  "max_lactate": 1.015799914301531,
+  "min_ph": 7.370467504031975,
+  "max_paco2": 43.69156199600317,
+  "min_paco2": 36.58407701038857,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "standard_adult",
+  "band": "average",
+  "seed": 45947,
+  "finished": true,
+  "stuck_in": null,
+  "score": 92,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 9,
+   "due": 13
+  },
+  "map_in": 96,
+  "do2_in": 99,
+  "case_min": 47.539333333294934,
+  "bypass_min": 46.927333333295486,
+  "clamp_min": 40.56266666663461,
+  "end_map": 67.33383494544401,
+  "end_cvp": 5.779331763138552,
+  "end_res": 1283.2281570189746,
+  "injury": 0.06544333333332256,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2703333333333276,
+   "STABILIZE": 0.18566666666666673,
+   "COOL": 3.5436666666675403,
+   "CLAMP_ON": 0.3459999999999217,
+   "ANTEGRADE": 4.039666666662993,
+   "RETROGRADE": 1.0033333333324217,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6529999999975873,
+   "REWARM": 10.546666666657075,
+   "CLAMP_OFF": 1.469333333331997,
+   "WEAN": 0.9916666666657648,
+   "POST": 0.38933333333297926
+  },
+  "errs": [
+   "overcool",
+   "retro_fast",
+   "vent_on_antegrade"
+  ],
+  "wall_s": 1.6856901200000038,
+  "steps": 142618,
+  "min_res": 1201.2820424276645,
+  "min_map": 53.450115611262056,
+  "max_map": 92.23127891430984,
+  "min_do2i": 326.9577634239959,
+  "min_svo2": 0.5756719982073122,
+  "max_k": 4.759336756967347,
+  "min_hct": 0.29853456098870157,
+  "max_line": 231.21578307253102,
+  "max_lactate": 1.0163249829042622,
+  "min_ph": 7.379170921369861,
+  "max_paco2": 42.60363482876747,
+  "min_paco2": 37.38033128836145,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "standard_adult",
+  "band": "average",
+  "seed": 45948,
+  "finished": true,
+  "stuck_in": null,
+  "score": 88,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ],
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 10,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 53.302666666623026,
+  "bypass_min": 52.69999999995691,
+  "clamp_min": 41.459333333300464,
+  "end_map": 73.03228686819605,
+  "end_cvp": 6.1032155934648475,
+  "end_res": 1245.0711073196037,
+  "injury": 0.06780599999998886,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2756666666666608,
+   "STABILIZE": 1.5056666666665846,
+   "COOL": 7.329999999996544,
+   "CLAMP_ON": 0.3103333333330511,
+   "ANTEGRADE": 4.031999999996333,
+   "RETROGRADE": 0.9976666666657593,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.673666666664235,
+   "REWARM": 11.258666666656428,
+   "CLAMP_OFF": 1.578999999998564,
+   "WEAN": 0.8576666666658866,
+   "POST": 0.38166666666631954
+  },
+  "errs": [
+   "flow_up_early",
+   "retro_fast",
+   "vent_on_antegrade"
+  ],
+  "wall_s": 1.8182685190000711,
+  "steps": 159908,
+  "min_res": 1246.9076420099134,
+  "min_map": 55.2658159030721,
+  "max_map": 80.44631606971828,
+  "min_do2i": 326.858351277977,
+  "min_svo2": 0.5826971981262971,
+  "max_k": 4.759476370135772,
+  "min_hct": 0.29874327058412653,
+  "max_line": 203.43286076743686,
+  "max_lactate": 1.0238406409327576,
+  "min_ph": 7.379037020651717,
+  "max_paco2": 42.519003230930835,
+  "min_paco2": 37.446434227910096,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "standard_adult",
+  "band": "novice",
+  "seed": 45949,
+  "finished": true,
+  "stuck_in": null,
+  "score": 74,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "vent_off_early",
+    "INITIATE"
+   ],
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "suckers_off"
+  ],
+  "callouts": {
+   "made": 5,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 98,
+  "case_min": 51.99233333329088,
+  "bypass_min": 51.40833333329142,
+  "clamp_min": 41.33299999996724,
+  "end_map": 71.14170035731755,
+  "end_cvp": 6.61761506526861,
+  "end_res": 1198.1461601393225,
+  "injury": 0.06828566666664576,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.29933333333332696,
+   "STABILIZE": 0.19733333333334038,
+   "COOL": 6.906999999998008,
+   "CLAMP_ON": 0.5129999999995334,
+   "ANTEGRADE": 4.0733333333296295,
+   "RETROGRADE": 1.3949999999987313,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6446666666642615,
+   "REWARM": 10.727999999990242,
+   "CLAMP_OFF": 1.5603333333319143,
+   "WEAN": 1.1953333333322462,
+   "POST": 0.37833333333298924
+  },
+  "errs": [
+   "ignore_gases",
+   "sucker_on_protamine",
+   "vent_off_early"
+  ],
+  "wall_s": 1.7667367299999341,
+  "steps": 155977,
+  "min_res": 1275.7948109223173,
+  "min_map": 57.29386390568583,
+  "max_map": 77.03135330469614,
+  "min_do2i": 336.0992588501243,
+  "min_svo2": 0.5836548371541268,
+  "max_k": 4.752318821210222,
+  "min_hct": 0.29866349414477367,
+  "max_line": 204.0801810292554,
+  "max_lactate": 1.0114888138478153,
+  "min_ph": 7.367509171872149,
+  "max_paco2": 44.061353515981445,
+  "min_paco2": 36.587629093505036,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "standard_adult",
+  "band": "novice",
+  "seed": 45950,
+  "finished": true,
+  "stuck_in": null,
+  "score": 60,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "vent_off_early",
+    "INITIATE"
+   ],
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 3,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 98,
+  "case_min": 44.38899999996446,
+  "bypass_min": 43.79766666663167,
+  "clamp_min": 37.02966666663782,
+  "end_map": 63.623217786625666,
+  "end_cvp": 6.082205106824249,
+  "end_res": 1258.7711559840482,
+  "injury": 0.0583069999999805,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2926666666666604,
+   "STABILIZE": 0.1836666666666704,
+   "COOL": 3.559000000000889,
+   "CLAMP_ON": 0.4523333333331076,
+   "ANTEGRADE": 4.058333333329643,
+   "RETROGRADE": 1.3973333333320626,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.671333333330904,
+   "REWARM": 6.456666666660794,
+   "CLAMP_OFF": 1.7643333333317286,
+   "WEAN": 1.0866666666656783,
+   "POST": 0.36599999999966715
+  },
+  "errs": [
+   "hot_rewarm",
+   "overcool",
+   "protamine_half",
+   "vent_late_on_wean",
+   "vent_off_early"
+  ],
+  "wall_s": 1.4687721110000211,
+  "steps": 133167,
+  "min_res": 1234.8454072950954,
+  "min_map": 58.92097734439148,
+  "max_map": 85.95784122409287,
+  "min_do2i": 330.8333811869805,
+  "min_svo2": 0.5676245269425958,
+  "max_k": 4.751804663240232,
+  "min_hct": 0.29845844198462435,
+  "max_line": 218.28992640610159,
+  "max_lactate": 1.0164070323059025,
+  "min_ph": 7.370892851426588,
+  "max_paco2": 43.48395255394175,
+  "min_paco2": 36.393045968187174,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "standard_adult",
+  "band": "novice",
+  "seed": 45951,
+  "finished": true,
+  "stuck_in": null,
+  "score": 48,
+  "critical": 2,
+  "findings": [
+   [
+    "major",
+    "vent_off_early",
+    "INITIATE"
+   ],
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ],
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "suckers_off"
+  ],
+  "callouts": {
+   "made": 2,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 98,
+  "case_min": 48.562333333294,
+  "bypass_min": 47.964999999961215,
+  "clamp_min": 37.471999999970755,
+  "end_map": 65.60364914996892,
+  "end_cvp": 6.223366092412443,
+  "end_res": 1240.2110574250307,
+  "injury": 0.06114999999996105,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.31433333333332664,
+   "STABILIZE": 0.19300000000000903,
+   "COOL": 7.139999999997785,
+   "CLAMP_ON": 0.5739999999994779,
+   "ANTEGRADE": 4.080666666662956,
+   "RETROGRADE": 1.3779999999987467,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.697666666664213,
+   "REWARM": 6.766999999993845,
+   "CLAMP_OFF": 1.7506666666650745,
+   "WEAN": 1.1786666666655947,
+   "POST": 0.3876666666663141
+  },
+  "errs": [
+   "hot_rewarm",
+   "sucker_on_protamine",
+   "vent_late_on_wean",
+   "vent_off_early",
+   "vent_on_antegrade"
+  ],
+  "wall_s": 1.59272235800006,
+  "steps": 145687,
+  "min_res": 1303.2970115027147,
+  "min_map": 61.57794336455131,
+  "max_map": 70.75995510918595,
+  "min_do2i": 327.4794906758551,
+  "min_svo2": 0.5832876415305795,
+  "max_k": 4.750247857603584,
+  "min_hct": 0.2986962942123761,
+  "max_line": 192.55055641397917,
+  "max_lactate": 1.0166764592178748,
+  "min_ph": 7.3709252031266175,
+  "max_paco2": 43.6343496091729,
+  "min_paco2": 37.356738340503675,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "small_anemic",
+  "band": "expert",
+  "seed": 38843,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 95,
+  "do2_in": 99,
+  "case_min": 48.10133333329442,
+  "bypass_min": 47.55133333329492,
+  "clamp_min": 38.92099999996944,
+  "end_map": 79.65291827186599,
+  "end_cvp": 6.233831446223475,
+  "end_res": 2136.789522044626,
+  "injury": 0.06000433333333124,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.171666666666663,
+   "STABILIZE": 0.5243333333333688,
+   "COOL": 5.930999999998684,
+   "CLAMP_ON": 0.16799999999984722,
+   "ANTEGRADE": 4.010999999996353,
+   "RETROGRADE": 1.325999999998794,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6389999999976,
+   "REWARM": 8.777666666658684,
+   "CLAMP_OFF": 1.4846666666653163,
+   "WEAN": 0.6126666666661095,
+   "POST": 0.3546666666663441
+  },
+  "errs": [],
+  "wall_s": 1.7779700329999741,
+  "steps": 144304,
+  "min_res": 1007.6313340412208,
+  "min_map": 39.341158971248426,
+  "max_map": 128.44515886372153,
+  "min_do2i": 252.96812627665648,
+  "min_svo2": 0.5512358270425028,
+  "max_k": 4.863718549690516,
+  "min_hct": 0.22287473381665232,
+  "max_line": 211.42494324199646,
+  "max_lactate": 1.0263399881469648,
+  "min_ph": 7.379861497686455,
+  "max_paco2": 42.504468460299854,
+  "min_paco2": 37.4891615494593,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "small_anemic",
+  "band": "strong",
+  "seed": 38844,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 12,
+   "due": 13
+  },
+  "map_in": 94,
+  "do2_in": 99,
+  "case_min": 48.2696666666276,
+  "bypass_min": 47.68299999996147,
+  "clamp_min": 38.89633333330279,
+  "end_map": 68.8342475169349,
+  "end_cvp": 5.654320020565837,
+  "end_res": 2194.22433127713,
+  "injury": 0.06003233333333077,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.202333333333329,
+   "STABILIZE": 0.5640000000000472,
+   "COOL": 5.887999999998646,
+   "CLAMP_ON": 0.19933333333315204,
+   "ANTEGRADE": 4.006999999996356,
+   "RETROGRADE": 1.3393333333321151,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.640666666664265,
+   "REWARM": 8.713333333325409,
+   "CLAMP_OFF": 1.5073333333319625,
+   "WEAN": 0.7356666666659976,
+   "POST": 0.37199999999966166
+  },
+  "errs": [],
+  "wall_s": 1.6642430750000585,
+  "steps": 144809,
+  "min_res": 1018.1970701784702,
+  "min_map": 44.19221414970944,
+  "max_map": 127.05006139137124,
+  "min_do2i": 247.83944432603832,
+  "min_svo2": 0.5424919856642991,
+  "max_k": 4.864521130905609,
+  "min_hct": 0.2200766493278763,
+  "max_line": 213.68518432332093,
+  "max_lactate": 1.0246048290994418,
+  "min_ph": 7.37972128657411,
+  "max_paco2": 42.5230732544097,
+  "min_paco2": 37.37750020139972,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "small_anemic",
+  "band": "strong",
+  "seed": 38845,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 94,
+  "do2_in": 99,
+  "case_min": 48.364666666627514,
+  "bypass_min": 47.79866666662803,
+  "clamp_min": 39.029666666636004,
+  "end_map": 81.69893816953017,
+  "end_cvp": 6.357014220470701,
+  "end_res": 2124.0959112866876,
+  "injury": 0.060518666666662765,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.18899999999999598,
+   "STABILIZE": 0.5106666666667031,
+   "COOL": 5.952333333331993,
+   "CLAMP_ON": 0.2133333333331393,
+   "ANTEGRADE": 4.005333333329691,
+   "RETROGRADE": 1.3346666666654527,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.654333333330919,
+   "REWARM": 8.823666666658642,
+   "CLAMP_OFF": 1.503333333331966,
+   "WEAN": 0.7086666666660222,
+   "POST": 0.36866666666633136
+  },
+  "errs": [],
+  "wall_s": 1.6263620500000115,
+  "steps": 145094,
+  "min_res": 1028.1612676824313,
+  "min_map": 47.32651925825204,
+  "max_map": 124.61828299709184,
+  "min_do2i": 249.6484366448697,
+  "min_svo2": 0.5337221372986376,
+  "max_k": 4.863875900860748,
+  "min_hct": 0.22401718319842573,
+  "max_line": 209.08776588917087,
+  "max_lactate": 1.0265737310038583,
+  "min_ph": 7.3798274510748465,
+  "max_paco2": 42.509006040395455,
+  "min_paco2": 37.41404712818177,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "small_anemic",
+  "band": "strong",
+  "seed": 38846,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 12,
+   "due": 13
+  },
+  "map_in": 94,
+  "do2_in": 99,
+  "case_min": 48.412333333294136,
+  "bypass_min": 47.83499999996133,
+  "clamp_min": 39.01666666663602,
+  "end_map": 74.53140616811297,
+  "end_cvp": 5.969701215979939,
+  "end_res": 2162.9275450691625,
+  "injury": 0.06056966666666252,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.19366666666666255,
+   "STABILIZE": 0.5163333333333715,
+   "COOL": 5.951333333331983,
+   "CLAMP_ON": 0.21133333333314114,
+   "ANTEGRADE": 4.007333333329689,
+   "RETROGRADE": 1.3349999999987858,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6446666666642615,
+   "REWARM": 8.811333333325319,
+   "CLAMP_OFF": 1.5093333333319605,
+   "WEAN": 0.7546666666659803,
+   "POST": 0.3766666666663241
+  },
+  "errs": [],
+  "wall_s": 1.597838319999937,
+  "steps": 145237,
+  "min_res": 1028.9758977279962,
+  "min_map": 47.79709897273442,
+  "max_map": 124.47581651534199,
+  "min_do2i": 249.51391389259962,
+  "min_svo2": 0.5317096436184227,
+  "max_k": 4.864009987656464,
+  "min_hct": 0.22345487834108704,
+  "max_line": 209.01477447472527,
+  "max_lactate": 1.0270873051253155,
+  "min_ph": 7.3797892393891455,
+  "max_paco2": 42.51343694568886,
+  "min_paco2": 37.36115987580317,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "small_anemic",
+  "band": "average",
+  "seed": 38847,
+  "finished": true,
+  "stuck_in": null,
+  "score": 50,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "do2_low",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "do2_low",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "unstable_bypass",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "do2_low",
+    "COOL"
+   ],
+   [
+    "minor",
+    "co2_range",
+    "ANTEGRADE"
+   ],
+   [
+    "minor",
+    "co2_range",
+    "OPERATE"
+   ],
+   [
+    "minor",
+    "co2_range",
+    "OPERATE"
+   ],
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "gases_in_range",
+   "suckers_off"
+  ],
+  "callouts": {
+   "made": 10,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 1,
+  "case_min": 57.0273333332863,
+  "bypass_min": 56.38399999995355,
+  "clamp_min": 40.22366666663492,
+  "end_map": 75.1533592790685,
+  "end_cvp": 7.120748360212478,
+  "end_res": 1140.9478306456094,
+  "injury": 0.06541499999998193,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3036666666666602,
+   "STABILIZE": 7.000333333331439,
+   "COOL": 6.6053333333273265,
+   "CLAMP_ON": 0.39199999999964347,
+   "ANTEGRADE": 4.030666666663003,
+   "RETROGRADE": 1.3759999999987484,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.671666666664237,
+   "REWARM": 9.758333333324458,
+   "CLAMP_OFF": 1.5269999999986112,
+   "WEAN": 0.860999999999217,
+   "POST": 0.40066666666630224
+  },
+  "errs": [
+   "ignore_gases",
+   "sucker_on_protamine"
+  ],
+  "wall_s": 2.179108088000021,
+  "steps": 171082,
+  "min_res": 1089.1054242549715,
+  "min_map": 58.451934049015435,
+  "max_map": 114.3482560128976,
+  "min_do2i": 236.36727830980078,
+  "min_svo2": 0.478437988352833,
+  "max_k": 4.865434478838559,
+  "min_hct": 0.19655271552766485,
+  "max_line": 196.67970357579205,
+  "max_lactate": 1.039026804219357,
+  "min_ph": 7.409480669576793,
+  "max_paco2": 35.58729085472218,
+  "min_paco2": 28.660927989854574,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "small_anemic",
+  "band": "average",
+  "seed": 38848,
+  "finished": true,
+  "stuck_in": null,
+  "score": 80,
+  "critical": 1,
+  "findings": [
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "suckers_off"
+  ],
+  "callouts": {
+   "made": 11,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 98,
+  "case_min": 50.72733333329203,
+  "bypass_min": 50.1386666666259,
+  "clamp_min": 39.578666666635506,
+  "end_map": 70.23066554043386,
+  "end_cvp": 6.322949012970616,
+  "end_res": 2127.7157653700247,
+  "injury": 0.06233399999999188,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2556666666666612,
+   "STABILIZE": 1.807333333333216,
+   "COOL": 6.3186666666639075,
+   "CLAMP_ON": 0.2746666666664178,
+   "ANTEGRADE": 4.027666666663004,
+   "RETROGRADE": 1.359999999998763,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6609999999975797,
+   "REWARM": 9.261999999991577,
+   "CLAMP_OFF": 1.5139999999986231,
+   "WEAN": 0.7663333333326363,
+   "POST": 0.37933333333298835
+  },
+  "errs": [
+   "sucker_on_protamine",
+   "vent_on_antegrade"
+  ],
+  "wall_s": 1.6936604680000755,
+  "steps": 152182,
+  "min_res": 1083.3383148208911,
+  "min_map": 51.92174421051513,
+  "max_map": 112.7505762028848,
+  "min_do2i": 268.58992693141846,
+  "min_svo2": 0.5395026205895569,
+  "max_k": 4.866616601389697,
+  "min_hct": 0.2275895487662452,
+  "max_line": 193.382514956034,
+  "max_lactate": 1.02252202536096,
+  "min_ph": 7.379345659608152,
+  "max_paco2": 42.57384624543012,
+  "min_paco2": 37.4336626872756,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "small_anemic",
+  "band": "average",
+  "seed": 38849,
+  "finished": true,
+  "stuck_in": null,
+  "score": 74,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ],
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "suckers_off"
+  ],
+  "callouts": {
+   "made": 11,
+   "due": 13
+  },
+  "map_in": 96,
+  "do2_in": 98,
+  "case_min": 45.94533333329638,
+  "bypass_min": 45.32699999996361,
+  "clamp_min": 36.04699999997205,
+  "end_map": 70.93594497012937,
+  "end_cvp": 6.346149967029196,
+  "end_res": 2128.913669964168,
+  "injury": 0.05502966666665622,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.27366666666666084,
+   "STABILIZE": 0.4773333333333796,
+   "COOL": 6.072999999998496,
+   "CLAMP_ON": 0.3273333333330356,
+   "ANTEGRADE": 4.029666666663003,
+   "RETROGRADE": 1.3629999999987603,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.649666666664257,
+   "REWARM": 5.65533333332819,
+   "CLAMP_OFF": 1.768333333331725,
+   "WEAN": 0.8336666666659085,
+   "POST": 0.3936666666663086
+  },
+  "errs": [
+   "hot_rewarm",
+   "sucker_on_protamine"
+  ],
+  "wall_s": 1.4811925889999884,
+  "steps": 137836,
+  "min_res": 1075.585078891246,
+  "min_map": 55.08654379168023,
+  "max_map": 116.11593929561052,
+  "min_do2i": 268.47655672128894,
+  "min_svo2": 0.5230725599325384,
+  "max_k": 4.864750859231807,
+  "min_hct": 0.2218269927658737,
+  "max_line": 200.315607820813,
+  "max_lactate": 1.025278437434077,
+  "min_ph": 7.379529554195501,
+  "max_paco2": 42.54976089710917,
+  "min_paco2": 36.94929393301668,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "small_anemic",
+  "band": "novice",
+  "seed": 38850,
+  "finished": true,
+  "stuck_in": null,
+  "score": 32,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "vent_off_early",
+    "INITIATE"
+   ],
+   [
+    "major",
+    "do2_low",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "unstable_bypass",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "do2_low",
+    "COOL"
+   ],
+   [
+    "major",
+    "do2_low",
+    "COOL"
+   ],
+   [
+    "minor",
+    "co2_range",
+    "ANTEGRADE"
+   ],
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ],
+   [
+    "minor",
+    "co2_range",
+    "OPERATE"
+   ],
+   [
+    "minor",
+    "co2_range",
+    "OPERATE"
+   ],
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ]
+  ],
+  "missed": [
+   "gases_in_range",
+   "redose"
+  ],
+  "callouts": {
+   "made": 6,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 1,
+  "case_min": 56.37266666662023,
+  "bypass_min": 55.740666666620804,
+  "clamp_min": 39.768333333302,
+  "end_map": 75.7302959672005,
+  "end_cvp": 7.1493053863544995,
+  "end_res": 1077.605461364749,
+  "injury": 0.06468166666665164,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3163333333333266,
+   "STABILIZE": 7.000333333331428,
+   "COOL": 6.473333333327447,
+   "CLAMP_ON": 0.4426666666662641,
+   "ANTEGRADE": 4.0593333333296435,
+   "RETROGRADE": 1.0083333333324163,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6836666666642257,
+   "REWARM": 9.577999999991288,
+   "CLAMP_OFF": 1.3623333333320944,
+   "WEAN": 0.9679999999991196,
+   "POST": 0.3796666666663214
+  },
+  "errs": [
+   "ignore_gases",
+   "no_redose",
+   "retro_fast",
+   "vent_late_on_wean",
+   "vent_off_early"
+  ],
+  "wall_s": 2.0318264259999523,
+  "steps": 169118,
+  "min_res": 1087.1656277823242,
+  "min_map": 57.74480374034051,
+  "max_map": 114.42589180390215,
+  "min_do2i": 236.40427654037433,
+  "min_svo2": 0.47350670863182603,
+  "max_k": 4.8758351176581005,
+  "min_hct": 0.19885632302600684,
+  "max_line": 197.81452382085098,
+  "max_lactate": 1.036211063926564,
+  "min_ph": 7.3911681824582836,
+  "max_paco2": 35.593333890365834,
+  "min_paco2": 28.658479165719665,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "small_anemic",
+  "band": "novice",
+  "seed": 38851,
+  "finished": true,
+  "stuck_in": null,
+  "score": 74,
+  "critical": 1,
+  "findings": [
+   [
+    "minor",
+    "map_high",
+    "STABILIZE"
+   ],
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "minor",
+    "cp_pressure",
+    "ANTEGRADE"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 6,
+   "due": 13
+  },
+  "map_in": 95,
+  "do2_in": 98,
+  "case_min": 45.627666666630006,
+  "bypass_min": 45.0453333332972,
+  "clamp_min": 37.97266666663697,
+  "end_map": 67.27313817012464,
+  "end_cvp": 6.232859696053433,
+  "end_res": 1839.77903039485,
+  "injury": 0.05713766666668473,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2926666666666604,
+   "STABILIZE": 1.2496666666666323,
+   "COOL": 3.155666666667176,
+   "CLAMP_ON": 0.37533333333299196,
+   "ANTEGRADE": 2.517333333331044,
+   "RETROGRADE": 1.3733333333320852,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.650999999997589,
+   "REWARM": 9.04799999999177,
+   "CLAMP_OFF": 1.5976666666652135,
+   "WEAN": 0.906333333332509,
+   "POST": 0.3599999999996726
+  },
+  "errs": [
+   "cp_fast",
+   "overcool",
+   "vent_late_on_wean"
+  ],
+  "wall_s": 1.5142575929999111,
+  "steps": 136883,
+  "min_res": 1060.7724252418047,
+  "min_map": 51.65519499208535,
+  "max_map": 122.88827669551394,
+  "min_do2i": 252.26568828003326,
+  "min_svo2": 0.4899555568123543,
+  "max_k": 4.880662101849409,
+  "min_hct": 0.21223448662956984,
+  "max_line": 216.13430211527742,
+  "max_lactate": 1.0266205098034784,
+  "min_ph": 7.359314433437571,
+  "max_paco2": 42.834462485777436,
+  "min_paco2": 36.74336238957792,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "small_anemic",
+  "band": "novice",
+  "seed": 38852,
+  "finished": true,
+  "stuck_in": null,
+  "score": 52,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "do2_low",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "do2_low",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "unstable_bypass",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "do2_low",
+    "COOL"
+   ],
+   [
+    "minor",
+    "co2_range",
+    "ANTEGRADE"
+   ],
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ],
+   [
+    "minor",
+    "co2_range",
+    "OPERATE"
+   ],
+   [
+    "minor",
+    "co2_range",
+    "OPERATE"
+   ],
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "gases_in_range",
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 5,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 1,
+  "case_min": 53.921999999955794,
+  "bypass_min": 53.17866666662314,
+  "clamp_min": 36.3906666666384,
+  "end_map": 73.0641676856724,
+  "end_cvp": 7.060354668425166,
+  "end_res": 1154.5111998242553,
+  "injury": 0.057949666666644244,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.37799999999999195,
+   "STABILIZE": 7.000333333331373,
+   "COOL": 6.5616666666607,
+   "CLAMP_ON": 0.5776666666661413,
+   "ANTEGRADE": 4.0849999999962865,
+   "RETROGRADE": 1.07033333333236,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.673666666664235,
+   "REWARM": 6.013333333327864,
+   "CLAMP_OFF": 1.8433333333316568,
+   "WEAN": 1.094333333332338,
+   "POST": 0.5236666666661904
+  },
+  "errs": [
+   "hot_rewarm",
+   "ignore_gases",
+   "protamine_half",
+   "retro_fast"
+  ],
+  "wall_s": 1.9368771000000606,
+  "steps": 161766,
+  "min_res": 1150.3117263947427,
+  "min_map": 60.39415410553557,
+  "max_map": 101.91007404073059,
+  "min_do2i": 236.36873524142436,
+  "min_svo2": 0.4724488502341553,
+  "max_k": 4.885556612781148,
+  "min_hct": 0.19635850630449275,
+  "max_line": 184.39304805063455,
+  "max_lactate": 1.0404029479970411,
+  "min_ph": 7.414061000418148,
+  "max_paco2": 35.59261119030547,
+  "min_paco2": 28.660057803661473,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "obese_adult",
+  "band": "expert",
+  "seed": 35929,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 55.04333333328811,
+  "bypass_min": 54.49333333328861,
+  "clamp_min": 43.558666666631886,
+  "end_map": 94.4660762408448,
+  "end_cvp": 7.471977600437367,
+  "end_res": 1106.0329066228003,
+  "injury": 0.07027399999999505,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.171666666666663,
+   "STABILIZE": 0.18666666666666268,
+   "COOL": 8.70099999999651,
+   "CLAMP_ON": 0.17533333333317386,
+   "ANTEGRADE": 4.006666666663023,
+   "RETROGRADE": 1.325999999998794,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6389999999976,
+   "REWARM": 13.415666666654465,
+   "CLAMP_OFF": 1.2239999999988869,
+   "WEAN": 0.7419999999993252,
+   "POST": 0.3546666666663441
+  },
+  "errs": [],
+  "wall_s": 1.846289769000009,
+  "steps": 165130,
+  "min_res": 1280.963960806373,
+  "min_map": 45.88810867461355,
+  "max_map": 80.25146090108692,
+  "min_do2i": 352.83185170410957,
+  "min_svo2": 0.6136222385336748,
+  "max_k": 4.747318131960245,
+  "min_hct": 0.33381010508098474,
+  "max_line": 296.3262577022741,
+  "max_lactate": 1.0286830284373942,
+  "min_ph": 7.375430554644996,
+  "max_paco2": 42.90977618982504,
+  "min_paco2": 37.36602525017334,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "obese_adult",
+  "band": "strong",
+  "seed": 35930,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 11,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 55.36999999995448,
+  "bypass_min": 54.808666666621654,
+  "clamp_min": 43.71266666663175,
+  "end_map": 73.60147110245283,
+  "end_cvp": 6.240379091645918,
+  "end_res": 1228.3780908351375,
+  "injury": 0.07094866666665997,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.19899999999999576,
+   "STABILIZE": 0.18866666666666265,
+   "COOL": 8.786666666663073,
+   "CLAMP_ON": 0.2076666666664778,
+   "ANTEGRADE": 4.007999999996355,
+   "RETROGRADE": 1.3299999999987904,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.636333333330936,
+   "REWARM": 13.52966666665436,
+   "CLAMP_OFF": 1.2389999999988732,
+   "WEAN": 0.7856666666659521,
+   "POST": 0.35866666666634045
+  },
+  "errs": [],
+  "wall_s": 1.8843415019999838,
+  "steps": 166110,
+  "min_res": 1330.6577896337192,
+  "min_map": 52.67056851215605,
+  "max_map": 79.97629678188116,
+  "min_do2i": 355.9160791983799,
+  "min_svo2": 0.6097520808012145,
+  "max_k": 4.747045045542457,
+  "min_hct": 0.33381874645623977,
+  "max_line": 282.2447559785217,
+  "max_lactate": 1.0256942305011627,
+  "min_ph": 7.360506143426621,
+  "max_paco2": 44.93673207167247,
+  "min_paco2": 37.16150385071928,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "obese_adult",
+  "band": "strong",
+  "seed": 35931,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 54.993666666621486,
+  "bypass_min": 54.40699999995535,
+  "clamp_min": 43.446333333298654,
+  "end_map": 87.40437197644967,
+  "end_cvp": 7.064452684991665,
+  "end_res": 1146.48706483392,
+  "injury": 0.0702993333333268,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.202333333333329,
+   "STABILIZE": 0.1956666666666625,
+   "COOL": 8.622666666663214,
+   "CLAMP_ON": 0.20466666666648053,
+   "ANTEGRADE": 4.013333333329683,
+   "RETROGRADE": 1.3393333333321151,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.640666666664265,
+   "REWARM": 13.247666666654618,
+   "CLAMP_OFF": 1.2573333333321899,
+   "WEAN": 0.7973333333326081,
+   "POST": 0.37199999999966166
+  },
+  "errs": [],
+  "wall_s": 1.8609989059999634,
+  "steps": 164981,
+  "min_res": 1309.1158173592873,
+  "min_map": 52.89955340370797,
+  "max_map": 82.00037463058675,
+  "min_do2i": 355.73077968377015,
+  "min_svo2": 0.6171018836506494,
+  "max_k": 4.7480523968452575,
+  "min_hct": 0.33379019280431677,
+  "max_line": 293.05482791063145,
+  "max_lactate": 1.0221078646633275,
+  "min_ph": 7.36195248415603,
+  "max_paco2": 44.755939480496224,
+  "min_paco2": 37.27361050214115,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "obese_adult",
+  "band": "strong",
+  "seed": 35932,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 12,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 55.04433333328811,
+  "bypass_min": 54.4699999999553,
+  "clamp_min": 43.49799999996527,
+  "end_map": 87.96291656583725,
+  "end_cvp": 7.093624467616127,
+  "end_res": 1143.8912199046397,
+  "injury": 0.07049699999999284,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.19166666666666257,
+   "STABILIZE": 0.19099999999999592,
+   "COOL": 8.648666666663205,
+   "CLAMP_ON": 0.2076666666664778,
+   "ANTEGRADE": 4.011999999996351,
+   "RETROGRADE": 1.3389999999987823,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6476666666642585,
+   "REWARM": 13.295666666654574,
+   "CLAMP_OFF": 1.246999999998866,
+   "WEAN": 0.795666666665943,
+   "POST": 0.3676666666663323
+  },
+  "errs": [],
+  "wall_s": 1.9005413029999545,
+  "steps": 165133,
+  "min_res": 1304.5790207648033,
+  "min_map": 52.03100715492332,
+  "max_map": 81.4048864807111,
+  "min_do2i": 355.3852139680653,
+  "min_svo2": 0.609574785215593,
+  "max_k": 4.748055366927039,
+  "min_hct": 0.3337898909918505,
+  "max_line": 290.0369694570881,
+  "max_lactate": 1.0248326648592525,
+  "min_ph": 7.3638577089469734,
+  "max_paco2": 44.517786381628405,
+  "min_paco2": 37.259901868533184,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "obese_adult",
+  "band": "average",
+  "seed": 35933,
+  "finished": true,
+  "stuck_in": null,
+  "score": 98,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "cp_pressure",
+    "ANTEGRADE"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 9,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 55.451333333287735,
+  "bypass_min": 54.839333333288295,
+  "clamp_min": 41.9683333333,
+  "end_map": 81.16246292725165,
+  "end_cvp": 6.690773025002654,
+  "end_res": 1184.7453641660009,
+  "injury": 0.06633933333334777,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2703333333333276,
+   "STABILIZE": 1.7526666666665363,
+   "COOL": 8.664666666661825,
+   "CLAMP_ON": 0.33966666666635775,
+   "ANTEGRADE": 2.5466666666643505,
+   "RETROGRADE": 1.347333333332108,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6529999999975873,
+   "REWARM": 13.086666666654764,
+   "CLAMP_OFF": 1.325999999998794,
+   "WEAN": 0.9743333333324472,
+   "POST": 0.38933333333297926
+  },
+  "errs": [
+   "cp_fast"
+  ],
+  "wall_s": 1.8350920789999918,
+  "steps": 166354,
+  "min_res": 1360.882325416084,
+  "min_map": 61.719020886396024,
+  "max_map": 85.00944261024505,
+  "min_do2i": 358.7060960936301,
+  "min_svo2": 0.5952228304743516,
+  "max_k": 4.769008103541449,
+  "min_hct": 0.333723306968809,
+  "max_line": 296.3541163484652,
+  "max_lactate": 1.0158240099006697,
+  "min_ph": 7.329160870602674,
+  "max_paco2": 44.43269577405873,
+  "min_paco2": 37.15263884376624,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "obese_adult",
+  "band": "average",
+  "seed": 35934,
+  "finished": true,
+  "stuck_in": null,
+  "score": 94,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "vent_off_early",
+    "INITIATE"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 10,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 57.79399999995227,
+  "bypass_min": 57.21333333328614,
+  "clamp_min": 44.09999999996473,
+  "end_map": 73.75687771726686,
+  "end_cvp": 6.265055187837388,
+  "end_res": 1224.1038145491545,
+  "injury": 0.07296066666665267,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2389999999999949,
+   "STABILIZE": 1.7246666666665473,
+   "COOL": 9.055666666661512,
+   "CLAMP_ON": 0.2939999999997326,
+   "ANTEGRADE": 4.033333333329665,
+   "RETROGRADE": 1.3533333333321025,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.639666666664266,
+   "REWARM": 13.784666666654129,
+   "CLAMP_OFF": 1.2516666666655283,
+   "WEAN": 0.950666666665802,
+   "POST": 0.3666666666663332
+  },
+  "errs": [
+   "vent_off_early"
+  ],
+  "wall_s": 1.89199673600001,
+  "steps": 173382,
+  "min_res": 1366.2607368030822,
+  "min_map": 58.56078491196781,
+  "max_map": 77.7955780817976,
+  "min_do2i": 358.7551965439736,
+  "min_svo2": 0.6105455982118457,
+  "max_k": 4.7494560767887855,
+  "min_hct": 0.3338415229705769,
+  "max_line": 268.8228107155901,
+  "max_lactate": 1.0172596898822366,
+  "min_ph": 7.330457765577084,
+  "max_paco2": 44.51704125130144,
+  "min_paco2": 37.40025226129172,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "obese_adult",
+  "band": "average",
+  "seed": 35935,
+  "finished": true,
+  "stuck_in": null,
+  "score": 86,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "cp_pressure",
+    "ANTEGRADE"
+   ],
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 9,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 56.37066666662023,
+  "bypass_min": 55.7899999999541,
+  "clamp_min": 42.44299999996623,
+  "end_map": 77.47287705278825,
+  "end_cvp": 6.447282364327248,
+  "end_res": 1208.6577635668082,
+  "injury": 0.06754433333335083,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.26366666666666105,
+   "STABILIZE": 1.9266666666666148,
+   "COOL": 9.130999999994504,
+   "CLAMP_ON": 0.2946666666663987,
+   "ANTEGRADE": 2.540666666664356,
+   "RETROGRADE": 1.0033333333324208,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.639666666664266,
+   "REWARM": 13.976333333320621,
+   "CLAMP_OFF": 1.235666666665543,
+   "WEAN": 0.8916666666658557,
+   "POST": 0.3666666666663332
+  },
+  "errs": [
+   "cp_fast",
+   "protamine_half",
+   "retro_fast"
+  ],
+  "wall_s": 1.9526240430000144,
+  "steps": 169112,
+  "min_res": 1371.0609322125442,
+  "min_map": 54.732148735995644,
+  "max_map": 62.661013208212005,
+  "min_do2i": 359.04377398436947,
+  "min_svo2": 0.6086770910396757,
+  "max_k": 4.780668964437862,
+  "min_hct": 0.3337269464629082,
+  "max_line": 254.2746959572977,
+  "max_lactate": 1.0180465497974747,
+  "min_ph": 7.323625285267192,
+  "max_paco2": 44.450320384904906,
+  "min_paco2": 37.426927196242275,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "obese_adult",
+  "band": "novice",
+  "seed": 35936,
+  "finished": true,
+  "stuck_in": null,
+  "score": 82,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "co2_range",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "unstable_bypass",
+    "STABILIZE"
+   ],
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ],
+   [
+    "minor",
+    "co2_range",
+    "REWARM"
+   ]
+  ],
+  "missed": [
+   "gases_in_range"
+  ],
+  "callouts": {
+   "made": 2,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 54.07433333328899,
+  "bypass_min": 53.4769999999562,
+  "clamp_min": 38.636999999969696,
+  "end_map": 80.56675047592341,
+  "end_cvp": 7.363881597226964,
+  "end_res": 1119.057506943468,
+  "injury": 0.06197733333331027,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3546666666666591,
+   "STABILIZE": 7.000333333331394,
+   "COOL": 4.521999999995888,
+   "CLAMP_ON": 0.4783333333328983,
+   "ANTEGRADE": 4.080666666662955,
+   "RETROGRADE": 1.3779999999987487,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.697666666664213,
+   "REWARM": 8.00066666665939,
+   "CLAMP_OFF": 1.701333333331786,
+   "WEAN": 1.3723333333320853,
+   "POST": 0.3876666666663141
+  },
+  "errs": [
+   "hot_rewarm",
+   "ignore_gases",
+   "overcool",
+   "vent_late_on_wean"
+  ],
+  "wall_s": 1.7796155920000274,
+  "steps": 162223,
+  "min_res": 1357.8132741064328,
+  "min_map": 57.41648750825602,
+  "max_map": 68.0613815600114,
+  "min_do2i": 368.30791209413155,
+  "min_svo2": 0.6158883531605767,
+  "max_k": 4.750247857603584,
+  "min_hct": 0.3338524278860879,
+  "max_line": 286.8412045719187,
+  "max_lactate": 1.0068855132963936,
+  "min_ph": 7.2457137966691585,
+  "max_paco2": 59.28577541635524,
+  "min_paco2": 47.84319489602613,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "obese_adult",
+  "band": "novice",
+  "seed": 35937,
+  "finished": true,
+  "stuck_in": null,
+  "score": 62,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ],
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ],
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ]
+  ],
+  "missed": [
+   "redose"
+  ],
+  "callouts": {
+   "made": 5,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 98,
+  "case_min": 56.3663333332869,
+  "bypass_min": 55.73099999995415,
+  "clamp_min": 39.56999999996885,
+  "end_map": 71.39420708544625,
+  "end_cvp": 6.7417319579072865,
+  "end_res": 1117.6251375419392,
+  "injury": 0.06613733333329101,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.4096666666666579,
+   "STABILIZE": 3.8340000000008914,
+   "COOL": 9.519333333324676,
+   "CLAMP_ON": 0.5289999999995189,
+   "ANTEGRADE": 4.067999999996302,
+   "RETROGRADE": 1.3726666666654181,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6603333333309136,
+   "REWARM": 8.704999999992083,
+   "CLAMP_OFF": 1.5983333333318797,
+   "WEAN": 1.1739999999989323,
+   "POST": 0.39533333333297377
+  },
+  "errs": [
+   "flow_up_early",
+   "hot_rewarm",
+   "no_redose",
+   "vent_late_on_wean"
+  ],
+  "wall_s": 1.8378372279998985,
+  "steps": 169099,
+  "min_res": 1373.8909948682783,
+  "min_map": 58.214508907536256,
+  "max_map": 63.05670827516182,
+  "min_do2i": 359.3736039065226,
+  "min_svo2": 0.6199034108800359,
+  "max_k": 4.749786375187674,
+  "min_hct": 0.3362637986009133,
+  "max_line": 242.87637536984087,
+  "max_lactate": 1.013254599188582,
+  "min_ph": 7.306235723783172,
+  "max_paco2": 44.702304851082566,
+  "min_paco2": 37.30941664867699,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "obese_adult",
+  "band": "novice",
+  "seed": 35938,
+  "finished": true,
+  "stuck_in": null,
+  "score": 86,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ],
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 6,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 50.18399999995919,
+  "bypass_min": 49.59999999995973,
+  "clamp_min": 37.97566666663696,
+  "end_map": 69.6196213434318,
+  "end_cvp": 6.612812842444373,
+  "end_res": 1198.884715755188,
+  "injury": 0.06080066666664804,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2936666666666604,
+   "STABILIZE": 3.9306666666675727,
+   "COOL": 4.307333333329416,
+   "CLAMP_ON": 0.5286666666661859,
+   "ANTEGRADE": 4.066333333329635,
+   "RETROGRADE": 1.0333333333323935,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6446666666642615,
+   "REWARM": 7.727333333326305,
+   "CLAMP_OFF": 1.7356666666650882,
+   "WEAN": 1.4373333333320262,
+   "POST": 0.37833333333298924
+  },
+  "errs": [
+   "hot_rewarm",
+   "overcool",
+   "retro_fast",
+   "vent_on_antegrade"
+  ],
+  "wall_s": 1.6855637400000205,
+  "steps": 150552,
+  "min_res": 1352.527597544562,
+  "min_map": 56.183216787431924,
+  "max_map": 73.50998532093628,
+  "min_do2i": 359.624570889261,
+  "min_svo2": 0.5731816171401272,
+  "max_k": 4.7620608080547155,
+  "min_hct": 0.33369015412988,
+  "max_line": 308.7581851082774,
+  "max_lactate": 1.0115022429279836,
+  "min_ph": 7.305382920278047,
+  "max_paco2": 44.70539340434724,
+  "min_paco2": 36.30786407852818,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "low_ef",
+  "band": "expert",
+  "seed": 19716,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 85,
+  "do2_in": 99,
+  "case_min": 52.1226666666241,
+  "bypass_min": 51.5726666666246,
+  "clamp_min": 41.03733333330084,
+  "end_map": 84.0533868098356,
+  "end_cvp": 6.158385397951852,
+  "end_res": 1240.3127935375312,
+  "injury": 0.06470433333332967,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.171666666666663,
+   "STABILIZE": 1.0546666666666928,
+   "COOL": 7.269333333330327,
+   "CLAMP_ON": 0.17466666666650782,
+   "ANTEGRADE": 4.007666666663022,
+   "RETROGRADE": 1.325999999998794,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6389999999976,
+   "REWARM": 10.887666666656765,
+   "CLAMP_OFF": 1.3706666666654201,
+   "WEAN": 0.7659999999993033,
+   "POST": 0.3546666666663441
+  },
+  "errs": [],
+  "wall_s": 1.6953351580000344,
+  "steps": 156368,
+  "min_res": 1139.782969703708,
+  "min_map": 49.91178696853165,
+  "max_map": 127.02417917840751,
+  "min_do2i": 310.75220640811074,
+  "min_svo2": 0.587123483617565,
+  "max_k": 4.963718549690516,
+  "min_hct": 0.2901690096019352,
+  "max_line": 265.8253979562022,
+  "max_lactate": 1.0282852112804077,
+  "min_ph": 7.379586114605083,
+  "max_paco2": 42.50096370838222,
+  "min_paco2": 37.49698696991593,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "low_ef",
+  "band": "strong",
+  "seed": 19717,
+  "finished": true,
+  "stuck_in": null,
+  "score": 94,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 85,
+  "do2_in": 99,
+  "case_min": 52.574333333290355,
+  "bypass_min": 51.999999999957545,
+  "clamp_min": 41.17166666663406,
+  "end_map": 90.69510669654865,
+  "end_cvp": 6.496254352044898,
+  "end_res": 1206.0982314617142,
+  "injury": 0.06538166666666069,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2046666666666623,
+   "STABILIZE": 1.3706666666666238,
+   "COOL": 7.1949999999968135,
+   "CLAMP_ON": 0.20833333333314386,
+   "ANTEGRADE": 4.012333333329684,
+   "RETROGRADE": 1.3389999999987823,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6476666666642585,
+   "REWARM": 10.959666666656698,
+   "CLAMP_OFF": 1.3849999999987403,
+   "WEAN": 0.783666666665954,
+   "POST": 0.3676666666663323
+  },
+  "errs": [
+   "protamine_half"
+  ],
+  "wall_s": 1.801061935000007,
+  "steps": 157723,
+  "min_res": 1172.3350533587038,
+  "min_map": 55.88952751921458,
+  "max_map": 124.15630401091366,
+  "min_do2i": 314.12705034502585,
+  "min_svo2": 0.5837731724377405,
+  "max_k": 4.964521176327319,
+  "min_hct": 0.2901580893082864,
+  "max_line": 269.1122891510189,
+  "max_lactate": 1.0256572944462143,
+  "min_ph": 7.3773279322044605,
+  "max_paco2": 42.5167937811564,
+  "min_paco2": 37.474167344360474,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "low_ef",
+  "band": "strong",
+  "seed": 19718,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 11,
+   "due": 13
+  },
+  "map_in": 87,
+  "do2_in": 99,
+  "case_min": 52.557333333290366,
+  "bypass_min": 51.97999999995756,
+  "clamp_min": 41.33066666663391,
+  "end_map": 86.87895571068226,
+  "end_cvp": 6.299194378127677,
+  "end_res": 1225.0532288535346,
+  "injury": 0.06541266666666244,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.19366666666666255,
+   "STABILIZE": 1.1393333333333386,
+   "COOL": 7.313666666663545,
+   "CLAMP_ON": 0.17966666666650327,
+   "ANTEGRADE": 4.003666666663025,
+   "RETROGRADE": 1.3299999999987904,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.649666666664257,
+   "REWARM": 11.160666666656516,
+   "CLAMP_OFF": 1.360999999998762,
+   "WEAN": 0.7586666666659767,
+   "POST": 0.3666666666663332
+  },
+  "errs": [],
+  "wall_s": 1.731660881000039,
+  "steps": 157672,
+  "min_res": 1154.6864194076393,
+  "min_map": 52.68619498456669,
+  "max_map": 124.78224523024275,
+  "min_do2i": 313.66314968279806,
+  "min_svo2": 0.5892589568262412,
+  "max_k": 4.963403442906666,
+  "min_hct": 0.2901698893933586,
+  "max_line": 263.9424840717583,
+  "max_lactate": 1.0279199465400295,
+  "min_ph": 7.377953911904245,
+  "max_paco2": 42.51488736808702,
+  "min_paco2": 37.48426578455374,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "low_ef",
+  "band": "strong",
+  "seed": 19719,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 86,
+  "do2_in": 99,
+  "case_min": 52.63733333329029,
+  "bypass_min": 52.07999999995747,
+  "clamp_min": 41.20733333330069,
+  "end_map": 95.19037131291714,
+  "end_cvp": 6.715534426533468,
+  "end_res": 1183.8858906795338,
+  "injury": 0.0651793333333291,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.19366666666666255,
+   "STABILIZE": 1.4003333333332866,
+   "COOL": 7.2569999999967445,
+   "CLAMP_ON": 0.18966666666649418,
+   "ANTEGRADE": 4.007666666663022,
+   "RETROGRADE": 1.3299999999987904,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.639666666664266,
+   "REWARM": 11.03999999998996,
+   "CLAMP_OFF": 1.3723333333320853,
+   "WEAN": 0.75133333333265,
+   "POST": 0.35499999999967713
+  },
+  "errs": [],
+  "wall_s": 1.8474700159999884,
+  "steps": 157912,
+  "min_res": 1165.06237508877,
+  "min_map": 55.304897100445245,
+  "max_map": 124.40400237861455,
+  "min_do2i": 314.15713639773867,
+  "min_svo2": 0.5939194818896356,
+  "max_k": 4.963435271576795,
+  "min_hct": 0.29017730144741416,
+  "max_line": 266.65104808278886,
+  "max_lactate": 1.024329171934171,
+  "min_ph": 7.37815880706647,
+  "max_paco2": 42.51398483408988,
+  "min_paco2": 37.48293064170755,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "low_ef",
+  "band": "average",
+  "seed": 19720,
+  "finished": true,
+  "stuck_in": null,
+  "score": 88,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 9,
+   "due": 13
+  },
+  "map_in": 91,
+  "do2_in": 99,
+  "case_min": 54.41633333328868,
+  "bypass_min": 53.82333333328922,
+  "clamp_min": 42.09333333329989,
+  "end_map": 73.257296903126,
+  "end_cvp": 6.205879990554595,
+  "end_res": 1234.3183342773464,
+  "injury": 0.06890599999998609,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.28799999999999387,
+   "STABILIZE": 1.632333333333224,
+   "COOL": 7.584999999996214,
+   "CLAMP_ON": 0.34866666666634955,
+   "ANTEGRADE": 4.017666666663013,
+   "RETROGRADE": 1.3556666666654338,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6783333333308974,
+   "REWARM": 11.502333333322872,
+   "CLAMP_OFF": 1.592666666665218,
+   "WEAN": 0.938666666665813,
+   "POST": 0.37633333333299107
+  },
+  "errs": [
+   "flow_up_early",
+   "protamine_half"
+  ],
+  "wall_s": 1.7900712289999774,
+  "steps": 163249,
+  "min_res": 1317.8830231761995,
+  "min_map": 65.54368624573226,
+  "max_map": 102.16394849898893,
+  "min_do2i": 316.7364121528989,
+  "min_svo2": 0.587768475748248,
+  "max_k": 4.965520270795397,
+  "min_hct": 0.290108612453705,
+  "max_line": 234.01071335411382,
+  "max_lactate": 1.024083389271707,
+  "min_ph": 7.372815630144561,
+  "max_paco2": 42.547123803183375,
+  "min_paco2": 37.43498774338688,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "low_ef",
+  "band": "average",
+  "seed": 19721,
+  "finished": true,
+  "stuck_in": null,
+  "score": 98,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "cp_pressure",
+    "ANTEGRADE"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 6,
+   "due": 13
+  },
+  "map_in": 94,
+  "do2_in": 99,
+  "case_min": 51.849666666624344,
+  "bypass_min": 51.251333333291555,
+  "clamp_min": 39.804999999968636,
+  "end_map": 79.3387213612823,
+  "end_cvp": 6.527294580469179,
+  "end_res": 1204.0755419528577,
+  "injury": 0.060568000000021126,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.23933333333332824,
+   "STABILIZE": 1.8743333333332415,
+   "COOL": 7.2133333333296905,
+   "CLAMP_ON": 0.25466666666643506,
+   "ANTEGRADE": 2.5313333333310313,
+   "RETROGRADE": 1.3373333333321171,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.641999999997597,
+   "REWARM": 11.043999999989955,
+   "CLAMP_OFF": 1.3999999999987267,
+   "WEAN": 0.8419999999992342,
+   "POST": 0.3706666666663295
+  },
+  "errs": [
+   "cp_fast"
+  ],
+  "wall_s": 1.7571709410000267,
+  "steps": 155549,
+  "min_res": 1203.584900513044,
+  "min_map": 55.89110481257856,
+  "max_map": 121.71037574085673,
+  "min_do2i": 316.8429737455118,
+  "min_svo2": 0.5825641974732473,
+  "max_k": 4.981374199947017,
+  "min_hct": 0.2900751605449678,
+  "max_line": 265.1965179342022,
+  "max_lactate": 1.0199994501705356,
+  "min_ph": 7.374923485057774,
+  "max_paco2": 42.57424269640892,
+  "min_paco2": 37.384180064880056,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "low_ef",
+  "band": "average",
+  "seed": 19722,
+  "finished": true,
+  "stuck_in": null,
+  "score": 80,
+  "critical": 1,
+  "findings": [
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "suckers_off"
+  ],
+  "callouts": {
+   "made": 9,
+   "due": 13
+  },
+  "map_in": 93,
+  "do2_in": 99,
+  "case_min": 53.61566666662274,
+  "bypass_min": 52.97833333328999,
+  "clamp_min": 41.229666666634,
+  "end_map": 69.84663645620347,
+  "end_cvp": 5.9979213205998345,
+  "end_res": 1256.7722012728295,
+  "injury": 0.06701633333331827,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.30033333333332696,
+   "STABILIZE": 1.9930000000000014,
+   "COOL": 7.101999999996203,
+   "CLAMP_ON": 0.3569999999996753,
+   "ANTEGRADE": 4.049333333329651,
+   "RETROGRADE": 1.3616666666654282,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6679999999975736,
+   "REWARM": 10.78933333332352,
+   "CLAMP_OFF": 1.4739999999986595,
+   "WEAN": 1.0236666666657357,
+   "POST": 0.3966666666663059
+  },
+  "errs": [
+   "sucker_on_protamine",
+   "vent_on_antegrade"
+  ],
+  "wall_s": 1.833800844999928,
+  "steps": 160847,
+  "min_res": 1268.1763456640404,
+  "min_map": 62.64196614975431,
+  "max_map": 111.11579008283637,
+  "min_do2i": 317.19656331226554,
+  "min_svo2": 0.5571324875531803,
+  "max_k": 4.9670508458051446,
+  "min_hct": 0.2901151755152331,
+  "max_line": 258.23288957429463,
+  "max_lactate": 1.0215523770977306,
+  "min_ph": 7.37418850218802,
+  "max_paco2": 42.57999917168049,
+  "min_paco2": 37.394284952964114,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "low_ef",
+  "band": "novice",
+  "seed": 19723,
+  "finished": true,
+  "stuck_in": null,
+  "score": 50,
+  "critical": 1,
+  "findings": [
+   [
+    "minor",
+    "map_high",
+    "STABILIZE"
+   ],
+   [
+    "minor",
+    "map_high",
+    "STABILIZE"
+   ],
+   [
+    "minor",
+    "map_high",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "unstable_bypass",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ],
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ],
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "gases_in_range",
+   "redose",
+   "suckers_off",
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 6,
+   "due": 13
+  },
+  "map_in": 1,
+  "do2_in": 98,
+  "case_min": 55.09233333328806,
+  "bypass_min": 54.5083333332886,
+  "clamp_min": 37.199999999971006,
+  "end_map": 71.54334782841944,
+  "end_cvp": 6.061518258644782,
+  "end_res": 1189.792507468385,
+  "injury": 0.05973933333330511,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.345333333333326,
+   "STABILIZE": 7.000333333331402,
+   "COOL": 7.267333333326724,
+   "CLAMP_ON": 0.5289999999995189,
+   "ANTEGRADE": 4.081333333329623,
+   "RETROGRADE": 1.3949999999987313,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6446666666642615,
+   "REWARM": 6.519333333327404,
+   "CLAMP_OFF": 1.5923333333318852,
+   "WEAN": 1.2386666666655402,
+   "POST": 0.37833333333298924
+  },
+  "errs": [
+   "hot_rewarm",
+   "ignore_gases",
+   "no_redose",
+   "protamine_half",
+   "sucker_on_protamine"
+  ],
+  "wall_s": 2.0209903219999887,
+  "steps": 165277,
+  "min_res": 1327.8214986722924,
+  "min_map": 85.40291988525618,
+  "max_map": 106.91990764616385,
+  "min_do2i": 326.75079339162335,
+  "min_svo2": 0.5564103423473802,
+  "max_k": 4.969194781748407,
+  "min_hct": 0.29269575231625605,
+  "max_line": 259.48473021765784,
+  "max_lactate": 1.017525969658612,
+  "min_ph": 7.337233807517321,
+  "max_paco2": 47.845774060334946,
+  "min_paco2": 38.58773687591537,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "low_ef",
+  "band": "novice",
+  "seed": 19724,
+  "finished": true,
+  "stuck_in": null,
+  "score": 64,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "vent_off_early",
+    "INITIATE"
+   ],
+   [
+    "major",
+    "unstable_bypass",
+    "STABILIZE"
+   ],
+   [
+    "minor",
+    "map_high",
+    "ANTEGRADE"
+   ],
+   [
+    "minor",
+    "map_high",
+    "ANTEGRADE"
+   ],
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "gases_in_range",
+   "suckers_off"
+  ],
+  "callouts": {
+   "made": 5,
+   "due": 13
+  },
+  "map_in": 1,
+  "do2_in": 99,
+  "case_min": 61.01133333328268,
+  "bypass_min": 60.42399999994988,
+  "clamp_min": 42.53666666663282,
+  "end_map": 78.59436459855307,
+  "end_cvp": 6.541498615199535,
+  "end_res": 1196.776805146251,
+  "injury": 0.07352033333328302,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3566666666666591,
+   "STABILIZE": 7.000333333331392,
+   "COOL": 7.9949999999927295,
+   "CLAMP_ON": 0.6166666666661058,
+   "ANTEGRADE": 4.055333333329647,
+   "RETROGRADE": 1.4039999999987232,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6996666666642115,
+   "REWARM": 11.755333333322643,
+   "CLAMP_OFF": 1.4966666666653055,
+   "WEAN": 1.1503333333322872,
+   "POST": 0.38066666666632043
+  },
+  "errs": [
+   "ignore_gases",
+   "sucker_on_protamine",
+   "vent_off_early"
+  ],
+  "wall_s": 2.042904015999966,
+  "steps": 183034,
+  "min_res": 1348.1724908198316,
+  "min_map": 89.17351150345812,
+  "max_map": 95.7234304089818,
+  "min_do2i": 326.6055800395764,
+  "min_svo2": 0.5945307248205797,
+  "max_k": 4.966429493144586,
+  "min_hct": 0.2903225200224641,
+  "max_line": 221.45037072732433,
+  "max_lactate": 1.0188395040153166,
+  "min_ph": 7.3376109009753545,
+  "max_paco2": 47.798637378080706,
+  "min_paco2": 38.602459679696544,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "low_ef",
+  "band": "novice",
+  "seed": 19725,
+  "finished": true,
+  "stuck_in": null,
+  "score": 84,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "map_high",
+    "STABILIZE"
+   ],
+   [
+    "minor",
+    "cp_pressure",
+    "ANTEGRADE"
+   ],
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 5,
+   "due": 13
+  },
+  "map_in": 91,
+  "do2_in": 99,
+  "case_min": 53.34199999995632,
+  "bypass_min": 52.71466666662356,
+  "clamp_min": 39.27433333330245,
+  "end_map": 72.03578417796186,
+  "end_cvp": 6.102952511839858,
+  "end_res": 1244.9620821488616,
+  "injury": 0.061076666666682954,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3196666666666598,
+   "STABILIZE": 3.6296666666675157,
+   "COOL": 7.074333333327208,
+   "CLAMP_ON": 0.37499999999965894,
+   "ANTEGRADE": 2.5386666666643576,
+   "RETROGRADE": 1.0079999999990832,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.676999999997565,
+   "REWARM": 10.650999999990313,
+   "CLAMP_OFF": 1.5229999999986148,
+   "WEAN": 1.0549999999990405,
+   "POST": 0.3899999999996453
+  },
+  "errs": [
+   "cp_fast",
+   "protamine_half",
+   "retro_fast"
+  ],
+  "wall_s": 1.9130973750000067,
+  "steps": 160026,
+  "min_res": 1288.3744332398878,
+  "min_map": 62.21237280551334,
+  "max_map": 110.87257562110732,
+  "min_do2i": 317.5948984285977,
+  "min_svo2": 0.569328542570805,
+  "max_k": 4.986336605431251,
+  "min_hct": 0.2901328574086046,
+  "max_line": 261.0198051655513,
+  "max_lactate": 1.016178369933895,
+  "min_ph": 7.362862455731989,
+  "max_paco2": 42.827938788822834,
+  "min_paco2": 37.098343796326745,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "ckd",
+  "band": "expert",
+  "seed": 9486,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 50.97866666662514,
+  "bypass_min": 50.42866666662564,
+  "clamp_min": 40.86333333330101,
+  "end_map": 69.7570719773504,
+  "end_cvp": 5.7123776958367305,
+  "end_res": 1286.057563749325,
+  "injury": 0.06431599999999647,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.171666666666663,
+   "STABILIZE": 0.22599999999999518,
+   "COOL": 7.167333333331204,
+   "CLAMP_ON": 0.17833333333317114,
+   "ANTEGRADE": 4.007333333329689,
+   "RETROGRADE": 1.325999999998794,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6389999999976,
+   "REWARM": 10.718666666656919,
+   "CLAMP_OFF": 1.3753333333320825,
+   "WEAN": 0.7136666666660176,
+   "POST": 0.3546666666663441
+  },
+  "errs": [],
+  "wall_s": 1.679146357000036,
+  "steps": 152936,
+  "min_res": 1115.9864450818566,
+  "min_map": 44.86299651669639,
+  "max_map": 116.17623157828405,
+  "min_do2i": 269.6518557898302,
+  "min_svo2": 0.555092861502361,
+  "max_k": 5.6394260237007146,
+  "min_hct": 0.24892820696114235,
+  "max_line": 247.21329119626787,
+  "max_lactate": 1.0344982309397976,
+  "min_ph": 7.379829107892991,
+  "max_paco2": 42.51686150992583,
+  "min_paco2": 37.49496498492187,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "ckd",
+  "band": "strong",
+  "seed": 9487,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 11,
+   "due": 13
+  },
+  "map_in": 96,
+  "do2_in": 99,
+  "case_min": 51.25033333329156,
+  "bypass_min": 50.687999999958734,
+  "clamp_min": 41.08566666663413,
+  "end_map": 68.70700696623352,
+  "end_cvp": 5.654468033386311,
+  "end_res": 1291.5648633277808,
+  "injury": 0.06475899999999662,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.18166666666666278,
+   "STABILIZE": 0.22566666666666185,
+   "COOL": 7.198999999997834,
+   "CLAMP_ON": 0.17466666666650782,
+   "ANTEGRADE": 4.007999999996356,
+   "RETROGRADE": 1.3319999999987886,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.641666666664264,
+   "REWARM": 10.928333333323394,
+   "CLAMP_OFF": 1.3693333333320878,
+   "WEAN": 0.7306666666660021,
+   "POST": 0.35866666666634045
+  },
+  "errs": [],
+  "wall_s": 1.7293194220000032,
+  "steps": 153751,
+  "min_res": 1119.6435229491135,
+  "min_map": 46.693548970664246,
+  "max_map": 115.33574242724943,
+  "min_do2i": 272.2807801748075,
+  "min_svo2": 0.5607071914996561,
+  "max_k": 5.64007641899735,
+  "min_hct": 0.24891265406517668,
+  "max_line": 246.10438944489857,
+  "max_lactate": 1.0332079275447572,
+  "min_ph": 7.379034468540871,
+  "max_paco2": 42.62069143239116,
+  "min_paco2": 37.48764793627651,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "ckd",
+  "band": "strong",
+  "seed": 9488,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 96,
+  "do2_in": 99,
+  "case_min": 51.02733333329176,
+  "bypass_min": 50.474666666625595,
+  "clamp_min": 40.950333333300925,
+  "end_map": 64.41431181349894,
+  "end_cvp": 5.417692626403951,
+  "end_res": 1315.3974040260011,
+  "injury": 0.06451333333332984,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.17433333333332962,
+   "STABILIZE": 0.24199999999999483,
+   "COOL": 7.109666666664572,
+   "CLAMP_ON": 0.17066666666651145,
+   "ANTEGRADE": 4.007333333329689,
+   "RETROGRADE": 1.325999999998794,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6389999999976,
+   "REWARM": 10.798999999990178,
+   "CLAMP_OFF": 1.3776666666654136,
+   "WEAN": 0.7263333333326727,
+   "POST": 0.3546666666663441
+  },
+  "errs": [],
+  "wall_s": 1.637902467999993,
+  "steps": 153082,
+  "min_res": 1111.3150398111516,
+  "min_map": 45.586276079695345,
+  "max_map": 117.5791832984279,
+  "min_do2i": 272.953084881122,
+  "min_svo2": 0.5599896758313138,
+  "max_k": 5.6394260237007146,
+  "min_hct": 0.2489234415345062,
+  "max_line": 250.90917803247032,
+  "max_lactate": 1.0341066736785933,
+  "min_ph": 7.379512608268347,
+  "max_paco2": 42.560923966456706,
+  "min_paco2": 37.47715934255363,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "ckd",
+  "band": "strong",
+  "seed": 9489,
+  "finished": true,
+  "stuck_in": null,
+  "score": 94,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 96,
+  "do2_in": 99,
+  "case_min": 51.03399999995842,
+  "bypass_min": 50.4333333332923,
+  "clamp_min": 40.78399999996774,
+  "end_map": 85.71681039517648,
+  "end_cvp": 6.606113070315496,
+  "end_res": 1195.3646929682388,
+  "injury": 0.06519666666666159,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.21699999999999536,
+   "STABILIZE": 0.20866666666666223,
+   "COOL": 7.116666666664558,
+   "CLAMP_ON": 0.23033333333312384,
+   "ANTEGRADE": 4.0106666666630195,
+   "RETROGRADE": 0.983333333332439,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.649666666664257,
+   "REWARM": 10.907999999990079,
+   "CLAMP_OFF": 1.3949999999987313,
+   "WEAN": 0.8306666666659112,
+   "POST": 0.3833333333329847
+  },
+  "errs": [
+   "retro_fast"
+  ],
+  "wall_s": 1.7761432480000394,
+  "steps": 153102,
+  "min_res": 1156.0372544549464,
+  "min_map": 58.83052082524121,
+  "max_map": 108.47109822147817,
+  "min_do2i": 272.26861775536395,
+  "min_svo2": 0.5462923377986451,
+  "max_k": 5.641160846172226,
+  "min_hct": 0.24891150845593382,
+  "max_line": 243.83574002740994,
+  "max_lactate": 1.0311819162762574,
+  "min_ph": 7.379717522201882,
+  "max_paco2": 42.53530972476475,
+  "min_paco2": 37.467635982233496,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "ckd",
+  "band": "average",
+  "seed": 9490,
+  "finished": true,
+  "stuck_in": null,
+  "score": 86,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "cp_pressure",
+    "ANTEGRADE"
+   ],
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ],
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ]
+  ],
+  "missed": [
+   "redose"
+  ],
+  "callouts": {
+   "made": 8,
+   "due": 13
+  },
+  "map_in": 96,
+  "do2_in": 99,
+  "case_min": 51.605333333291235,
+  "bypass_min": 51.00266666662512,
+  "clamp_min": 39.712999999968716,
+  "end_map": 85.45241668316767,
+  "end_cvp": 6.521022729118403,
+  "end_res": 1144.6410604211376,
+  "injury": 0.06211233333334878,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2756666666666608,
+   "STABILIZE": 1.5059999999999178,
+   "COOL": 7.570666666662992,
+   "CLAMP_ON": 0.3306666666663659,
+   "ANTEGRADE": 2.529666666664366,
+   "RETROGRADE": 0.9976666666657593,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.673666666664235,
+   "REWARM": 11.173666666656505,
+   "CLAMP_OFF": 1.1886666666655856,
+   "WEAN": 0.8766666666658693,
+   "POST": 0.38166666666631954
+  },
+  "errs": [
+   "cp_fast",
+   "no_redose",
+   "retro_fast"
+  ],
+  "wall_s": 1.7841015919999563,
+  "steps": 154816,
+  "min_res": 1261.6867301608036,
+  "min_map": 62.406557086152034,
+  "max_map": 85.9025604439014,
+  "min_do2i": 275.5827853242169,
+  "min_svo2": 0.5410788772599332,
+  "max_k": 5.621388442798775,
+  "min_hct": 0.2509610338851496,
+  "max_line": 209.05533480792832,
+  "max_lactate": 1.0309475283102083,
+  "min_ph": 7.376369836888132,
+  "max_paco2": 42.53352799273173,
+  "min_paco2": 37.413754684068095,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "ckd",
+  "band": "average",
+  "seed": 9491,
+  "finished": true,
+  "stuck_in": null,
+  "score": 88,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ],
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ]
+  ],
+  "missed": [
+   "redose"
+  ],
+  "callouts": {
+   "made": 11,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 47.46199999996167,
+  "bypass_min": 46.871999999962206,
+  "clamp_min": 37.07199999997112,
+  "end_map": 72.25205405751747,
+  "end_cvp": 6.4198597864411475,
+  "end_res": 1158.4473546890454,
+  "injury": 0.05631833333332666,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2263333333333285,
+   "STABILIZE": 0.19333333333332922,
+   "COOL": 7.2276666666644624,
+   "CLAMP_ON": 0.25433333333310204,
+   "ANTEGRADE": 4.019666666663012,
+   "RETROGRADE": 1.3439999999987777,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.639666666664266,
+   "REWARM": 6.820666666660463,
+   "CLAMP_OFF": 1.401999999998725,
+   "WEAN": 0.862333333332549,
+   "POST": 0.3713333333329956
+  },
+  "errs": [
+   "hot_rewarm",
+   "no_redose"
+  ],
+  "wall_s": 1.596889123999972,
+  "steps": 142386,
+  "min_res": 1179.211572712259,
+  "min_map": 54.0192650784002,
+  "max_map": 105.53260342246043,
+  "min_do2i": 275.5125326000705,
+  "min_svo2": 0.5479623152147661,
+  "max_k": 5.613657989407097,
+  "min_hct": 0.2509924768317125,
+  "max_line": 235.88758003447452,
+  "max_lactate": 1.0285764149064696,
+  "min_ph": 7.376218011379177,
+  "max_paco2": 42.9727485776029,
+  "min_paco2": 37.416790660793964,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "ckd",
+  "band": "average",
+  "seed": 9492,
+  "finished": true,
+  "stuck_in": null,
+  "score": 98,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 11,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 48.28933333329425,
+  "bypass_min": 47.717999999961435,
+  "clamp_min": 41.47199999996712,
+  "end_map": 67.90739458393813,
+  "end_cvp": 6.194434891975825,
+  "end_res": 1241.393177468737,
+  "injury": 0.06600866666665878,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.21766666666666204,
+   "STABILIZE": 0.19466666666666252,
+   "COOL": 3.7310000000009507,
+   "CLAMP_ON": 0.2286666666664909,
+   "ANTEGRADE": 4.02399999999634,
+   "RETROGRADE": 1.349999999998773,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.659666666664248,
+   "REWARM": 11.208999999989805,
+   "CLAMP_OFF": 1.380666666665411,
+   "WEAN": 0.8346666666659075,
+   "POST": 0.35866666666634045
+  },
+  "errs": [
+   "overcool"
+  ],
+  "wall_s": 1.829731340999956,
+  "steps": 144868,
+  "min_res": 1168.3302962141545,
+  "min_map": 52.27630958684411,
+  "max_map": 105.53763112131199,
+  "min_do2i": 275.38165209036197,
+  "min_svo2": 0.5520645771125128,
+  "max_k": 5.642298978754914,
+  "min_hct": 0.24875101936168825,
+  "max_line": 238.97185068548754,
+  "max_lactate": 1.026881648122487,
+  "min_ph": 7.378452090311878,
+  "max_paco2": 42.69348871101528,
+  "min_paco2": 37.17754704089775,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "ckd",
+  "band": "novice",
+  "seed": 9493,
+  "finished": true,
+  "stuck_in": null,
+  "score": 56,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "vent_off_early",
+    "INITIATE"
+   ],
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ],
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ],
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ]
+  ],
+  "missed": [
+   "redose"
+  ],
+  "callouts": {
+   "made": 5,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 98,
+  "case_min": 52.395333333290516,
+  "bypass_min": 51.749333333291105,
+  "clamp_min": 37.03766666663782,
+  "end_map": 70.93666200588262,
+  "end_cvp": 6.3490078745438225,
+  "end_res": 1160.8472125453382,
+  "injury": 0.05912966666664634,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3583333333333257,
+   "STABILIZE": 4.22933333333391,
+   "COOL": 7.798333333326242,
+   "CLAMP_ON": 0.46366666666624495,
+   "ANTEGRADE": 4.0383333333296605,
+   "RETROGRADE": 1.0333333333323955,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6756666666642333,
+   "REWARM": 6.841999999993777,
+   "CLAMP_OFF": 1.48066666666532,
+   "WEAN": 0.9863333333324362,
+   "POST": 0.38866666666631317
+  },
+  "errs": [
+   "hot_rewarm",
+   "no_redose",
+   "retro_fast",
+   "vent_late_on_wean",
+   "vent_off_early"
+  ],
+  "wall_s": 1.8048791899999514,
+  "steps": 157186,
+  "min_res": 1325.9949948624921,
+  "min_map": 63.71194456438003,
+  "max_map": 73.44635353497398,
+  "min_do2i": 276.2999153836388,
+  "min_svo2": 0.5348282841161195,
+  "max_k": 5.619365540478689,
+  "min_hct": 0.251090956180811,
+  "max_line": 199.70177502852,
+  "max_lactate": 1.0280718997317917,
+  "min_ph": 7.368170650398639,
+  "max_paco2": 43.056380630417436,
+  "min_paco2": 37.452958099058776,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "ckd",
+  "band": "novice",
+  "seed": 9494,
+  "finished": true,
+  "stuck_in": null,
+  "score": 66,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "unstable_bypass",
+    "STABILIZE"
+   ],
+   [
+    "minor",
+    "cp_pressure",
+    "ANTEGRADE"
+   ],
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ]
+  ],
+  "missed": [
+   "gases_in_range"
+  ],
+  "callouts": {
+   "made": 5,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 98,
+  "case_min": 57.74766666661898,
+  "bypass_min": 57.10033333328624,
+  "clamp_min": 40.03499999996843,
+  "end_map": 65.38139624649804,
+  "end_cvp": 6.025446198930677,
+  "end_res": 1249.587713439706,
+  "injury": 0.06382833333334034,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.37033333333332547,
+   "STABILIZE": 7.00033333333138,
+   "COOL": 7.132666666660181,
+   "CLAMP_ON": 0.5253333333328556,
+   "ANTEGRADE": 2.5613333333310058,
+   "RETROGRADE": 1.4016666666653919,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6979999999975464,
+   "REWARM": 10.567333333323722,
+   "CLAMP_OFF": 1.8509999999983164,
+   "WEAN": 1.1356666666656339,
+   "POST": 0.4033333333329665
+  },
+  "errs": [
+   "cp_fast",
+   "flow_up_early",
+   "ignore_gases",
+   "vent_late_on_wean"
+  ],
+  "wall_s": 1.9424602520000462,
+  "steps": 173243,
+  "min_res": 1294.8633199174558,
+  "min_map": 63.588880775283116,
+  "max_map": 83.19216256169274,
+  "min_do2i": 285.4067173264452,
+  "min_svo2": 0.5199980123033944,
+  "max_k": 5.649698809085202,
+  "min_hct": 0.24900118130291607,
+  "max_line": 225.50956776188795,
+  "max_lactate": 1.0430495229994887,
+  "min_ph": 7.352992191288776,
+  "max_paco2": 45.87597608890295,
+  "min_paco2": 36.99538418993142,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "ckd",
+  "band": "novice",
+  "seed": 9495,
+  "finished": true,
+  "stuck_in": null,
+  "score": 92,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 5,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 96,
+  "case_min": 53.278333333289716,
+  "bypass_min": 52.690999999956915,
+  "clamp_min": 42.1883333332998,
+  "end_map": 73.78691401629588,
+  "end_cvp": 6.597490589553518,
+  "end_res": 1197.3506077108016,
+  "injury": 0.07196533333329318,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3996666666666581,
+   "STABILIZE": 3.5313333333341745,
+   "COOL": 4.044999999996655,
+   "CLAMP_ON": 0.5789999999994744,
+   "ANTEGRADE": 4.032999999996332,
+   "RETROGRADE": 1.4039999999987232,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6996666666642115,
+   "REWARM": 11.197999999989815,
+   "CLAMP_OFF": 1.7716666666650553,
+   "WEAN": 1.1356666666656339,
+   "POST": 0.38066666666632043
+  },
+  "errs": [
+   "flow_up_early",
+   "overcool",
+   "vent_on_antegrade"
+  ],
+  "wall_s": 1.8003033779999669,
+  "steps": 159835,
+  "min_res": 1351.6172125692601,
+  "min_map": 65.76865396103534,
+  "max_map": 75.89367713499608,
+  "min_do2i": 276.144687009041,
+  "min_svo2": 0.5294013681934325,
+  "max_k": 5.644077845369723,
+  "min_hct": 0.24884627331862624,
+  "max_line": 205.11191555845107,
+  "max_lactate": 1.0470770456575775,
+  "min_ph": 7.375839553367671,
+  "max_paco2": 42.78166756202162,
+  "min_paco2": 37.13168877315103,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "heparin_resistant",
+  "band": "expert",
+  "seed": 56637,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 51.99266666662422,
+  "bypass_min": 51.30399999995817,
+  "clamp_min": 41.538999999967054,
+  "end_map": 75.62006429243186,
+  "end_cvp": 6.174527256805359,
+  "end_res": 1238.7486076523883,
+  "injury": 0.06580366666666275,
+  "dur": {
+   "PRE": 0.23599999999999646,
+   "INITIATE": 0.17433333333332962,
+   "STABILIZE": 0.18633333333334062,
+   "COOL": 7.430999999997531,
+   "CLAMP_ON": 0.17166666666651054,
+   "ANTEGRADE": 4.0066666666630235,
+   "RETROGRADE": 1.325999999998794,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6389999999976,
+   "REWARM": 11.393666666656305,
+   "CLAMP_OFF": 1.3386666666654492,
+   "WEAN": 0.7339999999993324,
+   "POST": 0.3546666666663441
+  },
+  "errs": [],
+  "wall_s": 1.6653450829999201,
+  "steps": 155978,
+  "min_res": 1161.632586341309,
+  "min_map": 44.79745574435508,
+  "max_map": 100.11808465466545,
+  "min_do2i": 338.3424349114748,
+  "min_svo2": 0.604916168200991,
+  "max_k": 4.747318131960245,
+  "min_hct": 0.3181952257658552,
+  "max_line": 251.31285972539035,
+  "max_lactate": 1.02553633139257,
+  "min_ph": 7.378835516917666,
+  "max_paco2": 42.645560385291844,
+  "min_paco2": 37.482406362032734,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "heparin_resistant",
+  "band": "strong",
+  "seed": 56638,
+  "finished": true,
+  "stuck_in": null,
+  "score": 94,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 12,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 52.134333333290755,
+  "bypass_min": 51.41099999995808,
+  "clamp_min": 41.63199999996697,
+  "end_map": 80.49780999827676,
+  "end_cvp": 6.477859794317974,
+  "end_res": 1207.825687234669,
+  "injury": 0.06661366666666049,
+  "dur": {
+   "PRE": 0.24399999999999628,
+   "INITIATE": 0.20766666666666225,
+   "STABILIZE": 0.19533333333334937,
+   "COOL": 7.331999999997567,
+   "CLAMP_ON": 0.21799999999980174,
+   "ANTEGRADE": 4.010999999996353,
+   "RETROGRADE": 1.3439999999987777,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6556666666642514,
+   "REWARM": 11.239666666656444,
+   "CLAMP_OFF": 1.526333333331945,
+   "WEAN": 0.7913333333326136,
+   "POST": 0.36866666666633136
+  },
+  "errs": [
+   "flow_up_early"
+  ],
+  "wall_s": 1.9061803980000604,
+  "steps": 156403,
+  "min_res": 1200.696720989235,
+  "min_map": 55.35030194620614,
+  "max_map": 93.16221534307596,
+  "min_do2i": 342.5242201030057,
+  "min_svo2": 0.6061187417912295,
+  "max_k": 4.747640404561739,
+  "min_hct": 0.3181826992814225,
+  "max_line": 251.06214802029425,
+  "max_lactate": 1.0226039121883415,
+  "min_ph": 7.375028450936063,
+  "max_paco2": 43.12144363299219,
+  "min_paco2": 37.44057581318217,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "heparin_resistant",
+  "band": "strong",
+  "seed": 56639,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 12,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 51.89533333329097,
+  "bypass_min": 51.19333333329161,
+  "clamp_min": 41.47733333330044,
+  "end_map": 71.23850953438743,
+  "end_cvp": 5.92296752230378,
+  "end_res": 1263.7352477689813,
+  "injury": 0.0657066666666626,
+  "dur": {
+   "PRE": 0.23999999999999636,
+   "INITIATE": 0.17966666666666284,
+   "STABILIZE": 0.1836666666666752,
+   "COOL": 7.381999999997569,
+   "CLAMP_ON": 0.17766666666650507,
+   "ANTEGRADE": 4.007666666663023,
+   "RETROGRADE": 1.325333333332128,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.639666666664266,
+   "REWARM": 11.323333333323035,
+   "CLAMP_OFF": 1.348333333332107,
+   "WEAN": 0.7253333333326737,
+   "POST": 0.36199999999967075
+  },
+  "errs": [],
+  "wall_s": 1.7010649339999873,
+  "steps": 155686,
+  "min_res": 1164.6571790434787,
+  "min_map": 45.060458791788555,
+  "max_map": 99.85727942618672,
+  "min_do2i": 341.59807378293164,
+  "min_svo2": 0.6078332384046159,
+  "max_k": 4.747173503206091,
+  "min_hct": 0.31819964295023145,
+  "max_line": 253.28547143415497,
+  "max_lactate": 1.0246294414815835,
+  "min_ph": 7.376554899309997,
+  "max_paco2": 42.93063758625047,
+  "min_paco2": 37.47246897648563,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "heparin_resistant",
+  "band": "strong",
+  "seed": 56640,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 12,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 52.47033333329045,
+  "bypass_min": 51.752999999957765,
+  "clamp_min": 41.781999999966835,
+  "end_map": 82.3917621975121,
+  "end_cvp": 6.564582618658596,
+  "end_res": 1199.369404800301,
+  "injury": 0.06649766666666157,
+  "dur": {
+   "PRE": 0.2429999999999963,
+   "INITIATE": 0.2046666666666623,
+   "STABILIZE": 0.19033333333334787,
+   "COOL": 7.55566666666404,
+   "CLAMP_ON": 0.20033333333315112,
+   "ANTEGRADE": 4.007999999996356,
+   "RETROGRADE": 1.3389999999987823,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6476666666642585,
+   "REWARM": 11.591666666656124,
+   "CLAMP_OFF": 1.3409999999987803,
+   "WEAN": 0.7806666666659566,
+   "POST": 0.3676666666663323
+  },
+  "errs": [
+   "vent_on_antegrade"
+  ],
+  "wall_s": 1.6848572210000157,
+  "steps": 157411,
+  "min_res": 1212.3243082648764,
+  "min_map": 52.979147102503845,
+  "max_map": 89.54575904484766,
+  "min_do2i": 341.1544476998154,
+  "min_svo2": 0.6086979169956855,
+  "max_k": 4.748055366927039,
+  "min_hct": 0.3181781200466537,
+  "max_line": 237.62560957858707,
+  "max_lactate": 1.0213475912983594,
+  "min_ph": 7.376580460007526,
+  "max_paco2": 42.92744249905932,
+  "min_paco2": 37.4719938689182,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "heparin_resistant",
+  "band": "average",
+  "seed": 56641,
+  "finished": true,
+  "stuck_in": null,
+  "score": 98,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 11,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 50.61433333329214,
+  "bypass_min": 49.8509999999595,
+  "clamp_min": 41.96333333330001,
+  "end_map": 75.315251456857,
+  "end_cvp": 6.1796124020890515,
+  "end_res": 1239.158426457485,
+  "injury": 0.0679759999999873,
+  "dur": {
+   "PRE": 0.24499999999999625,
+   "INITIATE": 0.27366666666666084,
+   "STABILIZE": 1.4826666666665635,
+   "COOL": 3.9346666666662125,
+   "CLAMP_ON": 0.3243333333330384,
+   "ANTEGRADE": 4.005666666663024,
+   "RETROGRADE": 1.3629999999987603,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.649666666664257,
+   "REWARM": 11.601666666656115,
+   "CLAMP_OFF": 1.4169999999987113,
+   "WEAN": 0.9226666666658275,
+   "POST": 0.3936666666663086
+  },
+  "errs": [
+   "overcool"
+  ],
+  "wall_s": 1.6242551599999615,
+  "steps": 151843,
+  "min_res": 1302.051395119043,
+  "min_map": 62.40697590934401,
+  "max_map": 81.07383568355614,
+  "min_do2i": 344.16596709186587,
+  "min_svo2": 0.605745658417038,
+  "max_k": 4.748186422664902,
+  "min_hct": 0.3180668763112937,
+  "max_line": 226.13585698759275,
+  "max_lactate": 1.0123508980119857,
+  "min_ph": 7.369281660005206,
+  "max_paco2": 42.543408300282564,
+  "min_paco2": 37.37857300320421,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "heparin_resistant",
+  "band": "average",
+  "seed": 56642,
+  "finished": true,
+  "stuck_in": null,
+  "score": 88,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ],
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ]
+  ],
+  "missed": [
+   "redose"
+  ],
+  "callouts": {
+   "made": 7,
+   "due": 13
+  },
+  "map_in": 96,
+  "do2_in": 99,
+  "case_min": 53.640666666622714,
+  "bypass_min": 52.821999999956795,
+  "clamp_min": 41.355999999967224,
+  "end_map": 80.90065477600473,
+  "end_cvp": 6.468395271893296,
+  "end_res": 1147.0978061437838,
+  "injury": 0.06756866666665445,
+  "dur": {
+   "PRE": 0.2633333333333292,
+   "INITIATE": 0.3100000000000005,
+   "STABILIZE": 1.643333333333241,
+   "COOL": 7.399999999996183,
+   "CLAMP_ON": 0.35866666666634045,
+   "ANTEGRADE": 4.038666666662993,
+   "RETROGRADE": 1.0126666666657456,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.662999999997578,
+   "REWARM": 11.271999999989749,
+   "CLAMP_OFF": 1.22766666666555,
+   "WEAN": 1.0419999999990524,
+   "POST": 0.408666666666295
+  },
+  "errs": [
+   "no_redose",
+   "retro_fast"
+  ],
+  "wall_s": 1.7725957530000187,
+  "steps": 160922,
+  "min_res": 1310.5558589171299,
+  "min_map": 61.67351593909728,
+  "max_map": 83.01706596258124,
+  "min_do2i": 344.49465824640953,
+  "min_svo2": 0.5966095723544421,
+  "max_k": 4.760640228992103,
+  "min_hct": 0.32060475918622583,
+  "max_line": 233.27320299685968,
+  "max_lactate": 1.0120049754647018,
+  "min_ph": 7.3663580669042386,
+  "max_paco2": 42.58563202474291,
+  "min_paco2": 37.36688704034699,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "heparin_resistant",
+  "band": "average",
+  "seed": 56643,
+  "finished": true,
+  "stuck_in": null,
+  "score": 86,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "vent_off_early",
+    "INITIATE"
+   ],
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ]
+  ],
+  "missed": [
+   "redose"
+  ],
+  "callouts": {
+   "made": 7,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 49.54333333329311,
+  "bypass_min": 48.814666666627105,
+  "clamp_min": 42.490666666632855,
+  "end_map": 71.43292411586701,
+  "end_cvp": 6.564834182691183,
+  "end_res": 1142.0339150637787,
+  "injury": 0.06913499999998644,
+  "dur": {
+   "PRE": 0.24466666666666292,
+   "INITIATE": 0.23466666666666167,
+   "STABILIZE": 0.19966666666668828,
+   "COOL": 4.0166666666672155,
+   "CLAMP_ON": 0.29333333333306655,
+   "ANTEGRADE": 4.02166666666301,
+   "RETROGRADE": 1.3433333333321116,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6549999999975853,
+   "REWARM": 12.191333333322245,
+   "CLAMP_OFF": 1.1013333333323316,
+   "WEAN": 0.872999999999206,
+   "POST": 0.3679999999996653
+  },
+  "errs": [
+   "no_redose",
+   "overcool",
+   "vent_off_early"
+  ],
+  "wall_s": 1.6285439309999674,
+  "steps": 148630,
+  "min_res": 1271.189772198999,
+  "min_map": 55.208318305243814,
+  "max_map": 76.92160708927896,
+  "min_do2i": 344.09783809657415,
+  "min_svo2": 0.5904510203270114,
+  "max_k": 4.748271268584717,
+  "min_hct": 0.3204552929168908,
+  "max_line": 219.2110853928646,
+  "max_lactate": 1.0201778820462477,
+  "min_ph": 7.367087325999708,
+  "max_paco2": 44.114084250036605,
+  "min_paco2": 37.01949100524971,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "heparin_resistant",
+  "band": "novice",
+  "seed": 56644,
+  "finished": true,
+  "stuck_in": null,
+  "score": 76,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "vent_off_early",
+    "INITIATE"
+   ],
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ],
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 6,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 98,
+  "case_min": 54.23033333328885,
+  "bypass_min": 53.43499999995624,
+  "clamp_min": 38.31366666663666,
+  "end_map": 70.80548666972099,
+  "end_cvp": 6.515885619712463,
+  "end_res": 1204.8711046948647,
+  "injury": 0.06280166666663271,
+  "dur": {
+   "PRE": 0.26799999999999574,
+   "INITIATE": 0.3490000000000074,
+   "STABILIZE": 3.8086666666674707,
+   "COOL": 8.078999999992654,
+   "CLAMP_ON": 0.562666666666155,
+   "ANTEGRADE": 4.068666666662968,
+   "RETROGRADE": 1.3999999999987267,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.639666666664266,
+   "REWARM": 7.3886666666599465,
+   "CLAMP_OFF": 1.9786666666648671,
+   "WEAN": 1.2779999999988376,
+   "POST": 0.408666666666295
+  },
+  "errs": [
+   "flow_up_early",
+   "hot_rewarm",
+   "protamine_half",
+   "vent_off_early",
+   "vent_on_antegrade"
+  ],
+  "wall_s": 1.712245651000103,
+  "steps": 162691,
+  "min_res": 1356.7198742978674,
+  "min_map": 61.812776975332646,
+  "max_map": 66.82388607524675,
+  "min_do2i": 345.29204297549984,
+  "min_svo2": 0.6198762203240001,
+  "max_k": 4.752549769649288,
+  "min_hct": 0.31822500087376066,
+  "max_line": 201.49082515351887,
+  "max_lactate": 1.0121817969821005,
+  "min_ph": 7.350054283366474,
+  "max_paco2": 42.57214538088811,
+  "min_paco2": 37.230000511883915,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "heparin_resistant",
+  "band": "novice",
+  "seed": 56645,
+  "finished": true,
+  "stuck_in": null,
+  "score": 74,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "unstable_bypass",
+    "STABILIZE"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ]
+  ],
+  "missed": [
+   "gases_in_range"
+  ],
+  "callouts": {
+   "made": 3,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 59.53633333328402,
+  "bypass_min": 58.73799999995141,
+  "clamp_min": 41.451999999967136,
+  "end_map": 69.75863387458718,
+  "end_cvp": 6.462587973197405,
+  "end_res": 1203.994869346429,
+  "injury": 0.0675269999999846,
+  "dur": {
+   "PRE": 0.2719999999999957,
+   "INITIATE": 0.3703333333333448,
+   "STABILIZE": 7.000333333331207,
+   "COOL": 7.392666666659944,
+   "CLAMP_ON": 0.4299999999996089,
+   "ANTEGRADE": 4.056666666662979,
+   "RETROGRADE": 1.3759999999987484,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6816666666642277,
+   "REWARM": 10.8849999999901,
+   "CLAMP_OFF": 1.5426666666652635,
+   "WEAN": 1.1676666666656046,
+   "POST": 0.3606666666663386
+  },
+  "errs": [
+   "ignore_gases",
+   "vent_late_on_wean",
+   "vent_on_antegrade"
+  ],
+  "wall_s": 1.8324855639999669,
+  "steps": 178609,
+  "min_res": 1325.6746499811118,
+  "min_map": 56.60279037301701,
+  "max_map": 72.84122914826445,
+  "min_do2i": 354.0267054251448,
+  "min_svo2": 0.5860284000002608,
+  "max_k": 4.75313487401707,
+  "min_hct": 0.3183247394624822,
+  "max_line": 237.87793199472026,
+  "max_lactate": 1.0096269885163176,
+  "min_ph": 7.321382913413493,
+  "max_paco2": 49.82713582331339,
+  "min_paco2": 40.20077424433879,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "heparin_resistant",
+  "band": "novice",
+  "seed": 56646,
+  "finished": true,
+  "stuck_in": null,
+  "score": 72,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "vent_off_early",
+    "INITIATE"
+   ],
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 4,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 98,
+  "case_min": 50.30733333329241,
+  "bypass_min": 49.55966666662643,
+  "clamp_min": 42.54733333329947,
+  "end_map": 71.7207766082968,
+  "end_cvp": 6.610758152177932,
+  "end_res": 1201.606184781924,
+  "injury": 0.07143633333330274,
+  "dur": {
+   "PRE": 0.256999999999996,
+   "INITIATE": 0.31099999999999955,
+   "STABILIZE": 0.19066666666669646,
+   "COOL": 3.9636666666671787,
+   "CLAMP_ON": 0.5583333333328255,
+   "ANTEGRADE": 4.034666666662998,
+   "RETROGRADE": 1.4129999999987148,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.7009999999975434,
+   "REWARM": 11.869999999989204,
+   "CLAMP_OFF": 1.4629999999986694,
+   "WEAN": 1.161333333332277,
+   "POST": 0.3829999999996517
+  },
+  "errs": [
+   "ignore_gases",
+   "overcool",
+   "vent_late_on_wean",
+   "vent_off_early"
+  ],
+  "wall_s": 1.5752244880000035,
+  "steps": 150922,
+  "min_res": 1350.9195130026244,
+  "min_map": 60.23421809047403,
+  "max_map": 66.81302204152144,
+  "min_do2i": 353.57309135990243,
+  "min_svo2": 0.6052648118515275,
+  "max_k": 4.753931851499285,
+  "min_hct": 0.3178498062690697,
+  "max_line": 210.23572374937723,
+  "max_lactate": 1.0115158481623876,
+  "min_ph": 7.334460906700977,
+  "max_paco2": 47.54316856722527,
+  "min_paco2": 40.0240914036632,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "aortic_insufficiency",
+  "band": "expert",
+  "seed": 65968,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 51.74133333329111,
+  "bypass_min": 51.00933333329178,
+  "clamp_min": 41.747666666633535,
+  "end_map": 71.9075757169898,
+  "end_cvp": 7.259984455026797,
+  "end_res": 1130.5688878300493,
+  "injury": 0.06816733333330341,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.171666666666663,
+   "STABILIZE": 0.18666666666666268,
+   "COOL": 6.8786666666648335,
+   "CLAMP_ON": 0.17733333333317206,
+   "ANTEGRADE": 5.272333333328539,
+   "RETROGRADE": 1.325999999998794,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6389999999976,
+   "REWARM": 10.338999999990596,
+   "CLAMP_OFF": 1.3949999999987313,
+   "WEAN": 0.71833333333268,
+   "POST": 0.5366666666661786
+  },
+  "errs": [],
+  "wall_s": 1.6470228780000298,
+  "steps": 155224,
+  "min_res": 1082.244864911558,
+  "min_map": 39.51448626906026,
+  "max_map": 95.87578855044107,
+  "min_do2i": 309.43543258617115,
+  "min_svo2": 0.5857424622956069,
+  "max_k": 4.733249702973501,
+  "min_hct": 0.28615690618408623,
+  "max_line": 212.848533764483,
+  "max_lactate": 1.025959218229405,
+  "min_ph": 7.379882799079743,
+  "max_paco2": 42.50391461594269,
+  "min_paco2": 37.496789875657015,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "aortic_insufficiency",
+  "band": "strong",
+  "seed": 65969,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 12,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 51.704666666624476,
+  "bypass_min": 51.12533333329167,
+  "clamp_min": 41.84533333330011,
+  "end_map": 73.76207109371249,
+  "end_cvp": 7.354480127576171,
+  "end_res": 1120.785320575361,
+  "injury": 0.06840333333330299,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.1969999999999958,
+   "STABILIZE": 0.18533333333332938,
+   "COOL": 6.859666666664831,
+   "CLAMP_ON": 0.1836666666664996,
+   "ANTEGRADE": 5.274333333328538,
+   "RETROGRADE": 1.3333333333321207,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.639666666664266,
+   "REWARM": 10.413999999990528,
+   "CLAMP_OFF": 1.40366666666539,
+   "WEAN": 0.7446666666659894,
+   "POST": 0.36866666666633136
+  },
+  "errs": [],
+  "wall_s": 1.7010424730000295,
+  "steps": 155114,
+  "min_res": 1094.9575000650455,
+  "min_map": 41.7204606675726,
+  "max_map": 94.09591143081083,
+  "min_do2i": 313.15656108213267,
+  "min_svo2": 0.5920430610828312,
+  "max_k": 4.733723125578661,
+  "min_hct": 0.28613547119409577,
+  "max_line": 212.9751196990108,
+  "max_lactate": 1.0239790789946157,
+  "min_ph": 7.379841161318028,
+  "max_paco2": 42.51034163486788,
+  "min_paco2": 37.47550393605281,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "aortic_insufficiency",
+  "band": "strong",
+  "seed": 65970,
+  "finished": true,
+  "stuck_in": null,
+  "score": 80,
+  "critical": 1,
+  "findings": [
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 11,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 51.90833333329096,
+  "bypass_min": 51.323999999958154,
+  "clamp_min": 41.98633333329998,
+  "end_map": 69.64114414428049,
+  "end_cvp": 7.057187775655011,
+  "end_res": 1149.4575557674941,
+  "injury": 0.0691326666666322,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.20299999999999568,
+   "STABILIZE": 0.19399999999999587,
+   "COOL": 6.848333333331494,
+   "CLAMP_ON": 0.21366666666647233,
+   "ANTEGRADE": 5.271999999995206,
+   "RETROGRADE": 1.3316666666654555,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6433333333309292,
+   "REWARM": 10.516999999990436,
+   "CLAMP_OFF": 1.414999999998713,
+   "WEAN": 0.7926666666659458,
+   "POST": 0.3769999999996571
+  },
+  "errs": [
+   "vent_late_on_wean"
+  ],
+  "wall_s": 1.7170128149999755,
+  "steps": 155725,
+  "min_res": 1113.1366586995716,
+  "min_map": 49.274889184354244,
+  "max_map": 91.34151703172887,
+  "min_do2i": 312.3639482363239,
+  "min_svo2": 0.5855034528210908,
+  "max_k": 4.732441294014853,
+  "min_hct": 0.2861703912504336,
+  "max_line": 210.71578635388997,
+  "max_lactate": 1.0209483302944842,
+  "min_ph": 7.35744766767501,
+  "max_paco2": 42.50876162067029,
+  "min_paco2": 37.4783322516417,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "aortic_insufficiency",
+  "band": "strong",
+  "seed": 65971,
+  "finished": true,
+  "stuck_in": null,
+  "score": 94,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 48.017333333294495,
+  "bypass_min": 47.4319999999617,
+  "clamp_min": 37.88399999997038,
+  "end_map": 73.59397232336237,
+  "end_cvp": 7.342636362993144,
+  "end_res": 1124.601030366895,
+  "injury": 0.05975399999996731,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.20766666666666225,
+   "STABILIZE": 0.18399999999999608,
+   "COOL": 6.84399999999817,
+   "CLAMP_ON": 0.2033333333331484,
+   "ANTEGRADE": 5.270999999995207,
+   "RETROGRADE": 1.3299999999987904,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.639666666664266,
+   "REWARM": 6.42866666666082,
+   "CLAMP_OFF": 1.6373333333318443,
+   "WEAN": 0.8043333333326018,
+   "POST": 0.3666666666663332
+  },
+  "errs": [
+   "hot_rewarm"
+  ],
+  "wall_s": 1.7197168699999565,
+  "steps": 144052,
+  "min_res": 1102.9503110406847,
+  "min_map": 47.177165878203056,
+  "max_map": 92.98968469466429,
+  "min_do2i": 312.0506260391623,
+  "min_svo2": 0.5842961001566405,
+  "max_k": 4.7324792995656395,
+  "min_hct": 0.28616514481320543,
+  "max_line": 212.46895870113278,
+  "max_lactate": 1.0230770359569386,
+  "min_ph": 7.3795343085017375,
+  "max_paco2": 42.54123167662649,
+  "min_paco2": 37.480379103193876,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "aortic_insufficiency",
+  "band": "average",
+  "seed": 65972,
+  "finished": true,
+  "stuck_in": null,
+  "score": 94,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ]
+  ],
+  "missed": [
+   "redose"
+  ],
+  "callouts": {
+   "made": 10,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 52.33933333329057,
+  "bypass_min": 51.71466666662447,
+  "clamp_min": 42.270333333299725,
+  "end_map": 73.42485768203319,
+  "end_cvp": 7.312977619117674,
+  "end_res": 1063.452904754491,
+  "injury": 0.07119799999994904,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2769999999999941,
+   "STABILIZE": 0.18766666666666823,
+   "COOL": 6.930333333331354,
+   "CLAMP_ON": 0.3373333333330265,
+   "ANTEGRADE": 5.308999999995172,
+   "RETROGRADE": 1.349333333332106,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6689999999975726,
+   "REWARM": 10.596333333323695,
+   "CLAMP_OFF": 1.2426666666655364,
+   "WEAN": 0.9419999999991433,
+   "POST": 0.39799999999963803
+  },
+  "errs": [
+   "no_redose"
+  ],
+  "wall_s": 1.797476598000003,
+  "steps": 157018,
+  "min_res": 1187.962442512018,
+  "min_map": 56.25784336316247,
+  "max_map": 79.31116815260518,
+  "min_do2i": 314.9707185203779,
+  "min_svo2": 0.58170128501744,
+  "max_k": 4.734074320343407,
+  "min_hct": 0.28874065855865855,
+  "max_line": 196.07981261112545,
+  "max_lactate": 1.0152898114678297,
+  "min_ph": 7.379657719062794,
+  "max_paco2": 42.53188722012599,
+  "min_paco2": 37.396866898826815,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "aortic_insufficiency",
+  "band": "average",
+  "seed": 65973,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 11,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 52.8139999999568,
+  "bypass_min": 52.20199999995736,
+  "clamp_min": 42.483666666632864,
+  "end_map": 70.37550361296208,
+  "end_cvp": 7.1142192226732,
+  "end_res": 1143.6620777319965,
+  "injury": 0.07158666666661649,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2703333333333276,
+   "STABILIZE": 0.18566666666666673,
+   "COOL": 7.016999999997951,
+   "CLAMP_ON": 0.33933333333302473,
+   "ANTEGRADE": 5.302999999995178,
+   "RETROGRADE": 1.347333333332108,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6529999999975873,
+   "REWARM": 10.851333333323463,
+   "CLAMP_OFF": 1.4459999999986848,
+   "WEAN": 0.9109999999991715,
+   "POST": 0.38933333333297926
+  },
+  "errs": [
+   "cp_fast"
+  ],
+  "wall_s": 1.8557234620000145,
+  "steps": 158442,
+  "min_res": 1190.1357393745052,
+  "min_map": 52.51779768732945,
+  "max_map": 78.60430084766473,
+  "min_do2i": 314.627043953061,
+  "min_svo2": 0.5808063394335647,
+  "max_k": 4.733441520689272,
+  "min_hct": 0.28610199185353,
+  "max_line": 193.5085619694029,
+  "max_lactate": 1.0160584566265332,
+  "min_ph": 7.379857113472206,
+  "max_paco2": 42.51389116632944,
+  "min_paco2": 37.41732686004443,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "aortic_insufficiency",
+  "band": "average",
+  "seed": 65974,
+  "finished": true,
+  "stuck_in": null,
+  "score": 68,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 10,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 52.95433333329001,
+  "bypass_min": 52.34699999995723,
+  "clamp_min": 42.68766666663268,
+  "end_map": 69.84755688106519,
+  "end_cvp": 7.095076956383473,
+  "end_res": 1145.1079710279314,
+  "injury": 0.07158999999995629,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.26366666666666105,
+   "STABILIZE": 0.19966666666666774,
+   "COOL": 7.067333333331231,
+   "CLAMP_ON": 0.27133333333308657,
+   "ANTEGRADE": 5.297999999995183,
+   "RETROGRADE": 1.3399999999987813,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.659666666664248,
+   "REWARM": 10.94866666665671,
+   "CLAMP_OFF": 1.5629999999985784,
+   "WEAN": 0.8656666666658793,
+   "POST": 0.3766666666663241
+  },
+  "errs": [
+   "flow_up_early",
+   "protamine_half",
+   "vent_late_on_wean"
+  ],
+  "wall_s": 1.79523467599995,
+  "steps": 158863,
+  "min_res": 1173.2811204002796,
+  "min_map": 49.190721450385546,
+  "max_map": 82.49594021285552,
+  "min_do2i": 314.81596471600074,
+  "min_svo2": 0.5740204631968012,
+  "max_k": 4.734287614371963,
+  "min_hct": 0.28612049075137824,
+  "max_line": 196.16876708873875,
+  "max_lactate": 1.0259049819414223,
+  "min_ph": 7.36112006349062,
+  "max_paco2": 42.59241295213449,
+  "min_paco2": 37.344737299050216,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "aortic_insufficiency",
+  "band": "novice",
+  "seed": 65975,
+  "finished": true,
+  "stuck_in": null,
+  "score": 52,
+  "critical": 2,
+  "findings": [
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ],
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "suckers_off"
+  ],
+  "callouts": {
+   "made": 7,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 49.887333333292794,
+  "bypass_min": 49.0426666666269,
+  "clamp_min": 38.617333333303044,
+  "end_map": 67.4248097250006,
+  "end_cvp": 7.803190413988477,
+  "end_res": 1079.7022919338228,
+  "injury": 0.06377433333327173,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3369999999999928,
+   "STABILIZE": 3.662666666667542,
+   "COOL": 3.832333333330084,
+   "CLAMP_ON": 0.419666666666285,
+   "ANTEGRADE": 5.286999999995192,
+   "RETROGRADE": 1.3779999999987467,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.662333333330912,
+   "REWARM": 6.867999999993754,
+   "CLAMP_OFF": 1.691333333331795,
+   "WEAN": 1.0309999999990622,
+   "POST": 0.6173333333327718
+  },
+  "errs": [
+   "hot_rewarm",
+   "overcool",
+   "sucker_on_protamine",
+   "vent_late_on_wean"
+  ],
+  "wall_s": 1.642055130000017,
+  "steps": 149662,
+  "min_res": 1269.0519430901606,
+  "min_map": 51.971141988004966,
+  "max_map": 67.28739691978063,
+  "min_do2i": 315.5329044634857,
+  "min_svo2": 0.5668174780905965,
+  "max_k": 4.734653333579203,
+  "min_hct": 0.28609359928469086,
+  "max_line": 178.2606688443024,
+  "max_lactate": 1.0213260831018973,
+  "min_ph": 7.369441212512982,
+  "max_paco2": 43.01694230762873,
+  "min_paco2": 37.307415919533646,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "aortic_insufficiency",
+  "band": "novice",
+  "seed": 65976,
+  "finished": true,
+  "stuck_in": null,
+  "score": 72,
+  "critical": 1,
+  "findings": [
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ]
+  ],
+  "missed": [
+   "redose"
+  ],
+  "callouts": {
+   "made": 6,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 98,
+  "case_min": 53.20933333328978,
+  "bypass_min": 52.63199999995697,
+  "clamp_min": 42.661666666632705,
+  "end_map": 66.9897805933732,
+  "end_cvp": 7.647522201430165,
+  "end_res": 1031.6444465233594,
+  "injury": 0.07292199999993737,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3406666666666594,
+   "STABILIZE": 3.5216666666674716,
+   "COOL": 3.6813333333304166,
+   "CLAMP_ON": 0.48033333333289646,
+   "ANTEGRADE": 5.339999999995144,
+   "RETROGRADE": 1.3769999999987477,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6836666666642257,
+   "REWARM": 10.76299999999021,
+   "CLAMP_OFF": 1.3326666666654545,
+   "WEAN": 1.214666666665562,
+   "POST": 0.3736666666663268
+  },
+  "errs": [
+   "no_redose",
+   "overcool",
+   "vent_late_on_wean"
+  ],
+  "wall_s": 1.7427648970000291,
+  "steps": 159628,
+  "min_res": 1273.1764578027453,
+  "min_map": 51.59290414651638,
+  "max_map": 67.64071565841891,
+  "min_do2i": 315.5299516316646,
+  "min_svo2": 0.5628862466464833,
+  "max_k": 4.73649153026098,
+  "min_hct": 0.28869471138758684,
+  "max_line": 184.39097722888405,
+  "max_lactate": 1.0161450717504092,
+  "min_ph": 7.377029638716162,
+  "max_paco2": 42.62305108584146,
+  "min_paco2": 36.293560089668766,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "aortic_insufficiency",
+  "band": "novice",
+  "seed": 65977,
+  "finished": true,
+  "stuck_in": null,
+  "score": 62,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "unstable_bypass",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ],
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ]
+  ],
+  "missed": [
+   "gases_in_range",
+   "redose"
+  ],
+  "callouts": {
+   "made": 5,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 98,
+  "case_min": 59.93433333328366,
+  "bypass_min": 59.26033333328427,
+  "clamp_min": 42.6646666666327,
+  "end_map": 65.62605815198333,
+  "end_cvp": 7.485881722722124,
+  "end_res": 1040.374161060594,
+  "injury": 0.07322966666660648,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3303333333333263,
+   "STABILIZE": 7.000333333331415,
+   "COOL": 7.0686666666602385,
+   "CLAMP_ON": 0.45999999999958163,
+   "ANTEGRADE": 5.32066666666183,
+   "RETROGRADE": 1.3866666666654055,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6563333333309176,
+   "REWARM": 10.529999999990423,
+   "CLAMP_OFF": 1.6036666666652082,
+   "WEAN": 1.026999999999066,
+   "POST": 0.4499999999995907
+  },
+  "errs": [
+   "cp_fast",
+   "flow_up_early",
+   "ignore_gases",
+   "no_redose",
+   "vent_late_on_wean"
+  ],
+  "wall_s": 2.056619673,
+  "steps": 179803,
+  "min_res": 1236.204384410063,
+  "min_map": 50.849860445710945,
+  "max_map": 73.84043864024432,
+  "min_do2i": 324.52384312767424,
+  "min_svo2": 0.5583944899528863,
+  "max_k": 4.736670855200327,
+  "min_hct": 0.28900247206140794,
+  "max_line": 193.34765949958273,
+  "max_lactate": 1.0220165316992462,
+  "min_ph": 7.374317503839939,
+  "max_paco2": 43.21031202000769,
+  "min_paco2": 34.83334329109721,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "vasoplegic",
+  "band": "expert",
+  "seed": 33139,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 99,
+  "do2_in": 99,
+  "case_min": 51.35999999995813,
+  "bypass_min": 50.61933333329213,
+  "clamp_min": 41.02833333330086,
+  "end_map": 64.2790479340734,
+  "end_cvp": 8.137570861600198,
+  "end_res": 1043.1569138394757,
+  "injury": 0.06468599999999634,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.171666666666663,
+   "STABILIZE": 0.18666666666666268,
+   "COOL": 7.22699999999785,
+   "CLAMP_ON": 0.1756666666665069,
+   "ANTEGRADE": 4.006999999996356,
+   "RETROGRADE": 1.325999999998794,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6389999999976,
+   "REWARM": 10.8839999999901,
+   "CLAMP_OFF": 1.3656666666654247,
+   "WEAN": 0.7313333333326681,
+   "POST": 0.5453333333328374
+  },
+  "errs": [],
+  "wall_s": 1.7310693489999949,
+  "steps": 154080,
+  "min_res": 1121.4522954624783,
+  "min_map": 37.43284198294641,
+  "max_map": 67.58192953027422,
+  "min_do2i": 301.8456019878875,
+  "min_svo2": 0.5793112973285874,
+  "max_k": 4.863718549690516,
+  "min_hct": 0.28083117352548265,
+  "max_line": 211.76390480031102,
+  "max_lactate": 1.0301573613888009,
+  "min_ph": 7.379536527206974,
+  "max_paco2": 42.55793409912825,
+  "min_paco2": 37.490012802720436,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "vasoplegic",
+  "band": "strong",
+  "seed": 33140,
+  "finished": true,
+  "stuck_in": null,
+  "score": 94,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 12,
+   "due": 13
+  },
+  "map_in": 99,
+  "do2_in": 99,
+  "case_min": 51.55199999995795,
+  "bypass_min": 50.83099999995861,
+  "clamp_min": 41.273333333300634,
+  "end_map": 63.230872066689344,
+  "end_cvp": 8.392146136746396,
+  "end_res": 1017.6400529913185,
+  "injury": 0.06557233333332867,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.19333333333332922,
+   "STABILIZE": 0.19899999999999576,
+   "COOL": 7.139666666664567,
+   "CLAMP_ON": 0.1923333333331584,
+   "ANTEGRADE": 4.015666666663015,
+   "RETROGRADE": 1.3319999999987886,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.641666666664264,
+   "REWARM": 10.93566666665672,
+   "CLAMP_OFF": 1.5219999999986158,
+   "WEAN": 0.7699999999992997,
+   "POST": 0.5099999999995362
+  },
+  "errs": [
+   "flow_up_early"
+  ],
+  "wall_s": 1.6833378719999246,
+  "steps": 154656,
+  "min_res": 1128.588387033703,
+  "min_map": 42.78971110625384,
+  "max_map": 68.79166388895061,
+  "min_do2i": 305.0152891998486,
+  "min_svo2": 0.5810287525051617,
+  "max_k": 4.864495450419887,
+  "min_hct": 0.28079640829010705,
+  "max_line": 207.19961798703312,
+  "max_lactate": 1.034033749781961,
+  "min_ph": 7.379158911764769,
+  "max_paco2": 42.60513602940395,
+  "min_paco2": 37.46846759701005,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "vasoplegic",
+  "band": "strong",
+  "seed": 33141,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 99,
+  "do2_in": 99,
+  "case_min": 51.550666666624615,
+  "bypass_min": 50.9166666666252,
+  "clamp_min": 41.23433333330067,
+  "end_map": 66.26879634721095,
+  "end_cvp": 7.4947422613024175,
+  "end_res": 1105.7517738693891,
+  "injury": 0.06575166666665938,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.21699999999999536,
+   "STABILIZE": 0.19999999999999574,
+   "COOL": 7.168999999997851,
+   "CLAMP_ON": 0.23666666666645142,
+   "ANTEGRADE": 4.0106666666630195,
+   "RETROGRADE": 1.3333333333321207,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.649666666664257,
+   "REWARM": 11.01033333332332,
+   "CLAMP_OFF": 1.3873333333320716,
+   "WEAN": 0.8193333333325882,
+   "POST": 0.4166666666662877
+  },
+  "errs": [],
+  "wall_s": 1.7174468629999637,
+  "steps": 154652,
+  "min_res": 1158.450629037195,
+  "min_map": 47.40398374336611,
+  "max_map": 67.67912857026182,
+  "min_do2i": 304.8003035577721,
+  "min_svo2": 0.5726206052262536,
+  "max_k": 4.862934701113947,
+  "min_hct": 0.2808372399994475,
+  "max_line": 203.7400710665803,
+  "max_lactate": 1.0248889456045818,
+  "min_ph": 7.378404476917423,
+  "max_paco2": 42.6994403853222,
+  "min_paco2": 37.47141343121176,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "vasoplegic",
+  "band": "strong",
+  "seed": 33142,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 99,
+  "do2_in": 99,
+  "case_min": 51.769999999957754,
+  "bypass_min": 51.124666666625004,
+  "clamp_min": 41.321333333300586,
+  "end_map": 63.881277057241086,
+  "end_cvp": 8.333975052637388,
+  "end_res": 1023.4624947358401,
+  "injury": 0.0655089999999949,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.18766666666666268,
+   "STABILIZE": 0.1906666666666626,
+   "COOL": 7.272666666664459,
+   "CLAMP_ON": 0.18933333333316113,
+   "ANTEGRADE": 4.004999999996358,
+   "RETROGRADE": 1.3373333333321171,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.649666666664257,
+   "REWARM": 11.139999999989868,
+   "CLAMP_OFF": 1.358999999998764,
+   "WEAN": 0.8906666666658566,
+   "POST": 0.44733333333292646
+  },
+  "errs": [],
+  "wall_s": 1.7735185190000493,
+  "steps": 155310,
+  "min_res": 1146.4405974723725,
+  "min_map": 41.23081481485249,
+  "max_map": 65.77429589550519,
+  "min_do2i": 304.3101582867371,
+  "min_svo2": 0.5770051570298809,
+  "max_k": 4.864084888915607,
+  "min_hct": 0.28081316417392077,
+  "max_line": 199.32902509980158,
+  "max_lactate": 1.0280107049101208,
+  "min_ph": 7.378662031077426,
+  "max_paco2": 42.66724611532182,
+  "min_paco2": 37.465091101126305,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "vasoplegic",
+  "band": "average",
+  "seed": 33143,
+  "finished": true,
+  "stuck_in": null,
+  "score": 74,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ],
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "suckers_off"
+  ],
+  "callouts": {
+   "made": 7,
+   "due": 13
+  },
+  "map_in": 99,
+  "do2_in": 99,
+  "case_min": 53.47333333328954,
+  "bypass_min": 52.60333333329033,
+  "clamp_min": 41.19366666663404,
+  "end_map": 61.95678551487541,
+  "end_cvp": 8.049737932535153,
+  "end_res": 1051.9735400791274,
+  "injury": 0.06675966666665727,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2703333333333276,
+   "STABILIZE": 1.5266666666665814,
+   "COOL": 7.367333333329833,
+   "CLAMP_ON": 0.32966666666636685,
+   "ANTEGRADE": 4.022666666663008,
+   "RETROGRADE": 1.0033333333324208,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6529999999975873,
+   "REWARM": 11.179999999989832,
+   "CLAMP_OFF": 1.4426666666653545,
+   "WEAN": 0.9296666666658211,
+   "POST": 0.6473333333327446
+  },
+  "errs": [
+   "retro_fast",
+   "sucker_on_protamine"
+  ],
+  "wall_s": 2.024468264999996,
+  "steps": 160420,
+  "min_res": 1239.1476314162835,
+  "min_map": 42.45425124747627,
+  "max_map": 61.79368095663422,
+  "min_do2i": 307.6749177599504,
+  "min_svo2": 0.5723802984752834,
+  "max_k": 4.874214970607699,
+  "min_hct": 0.28079757826944046,
+  "max_line": 192.84182838147103,
+  "max_lactate": 1.0188527559904146,
+  "min_ph": 7.374436245832754,
+  "max_paco2": 42.5849233976904,
+  "min_paco2": 37.42519041621286,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "vasoplegic",
+  "band": "average",
+  "seed": 33144,
+  "finished": true,
+  "stuck_in": null,
+  "score": 80,
+  "critical": 1,
+  "findings": [
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "suckers_off"
+  ],
+  "callouts": {
+   "made": 8,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 52.327333333290575,
+  "bypass_min": 51.72266666662446,
+  "clamp_min": 41.75599999996686,
+  "end_map": 65.49626528815345,
+  "end_cvp": 7.49034519429284,
+  "end_res": 1107.941480570275,
+  "injury": 0.06736399999998975,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2263333333333285,
+   "STABILIZE": 0.18666666666666268,
+   "COOL": 7.472666666664245,
+   "CLAMP_ON": 0.2496666666664396,
+   "ANTEGRADE": 4.019333333329679,
+   "RETROGRADE": 1.3346666666654527,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6476666666642585,
+   "REWARM": 11.496333333322877,
+   "CLAMP_OFF": 1.3683333333320888,
+   "WEAN": 0.8269999999992479,
+   "POST": 0.39799999999963803
+  },
+  "errs": [
+   "sucker_on_protamine"
+  ],
+  "wall_s": 1.857317025000043,
+  "steps": 156982,
+  "min_res": 1209.0986701842085,
+  "min_map": 49.360395911093015,
+  "max_map": 61.607520434739804,
+  "min_do2i": 307.7725172411937,
+  "min_svo2": 0.5661082446469969,
+  "max_k": 4.863552081663907,
+  "min_hct": 0.280815981242364,
+  "max_line": 186.6675273442545,
+  "max_lactate": 1.0273230053360063,
+  "min_ph": 7.373440980755033,
+  "max_paco2": 43.31987740562085,
+  "min_paco2": 37.42432245237515,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "vasoplegic",
+  "band": "average",
+  "seed": 33145,
+  "finished": true,
+  "stuck_in": null,
+  "score": 92,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ]
+  ],
+  "missed": [
+   "redose"
+  ],
+  "callouts": {
+   "made": 7,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 49.41033333329323,
+  "bypass_min": 48.696999999960546,
+  "clamp_min": 41.24899999996732,
+  "end_map": 65.14373287421421,
+  "end_cvp": 8.175847018546829,
+  "end_res": 981.0929648113857,
+  "injury": 0.06568533333332517,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.23066666666666175,
+   "STABILIZE": 1.556333333333249,
+   "COOL": 3.7399999999998044,
+   "CLAMP_ON": 0.24899999999977354,
+   "ANTEGRADE": 4.022999999996342,
+   "RETROGRADE": 1.3489999999987732,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.642666666664263,
+   "REWARM": 10.98499999999001,
+   "CLAMP_OFF": 1.181999999998925,
+   "WEAN": 0.8603333333325509,
+   "POST": 0.4916666666662195
+  },
+  "errs": [
+   "no_redose",
+   "overcool"
+  ],
+  "wall_s": 1.6653461450000577,
+  "steps": 148231,
+  "min_res": 1166.9841736521928,
+  "min_map": 42.24879303406274,
+  "max_map": 63.91449884015151,
+  "min_do2i": 307.74095738506605,
+  "min_svo2": 0.5779615505602713,
+  "max_k": 4.865516848455964,
+  "min_hct": 0.28303212301965475,
+  "max_line": 203.02480843094537,
+  "max_lactate": 1.021090849198774,
+  "min_ph": 7.373302400916006,
+  "max_paco2": 42.559065946522736,
+  "min_paco2": 37.34656558048202,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "vasoplegic",
+  "band": "novice",
+  "seed": 33146,
+  "finished": true,
+  "stuck_in": null,
+  "score": 86,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "cp_pressure",
+    "ANTEGRADE"
+   ],
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 6,
+   "due": 13
+  },
+  "map_in": 96,
+  "do2_in": 98,
+  "case_min": 54.28366666662213,
+  "bypass_min": 53.35833333328964,
+  "clamp_min": 39.768333333302,
+  "end_map": 63.08868061162538,
+  "end_cvp": 8.057616252520548,
+  "end_res": 1051.6587080805293,
+  "injury": 0.062313333333346,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3649999999999922,
+   "STABILIZE": 3.595666666667522,
+   "COOL": 6.957999999993964,
+   "CLAMP_ON": 0.4886666666662222,
+   "ANTEGRADE": 2.55433333333101,
+   "RETROGRADE": 1.3823333333320762,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6909999999975525,
+   "REWARM": 10.38333333332389,
+   "CLAMP_OFF": 1.8509999999983164,
+   "WEAN": 1.2296666666655482,
+   "POST": 0.6839999999993779
+  },
+  "errs": [
+   "cp_fast",
+   "flow_up_early",
+   "protamine_half"
+  ],
+  "wall_s": 1.9460008190000053,
+  "steps": 162851,
+  "min_res": 1279.580538906553,
+  "min_map": 40.412157824736816,
+  "max_map": 62.851545086638296,
+  "min_do2i": 308.581437350443,
+  "min_svo2": 0.5330679329153565,
+  "max_k": 4.884666974354673,
+  "min_hct": 0.28071415310983167,
+  "max_line": 215.40869106966238,
+  "max_lactate": 1.0304340740795468,
+  "min_ph": 7.36877732069412,
+  "max_paco2": 42.63788320837462,
+  "min_paco2": 36.977080961223685,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "vasoplegic",
+  "band": "novice",
+  "seed": 33147,
+  "finished": true,
+  "stuck_in": null,
+  "score": 58,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "map_low",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "map_low",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "map_low",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "unstable_bypass",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ],
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ],
+   [
+    "major",
+    "unstable_off_bypass",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "gases_in_range",
+   "stable_off"
+  ],
+  "callouts": {
+   "made": 5,
+   "due": 13
+  },
+  "map_in": 2,
+  "do2_in": 99,
+  "case_min": 68.30599999994361,
+  "bypass_min": 59.93199999995033,
+  "clamp_min": 41.760999999966856,
+  "end_map": 60.62453476375311,
+  "end_cvp": 18.243578725442084,
+  "end_res": 16.414127447533804,
+  "injury": 0.0689376666666532,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3346666666666595,
+   "STABILIZE": 7.000333333331412,
+   "COOL": 7.647666666659712,
+   "CLAMP_ON": 0.3956666666663068,
+   "ANTEGRADE": 4.021666666663011,
+   "RETROGRADE": 1.0139999999990779,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.686666666664223,
+   "REWARM": 11.379333333322984,
+   "CLAMP_OFF": 1.6936666666651263,
+   "WEAN": 1.9033333333316023,
+   "POST": 8.128333333326834
+  },
+  "errs": [
+   "flow_up_early",
+   "ignore_gases",
+   "retro_fast"
+  ],
+  "wall_s": 2.2515240710000626,
+  "steps": 204918,
+  "min_res": 1298.1394319497417,
+  "min_map": 36.18240369806286,
+  "max_map": 42.75037041068347,
+  "min_do2i": 317.23913263459747,
+  "min_svo2": 0.5820126014843711,
+  "max_k": 4.87458378327667,
+  "min_hct": 0.2809904603089768,
+  "max_line": 172.47500868029303,
+  "max_lactate": 1.0226863308172167,
+  "min_ph": 7.34430861980343,
+  "max_paco2": 46.96142252457132,
+  "min_paco2": 37.90944407001941,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "vasoplegic",
+  "band": "novice",
+  "seed": 33148,
+  "finished": true,
+  "stuck_in": null,
+  "score": 42,
+  "critical": 2,
+  "findings": [
+   [
+    "major",
+    "vent_off_early",
+    "INITIATE"
+   ],
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ],
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "suckers_off",
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 8,
+   "due": 13
+  },
+  "map_in": 94,
+  "do2_in": 98,
+  "case_min": 57.062999999952936,
+  "bypass_min": 56.482333333286796,
+  "clamp_min": 42.420999999966256,
+  "end_map": 68.20345981547416,
+  "end_cvp": 7.59722115069776,
+  "end_res": 1094.4275515964691,
+  "injury": 0.07248799999996194,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.32633333333332637,
+   "STABILIZE": 3.5590000000008164,
+   "COOL": 7.632999999993458,
+   "CLAMP_ON": 0.5546666666661622,
+   "ANTEGRADE": 4.048333333329651,
+   "RETROGRADE": 1.3859999999987413,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6909999999975525,
+   "REWARM": 11.486333333322886,
+   "CLAMP_OFF": 1.736333333331754,
+   "WEAN": 1.1653333333322735,
+   "POST": 0.37599999999965805
+  },
+  "errs": [
+   "flow_up_early",
+   "protamine_half",
+   "sucker_on_protamine",
+   "vent_late_on_wean",
+   "vent_off_early"
+  ],
+  "wall_s": 1.8030383399999437,
+  "steps": 171189,
+  "min_res": 1332.3713122543263,
+  "min_map": 39.243926947678744,
+  "max_map": 63.0917117315671,
+  "min_do2i": 308.5676383221798,
+  "min_svo2": 0.5626127122016982,
+  "max_k": 4.864671355672074,
+  "min_hct": 0.28090269581611726,
+  "max_line": 188.27634592044998,
+  "max_lactate": 1.0290582199663842,
+  "min_ph": 7.368631241171228,
+  "max_paco2": 42.73619463591583,
+  "min_paco2": 37.27014201931336,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "hypertensive",
+  "band": "expert",
+  "seed": 40858,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 79,
+  "do2_in": 99,
+  "case_min": 53.88199999995583,
+  "bypass_min": 53.323333333289675,
+  "clamp_min": 41.96399999996667,
+  "end_map": 114.27792779472456,
+  "end_cvp": 6.041744573976366,
+  "end_res": 1249.9575426019235,
+  "injury": 0.06674266666666252,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.1803333333333295,
+   "STABILIZE": 1.485333333333272,
+   "COOL": 7.758666666662903,
+   "CLAMP_ON": 0.17399999999984175,
+   "ANTEGRADE": 4.0069999999963555,
+   "RETROGRADE": 1.325999999998794,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6389999999976,
+   "REWARM": 11.815333333322588,
+   "CLAMP_OFF": 1.3183333333321343,
+   "WEAN": 0.7226666666660094,
+   "POST": 0.3546666666663441
+  },
+  "errs": [],
+  "wall_s": 1.9621657889999824,
+  "steps": 161646,
+  "min_res": 1163.4566931820937,
+  "min_map": 49.865955988077644,
+  "max_map": 160.78455659252785,
+  "min_do2i": 359.5384675678943,
+  "min_svo2": 0.6181383229339632,
+  "max_k": 4.772094816144642,
+  "min_hct": 0.3392509880777406,
+  "max_line": 314.10570691472697,
+  "max_lactate": 1.0212914104400315,
+  "min_ph": 7.378918720984801,
+  "max_paco2": 42.50297802346898,
+  "min_paco2": 37.49424518505402,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "hypertensive",
+  "band": "strong",
+  "seed": 40859,
+  "finished": true,
+  "stuck_in": null,
+  "score": 98,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "cp_pressure",
+    "ANTEGRADE"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 11,
+   "due": 13
+  },
+  "map_in": 81,
+  "do2_in": 99,
+  "case_min": 52.57666666662369,
+  "bypass_min": 52.006666666624206,
+  "clamp_min": 40.609999999967904,
+  "end_map": 107.49880356883354,
+  "end_cvp": 5.773561748382563,
+  "end_res": 1278.4198251611142,
+  "injury": 0.06154066666669208,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.17699999999999622,
+   "STABILIZE": 1.4273333333332843,
+   "COOL": 7.864666666662851,
+   "CLAMP_ON": 0.1723333333331766,
+   "ANTEGRADE": 2.506333333331054,
+   "RETROGRADE": 1.3339999999987868,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.639999999997599,
+   "REWARM": 11.956333333322458,
+   "CLAMP_OFF": 1.3086666666654765,
+   "WEAN": 0.7246666666660075,
+   "POST": 0.364666666666335
+  },
+  "errs": [
+   "cp_fast"
+  ],
+  "wall_s": 1.7566520199999331,
+  "steps": 157730,
+  "min_res": 1163.6124023356374,
+  "min_map": 53.80617986081888,
+  "max_map": 159.63564005289172,
+  "min_do2i": 363.0958052625581,
+  "min_svo2": 0.6222012008577369,
+  "max_k": 4.785813339372283,
+  "min_hct": 0.33916191303110316,
+  "max_line": 309.26087696390556,
+  "max_lactate": 1.0207554976734705,
+  "min_ph": 7.376921069908636,
+  "max_paco2": 42.51587607262054,
+  "min_paco2": 37.491723013637696,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "hypertensive",
+  "band": "strong",
+  "seed": 40860,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 12,
+   "due": 13
+  },
+  "map_in": 80,
+  "do2_in": 99,
+  "case_min": 54.38366666662204,
+  "bypass_min": 53.79933333328924,
+  "clamp_min": 42.09699999996655,
+  "end_map": 128.40701915202428,
+  "end_cvp": 6.558330920080034,
+  "end_res": 1197.3692413249046,
+  "injury": 0.06749033333332653,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.20299999999999568,
+   "STABILIZE": 1.6809999999998957,
+   "COOL": 7.803333333329374,
+   "CLAMP_ON": 0.21599999999980354,
+   "ANTEGRADE": 4.018333333329679,
+   "RETROGRADE": 1.3316666666654555,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6433333333309292,
+   "REWARM": 11.878666666655864,
+   "CLAMP_OFF": 1.3399999999987813,
+   "WEAN": 0.7906666666659475,
+   "POST": 0.3769999999996571
+  },
+  "errs": [],
+  "wall_s": 1.9060362089999217,
+  "steps": 163151,
+  "min_res": 1208.2776386590776,
+  "min_map": 61.119285628534286,
+  "max_map": 147.39669122650227,
+  "min_do2i": 364.16414372208976,
+  "min_svo2": 0.6193029894968461,
+  "max_k": 4.77279235856277,
+  "min_hct": 0.3392617111582831,
+  "max_line": 301.5382270313778,
+  "max_lactate": 1.0152483459147659,
+  "min_ph": 7.374736635271352,
+  "max_paco2": 42.51811541556753,
+  "min_paco2": 37.45545901921178,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "hypertensive",
+  "band": "strong",
+  "seed": 40861,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 11,
+   "due": 13
+  },
+  "map_in": 81,
+  "do2_in": 99,
+  "case_min": 54.533999999955235,
+  "bypass_min": 53.93333333328912,
+  "clamp_min": 42.20033333329979,
+  "end_map": 133.48734305979656,
+  "end_cvp": 6.750050225619462,
+  "end_res": 1177.2376441041497,
+  "injury": 0.06792866666665875,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.21699999999999536,
+   "STABILIZE": 1.582999999999913,
+   "COOL": 7.870333333329373,
+   "CLAMP_ON": 0.2409999999997808,
+   "ANTEGRADE": 4.00533333332969,
+   "RETROGRADE": 1.3333333333321207,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.649666666664257,
+   "REWARM": 11.973666666655777,
+   "CLAMP_OFF": 1.3346666666654527,
+   "WEAN": 0.8419999999992342,
+   "POST": 0.3833333333329847
+  },
+  "errs": [
+   "vent_on_antegrade"
+  ],
+  "wall_s": 1.673262646000012,
+  "steps": 163602,
+  "min_res": 1219.7485531166355,
+  "min_map": 68.14772047330275,
+  "max_map": 143.4695994678183,
+  "min_do2i": 362.97569550763046,
+  "min_svo2": 0.6114228335246411,
+  "max_k": 4.7713143900640995,
+  "min_hct": 0.3392742330583603,
+  "max_line": 296.03917600481014,
+  "max_lactate": 1.0164158066507616,
+  "min_ph": 7.376222466113843,
+  "max_paco2": 42.51372202486388,
+  "min_paco2": 37.4793327839553,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "hypertensive",
+  "band": "average",
+  "seed": 40862,
+  "finished": true,
+  "stuck_in": null,
+  "score": 66,
+  "critical": 1,
+  "findings": [
+   [
+    "minor",
+    "map_high",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ],
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "suckers_off",
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 10,
+   "due": 13
+  },
+  "map_in": 93,
+  "do2_in": 99,
+  "case_min": 50.63533333329212,
+  "bypass_min": 50.023333333292676,
+  "clamp_min": 37.465666666637425,
+  "end_map": 81.64290391226638,
+  "end_cvp": 5.318814659913614,
+  "end_res": 1327.3305340081668,
+  "injury": 0.058121666666654304,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2703333333333276,
+   "STABILIZE": 2.165333333333407,
+   "COOL": 7.627333333328855,
+   "CLAMP_ON": 0.3343333333330293,
+   "ANTEGRADE": 4.036666666662995,
+   "RETROGRADE": 1.347333333332108,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6529999999975873,
+   "REWARM": 7.094666666660214,
+   "CLAMP_OFF": 1.6656666666651518,
+   "WEAN": 0.950666666665802,
+   "POST": 0.38933333333297926
+  },
+  "errs": [
+   "hot_rewarm",
+   "protamine_half",
+   "sucker_on_protamine"
+  ],
+  "wall_s": 1.6402980829999478,
+  "steps": 151906,
+  "min_res": 1280.24276803622,
+  "min_map": 62.840011340562896,
+  "max_map": 128.61882804510395,
+  "min_do2i": 366.3067669272915,
+  "min_svo2": 0.6048143263908675,
+  "max_k": 4.773233264815752,
+  "min_hct": 0.3392263403929395,
+  "max_line": 293.62372751632284,
+  "max_lactate": 1.010640644632195,
+  "min_ph": 7.365712780853763,
+  "max_paco2": 42.5021094312632,
+  "min_paco2": 37.33418648281103,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "hypertensive",
+  "band": "average",
+  "seed": 40863,
+  "finished": true,
+  "stuck_in": null,
+  "score": 86,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "map_high",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 9,
+   "due": 13
+  },
+  "map_in": 84,
+  "do2_in": 99,
+  "case_min": 55.835999999954055,
+  "bypass_min": 55.1986666666213,
+  "clamp_min": 42.782333333299256,
+  "end_map": 100.88650150846614,
+  "end_cvp": 6.168724547567553,
+  "end_res": 1235.5715452428547,
+  "injury": 0.07103399999998242,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.30033333333332696,
+   "STABILIZE": 2.002000000000006,
+   "COOL": 7.965666666662071,
+   "CLAMP_ON": 0.3743333333329929,
+   "ANTEGRADE": 4.0459999999963205,
+   "RETROGRADE": 1.3616666666654282,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6679999999975736,
+   "REWARM": 12.111333333322317,
+   "CLAMP_OFF": 1.5959999999985484,
+   "WEAN": 0.9133333333325027,
+   "POST": 0.3966666666663059
+  },
+  "errs": [
+   "flow_up_early",
+   "protamine_half"
+  ],
+  "wall_s": 1.8500344290000612,
+  "steps": 167508,
+  "min_res": 1320.7465694756056,
+  "min_map": 70.9022056555008,
+  "max_map": 114.34825732384925,
+  "min_do2i": 366.09135033554895,
+  "min_svo2": 0.6175982296216588,
+  "max_k": 4.77556677663131,
+  "min_hct": 0.3391839140033237,
+  "max_line": 264.56322573528826,
+  "max_lactate": 1.0133437389405666,
+  "min_ph": 7.363310921591051,
+  "max_paco2": 42.53528047636149,
+  "min_paco2": 37.34154605235931,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "hypertensive",
+  "band": "average",
+  "seed": 40864,
+  "finished": true,
+  "stuck_in": null,
+  "score": 72,
+  "critical": 1,
+  "findings": [
+   [
+    "minor",
+    "map_high",
+    "STABILIZE"
+   ],
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 7,
+   "due": 13
+  },
+  "map_in": 94,
+  "do2_in": 99,
+  "case_min": 54.760333333288365,
+  "bypass_min": 54.161999999955576,
+  "clamp_min": 42.008333333299966,
+  "end_map": 105.22555394053909,
+  "end_cvp": 6.338142721492359,
+  "end_res": 1219.3327278503402,
+  "injury": 0.06812899999999274,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.23933333333332824,
+   "STABILIZE": 1.9256666666666011,
+   "COOL": 7.9223333333289725,
+   "CLAMP_ON": 0.2716666666664196,
+   "ANTEGRADE": 4.015666666663014,
+   "RETROGRADE": 0.983333333332439,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.641999999997597,
+   "REWARM": 12.101333333322327,
+   "CLAMP_OFF": 1.3426666666654454,
+   "WEAN": 0.8449999999992315,
+   "POST": 0.3706666666663295
+  },
+  "errs": [
+   "retro_fast",
+   "vent_late_on_wean"
+  ],
+  "wall_s": 1.7286884009999994,
+  "steps": 164281,
+  "min_res": 1244.6663606851853,
+  "min_map": 62.73243088854682,
+  "max_map": 139.72662060385707,
+  "min_do2i": 366.19005900056,
+  "min_svo2": 0.6136785954109509,
+  "max_k": 4.780098356975063,
+  "min_hct": 0.33922219695897476,
+  "max_line": 291.3019416715273,
+  "max_lactate": 1.013304383865333,
+  "min_ph": 7.357658405472746,
+  "max_paco2": 42.56463487769725,
+  "min_paco2": 37.342199674187626,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "hypertensive",
+  "band": "novice",
+  "seed": 40865,
+  "finished": true,
+  "stuck_in": null,
+  "score": 58,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "vent_off_early",
+    "INITIATE"
+   ],
+   [
+    "minor",
+    "map_high",
+    "STABILIZE"
+   ],
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ],
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "suckers_off",
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 5,
+   "due": 13
+  },
+  "map_in": 26,
+  "do2_in": 98,
+  "case_min": 53.54433333328947,
+  "bypass_min": 52.88899999995673,
+  "clamp_min": 42.12666666663319,
+  "end_map": 108.99538787331119,
+  "end_cvp": 6.508000414741973,
+  "end_res": 1205.9536251920842,
+  "injury": 0.06981466666664822,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3086666666666601,
+   "STABILIZE": 4.008666666667489,
+   "COOL": 3.911999999996442,
+   "CLAMP_ON": 0.46933333333290744,
+   "ANTEGRADE": 4.03933333332966,
+   "RETROGRADE": 1.3719999999987522,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6466666666642595,
+   "REWARM": 11.292666666656396,
+   "CLAMP_OFF": 1.800666666665029,
+   "WEAN": 1.1849999999989222,
+   "POST": 0.408666666666295
+  },
+  "errs": [
+   "flow_up_early",
+   "overcool",
+   "protamine_half",
+   "sucker_on_protamine",
+   "vent_off_early"
+  ],
+  "wall_s": 1.7766993100000263,
+  "steps": 160633,
+  "min_res": 1291.2037986910073,
+  "min_map": 65.87093346089853,
+  "max_map": 126.00620977929927,
+  "min_do2i": 366.7724001932161,
+  "min_svo2": 0.589256555911056,
+  "max_k": 4.774010441615235,
+  "min_hct": 0.33910166802156344,
+  "max_line": 289.18968286449854,
+  "max_lactate": 1.0068146417670791,
+  "min_ph": 7.357116106362579,
+  "max_paco2": 42.59788142848714,
+  "min_paco2": 36.70061672298565,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "hypertensive",
+  "band": "novice",
+  "seed": 40866,
+  "finished": true,
+  "stuck_in": null,
+  "score": 64,
+  "critical": 1,
+  "findings": [
+   [
+    "minor",
+    "map_high",
+    "STABILIZE"
+   ],
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ],
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ],
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "suckers_off"
+  ],
+  "callouts": {
+   "made": 6,
+   "due": 13
+  },
+  "map_in": 91,
+  "do2_in": 98,
+  "case_min": 53.78633333328925,
+  "bypass_min": 53.20899999995644,
+  "clamp_min": 42.79566666663258,
+  "end_map": 99.43492927953402,
+  "end_cvp": 6.114924289478422,
+  "end_res": 1245.83323771831,
+  "injury": 0.07252033333330818,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3406666666666594,
+   "STABILIZE": 3.5216666666674716,
+   "COOL": 4.132666666663339,
+   "CLAMP_ON": 0.5173333333328638,
+   "ANTEGRADE": 4.035666666662996,
+   "RETROGRADE": 1.0199999999990723,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6836666666642257,
+   "REWARM": 12.231999999988876,
+   "CLAMP_OFF": 1.7269999999984293,
+   "WEAN": 1.1013333333323316,
+   "POST": 0.3736666666663268
+  },
+  "errs": [
+   "flow_up_early",
+   "overcool",
+   "retro_fast",
+   "sucker_on_protamine",
+   "vent_on_antegrade"
+  ],
+  "wall_s": 1.6900494189999336,
+  "steps": 161359,
+  "min_res": 1354.1740237541542,
+  "min_map": 70.11312245809808,
+  "max_map": 107.55276382147338,
+  "min_do2i": 366.73426676846987,
+  "min_svo2": 0.6191056566465893,
+  "max_k": 4.7828271127098745,
+  "min_hct": 0.3390978527473211,
+  "max_line": 255.22550626805645,
+  "max_lactate": 1.013061757899757,
+  "min_ph": 7.349339912516922,
+  "max_paco2": 42.59363711389362,
+  "min_paco2": 36.78251410236336,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "hypertensive",
+  "band": "novice",
+  "seed": 40867,
+  "finished": true,
+  "stuck_in": null,
+  "score": 76,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "map_high",
+    "STABILIZE"
+   ],
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "minor",
+    "cp_pressure",
+    "ANTEGRADE"
+   ],
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ],
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ],
+   [
+    "major",
+    "flow_up_early",
+    "CLAMP_OFF"
+   ]
+  ],
+  "missed": [
+   "redose"
+  ],
+  "callouts": {
+   "made": 3,
+   "due": 13
+  },
+  "map_in": 90,
+  "do2_in": 98,
+  "case_min": 47.7923333332947,
+  "bypass_min": 47.178999999961924,
+  "clamp_min": 36.877999999971294,
+  "end_map": 109.67930496202449,
+  "end_cvp": 6.463509509429314,
+  "end_res": 1155.8107157232407,
+  "injury": 0.055805000000009895,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.3346666666666595,
+   "STABILIZE": 3.507000000000794,
+   "COOL": 4.206666666663302,
+   "CLAMP_ON": 0.397999999999639,
+   "ANTEGRADE": 2.5686666666643303,
+   "RETROGRADE": 1.3649999999987585,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.686666666664223,
+   "REWARM": 7.567666666659784,
+   "CLAMP_OFF": 1.6949999999984584,
+   "WEAN": 0.994666666665762,
+   "POST": 0.3676666666663323
+  },
+  "errs": [
+   "cp_fast",
+   "flow_up_early",
+   "hot_rewarm",
+   "no_redose",
+   "overcool"
+  ],
+  "wall_s": 1.4978610560000334,
+  "steps": 143377,
+  "min_res": 1342.34877541863,
+  "min_map": 68.72783864759177,
+  "max_map": 110.17596403815686,
+  "min_do2i": 366.7203786789919,
+  "min_svo2": 0.6292963911962578,
+  "max_k": 4.792972274800065,
+  "min_hct": 0.3416211709305694,
+  "max_line": 257.1105361148881,
+  "max_lactate": 1.0107719913307671,
+  "min_ph": 7.350154627875941,
+  "max_paco2": 42.8690850646239,
+  "min_paco2": 36.90939709665288,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "jehovah_witness",
+  "band": "expert",
+  "seed": 50127,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 49.40133333329324,
+  "bypass_min": 48.85133333329374,
+  "clamp_min": 39.82399999996861,
+  "end_map": 73.78051599957159,
+  "end_cvp": 6.197297023937645,
+  "end_res": 1239.142964272585,
+  "injury": 0.06204966666666377,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.171666666666663,
+   "STABILIZE": 0.3160000000000029,
+   "COOL": 6.510666666665045,
+   "CLAMP_ON": 0.17299999999984267,
+   "ANTEGRADE": 4.007333333329689,
+   "RETROGRADE": 1.325999999998794,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6389999999976,
+   "REWARM": 9.676666666657866,
+   "CLAMP_OFF": 1.435666666665361,
+   "WEAN": 0.6899999999993724,
+   "POST": 0.3546666666663441
+  },
+  "errs": [],
+  "wall_s": 1.5750953160001018,
+  "steps": 148204,
+  "min_res": 1044.85436226306,
+  "min_map": 39.66982097502115,
+  "max_map": 118.2123622548976,
+  "min_do2i": 276.8710788514876,
+  "min_svo2": 0.5615478417357149,
+  "max_k": 4.747318131960245,
+  "min_hct": 0.25280865870457697,
+  "max_line": 218.00309298063715,
+  "max_lactate": 1.0282878194842406,
+  "min_ph": 7.3798848549673055,
+  "max_paco2": 42.502383897823286,
+  "min_paco2": 37.490799586215864,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "jehovah_witness",
+  "band": "strong",
+  "seed": 50128,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 12,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 49.71533333329295,
+  "bypass_min": 49.13599999996015,
+  "clamp_min": 40.032666666635095,
+  "end_map": 72.09124254615298,
+  "end_cvp": 6.109683736754295,
+  "end_res": 1247.0622929908097,
+  "injury": 0.06298099999999411,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.20766666666666225,
+   "STABILIZE": 0.3026666666666739,
+   "COOL": 6.475333333331719,
+   "CLAMP_ON": 0.2176666666664687,
+   "ANTEGRADE": 4.0086666666630215,
+   "RETROGRADE": 1.3439999999987777,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6556666666642514,
+   "REWARM": 9.79699999999109,
+   "CLAMP_OFF": 1.457999999998674,
+   "WEAN": 0.7793333333326246,
+   "POST": 0.36866666666633136
+  },
+  "errs": [
+   "vent_on_antegrade"
+  ],
+  "wall_s": 1.6306958290000466,
+  "steps": 149146,
+  "min_res": 1071.9236171816374,
+  "min_map": 50.39437130685619,
+  "max_map": 113.26186886069962,
+  "min_do2i": 280.25233441319205,
+  "min_svo2": 0.5575070398100659,
+  "max_k": 4.747640404561739,
+  "min_hct": 0.25278462080017544,
+  "max_line": 215.61777259785055,
+  "max_lactate": 1.024450125264901,
+  "min_ph": 7.3797138591944575,
+  "max_paco2": 42.525620049293174,
+  "min_paco2": 37.47170372098275,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "jehovah_witness",
+  "band": "strong",
+  "seed": 50129,
+  "finished": true,
+  "stuck_in": null,
+  "score": 100,
+  "critical": 0,
+  "findings": [],
+  "missed": [],
+  "callouts": {
+   "made": 13,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 49.70733333329296,
+  "bypass_min": 49.133333333293486,
+  "clamp_min": 40.066666666635065,
+  "end_map": 69.28804002913687,
+  "end_cvp": 5.940488336309409,
+  "end_res": 1264.0271663685858,
+  "injury": 0.06277333333332889,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.1969999999999958,
+   "STABILIZE": 0.3140000000000071,
+   "COOL": 6.475333333331719,
+   "CLAMP_ON": 0.1999999999998181,
+   "ANTEGRADE": 4.006999999996356,
+   "RETROGRADE": 1.3333333333321207,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6529999999975873,
+   "REWARM": 9.877999999991015,
+   "CLAMP_OFF": 1.4359999999986939,
+   "WEAN": 0.7496666666659848,
+   "POST": 0.3633333333330029
+  },
+  "errs": [],
+  "wall_s": 1.569632071000001,
+  "steps": 149122,
+  "min_res": 1058.8250645427793,
+  "min_map": 46.55923697498536,
+  "max_map": 115.82074638801072,
+  "min_do2i": 279.49194112370486,
+  "min_svo2": 0.5633221925430998,
+  "max_k": 4.746928498216361,
+  "min_hct": 0.2527892462707382,
+  "max_line": 218.29865097728438,
+  "max_lactate": 1.024467565125353,
+  "min_ph": 7.379837809719333,
+  "max_paco2": 42.5104670394215,
+  "min_paco2": 37.45503454385195,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "jehovah_witness",
+  "band": "strong",
+  "seed": 50130,
+  "finished": true,
+  "stuck_in": null,
+  "score": 80,
+  "critical": 1,
+  "findings": [
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "suckers_off"
+  ],
+  "callouts": {
+   "made": 12,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 99,
+  "case_min": 50.02199999995934,
+  "bypass_min": 49.45599999995986,
+  "clamp_min": 40.28933333330153,
+  "end_map": 68.46506793550522,
+  "end_cvp": 5.895788962825163,
+  "end_res": 1269.8811037170958,
+  "injury": 0.06355099999999374,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.18899999999999598,
+   "STABILIZE": 0.27599999999999975,
+   "COOL": 6.597333333331657,
+   "CLAMP_ON": 0.2263333333331275,
+   "ANTEGRADE": 4.007333333329689,
+   "RETROGRADE": 1.3346666666654527,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.654333333330919,
+   "REWARM": 10.063666666657515,
+   "CLAMP_OFF": 1.4386666666653583,
+   "WEAN": 0.7653333333326373,
+   "POST": 0.36866666666633136
+  },
+  "errs": [
+   "sucker_on_protamine"
+  ],
+  "wall_s": 1.6137438169999996,
+  "steps": 150066,
+  "min_res": 1073.6139513118362,
+  "min_map": 50.19437171529292,
+  "max_map": 112.26259819890075,
+  "min_do2i": 280.3554266126091,
+  "min_svo2": 0.5505813702549919,
+  "max_k": 4.747435863632827,
+  "min_hct": 0.25278798486622484,
+  "max_line": 211.10711792775282,
+  "max_lactate": 1.0273045113222783,
+  "min_ph": 7.3798360812526935,
+  "max_paco2": 42.509602595084935,
+  "min_paco2": 37.46760450740575,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "jehovah_witness",
+  "band": "average",
+  "seed": 50131,
+  "finished": true,
+  "stuck_in": null,
+  "score": 96,
+  "critical": 0,
+  "findings": [
+   [
+    "minor",
+    "gradient",
+    "COOL"
+   ],
+   [
+    "minor",
+    "cp_pressure",
+    "ANTEGRADE"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 7,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 45.439333333296844,
+  "bypass_min": 44.858999999964034,
+  "clamp_min": 38.74266666663627,
+  "end_map": 74.72032167765437,
+  "end_cvp": 6.9057657288846075,
+  "end_res": 1172.910093777811,
+  "injury": 0.058031333333355084,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.23066666666666175,
+   "STABILIZE": 0.29733333333334383,
+   "COOL": 3.427333333334173,
+   "CLAMP_ON": 0.25166666666673715,
+   "ANTEGRADE": 2.5139999999977136,
+   "RETROGRADE": 1.3489999999987732,
+   "OPERATE": 22.00033333331333,
+   "HOTSHOT": 2.642666666664263,
+   "REWARM": 9.992666666657579,
+   "CLAMP_OFF": 1.4513333333320133,
+   "WEAN": 0.8233333333325845,
+   "POST": 0.35866666666634045
+  },
+  "errs": [
+   "cp_fast",
+   "overcool"
+  ],
+  "wall_s": 1.534868718000098,
+  "steps": 136318,
+  "min_res": 1087.1293376562062,
+  "min_map": 54.869485759472866,
+  "max_map": 112.49355892473022,
+  "min_do2i": 282.3916744186364,
+  "min_svo2": 0.5548391908652675,
+  "max_k": 4.766978224508479,
+  "min_hct": 0.2525322451076607,
+  "max_line": 214.7219310961026,
+  "max_lactate": 1.0226971016876023,
+  "min_ph": 7.379867528220225,
+  "max_paco2": 42.508332691911725,
+  "min_paco2": 37.409529929087554,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "jehovah_witness",
+  "band": "average",
+  "seed": 50132,
+  "finished": true,
+  "stuck_in": null,
+  "score": 74,
+  "critical": 1,
+  "findings": [
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 8,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 50.557333333292185,
+  "bypass_min": 49.91999999995944,
+  "clamp_min": 40.530999999967975,
+  "end_map": 75.55792197454961,
+  "end_cvp": 6.322588702362282,
+  "end_res": 1224.8937964300535,
+  "injury": 0.06560733333331809,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.2836666666666606,
+   "STABILIZE": 0.19133333333333666,
+   "COOL": 6.703999999998215,
+   "CLAMP_ON": 0.35833333333300743,
+   "ANTEGRADE": 4.032666666663,
+   "RETROGRADE": 1.3499999999987722,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.659666666664248,
+   "REWARM": 10.117333333324131,
+   "CLAMP_OFF": 1.4979999999986375,
+   "WEAN": 0.8549999999992224,
+   "POST": 0.4066666666662968
+  },
+  "errs": [
+   "protamine_half",
+   "vent_late_on_wean"
+  ],
+  "wall_s": 1.7360373789999812,
+  "steps": 151672,
+  "min_res": 1148.7606411388838,
+  "min_map": 60.19125455575085,
+  "max_map": 97.09726632105715,
+  "min_do2i": 282.4569653083733,
+  "min_svo2": 0.5495995567212334,
+  "max_k": 4.749229310700056,
+  "min_hct": 0.2527344069464001,
+  "max_line": 193.7996912926046,
+  "max_lactate": 1.0221608300857876,
+  "min_ph": 7.361251269603437,
+  "max_paco2": 42.56902036449333,
+  "min_paco2": 37.43127524861877,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "jehovah_witness",
+  "band": "average",
+  "seed": 50133,
+  "finished": true,
+  "stuck_in": null,
+  "score": 74,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ]
+  ],
+  "missed": [],
+  "callouts": {
+   "made": 10,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 99,
+  "case_min": 46.49833333329588,
+  "bypass_min": 45.917333333296405,
+  "clamp_min": 36.51466666663829,
+  "end_map": 76.44819358951855,
+  "end_cvp": 7.060722095726442,
+  "end_res": 1155.8787904269257,
+  "injury": 0.05566733333332391,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.22933333333332845,
+   "STABILIZE": 0.26600000000000534,
+   "COOL": 6.5143333333317,
+   "CLAMP_ON": 0.297999999999729,
+   "ANTEGRADE": 4.026999999996338,
+   "RETROGRADE": 1.3399999999987813,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6556666666642514,
+   "REWARM": 6.206666666661022,
+   "CLAMP_OFF": 1.6713333333318132,
+   "WEAN": 0.8153333333325918,
+   "POST": 0.3739999999996598
+  },
+  "errs": [
+   "hot_rewarm",
+   "vent_late_on_wean"
+  ],
+  "wall_s": 1.5571156610000116,
+  "steps": 139495,
+  "min_res": 1105.307521637496,
+  "min_map": 50.324978127693456,
+  "max_map": 106.04127677697583,
+  "min_do2i": 282.6169541973271,
+  "min_svo2": 0.5391605914072705,
+  "max_k": 4.749183540149962,
+  "min_hct": 0.25275730279395736,
+  "max_line": 207.11640082039472,
+  "max_lactate": 1.0266857598480494,
+  "min_ph": 7.355280611936045,
+  "max_paco2": 42.63928384435223,
+  "min_paco2": 37.40225732544966,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "jehovah_witness",
+  "band": "novice",
+  "seed": 50134,
+  "finished": true,
+  "stuck_in": null,
+  "score": 86,
+  "critical": 0,
+  "findings": [
+   [
+    "major",
+    "unstable_bypass",
+    "STABILIZE"
+   ],
+   [
+    "minor",
+    "cp_pressure",
+    "ANTEGRADE"
+   ],
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ]
+  ],
+  "missed": [
+   "gases_in_range",
+   "redose"
+  ],
+  "callouts": {
+   "made": 4,
+   "due": 13
+  },
+  "map_in": 98,
+  "do2_in": 98,
+  "case_min": 57.42533333328594,
+  "bypass_min": 56.80266666661984,
+  "clamp_min": 40.02333333330177,
+  "end_map": 64.95936691569135,
+  "end_cvp": 6.255428383278859,
+  "end_res": 1168.2358283382955,
+  "injury": 0.06454333333333334,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.38033333333332525,
+   "STABILIZE": 7.000333333331371,
+   "COOL": 7.299999999993362,
+   "CLAMP_ON": 0.49999999999954525,
+   "ANTEGRADE": 2.5693333333309982,
+   "RETROGRADE": 1.3883333333320707,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.672333333330903,
+   "REWARM": 10.87633333332344,
+   "CLAMP_OFF": 1.2626666666655182,
+   "WEAN": 1.0013333333324226,
+   "POST": 0.3736666666663268
+  },
+  "errs": [
+   "cp_fast",
+   "ignore_gases",
+   "no_redose"
+  ],
+  "wall_s": 1.8805048240000133,
+  "steps": 172276,
+  "min_res": 1243.1538741073198,
+  "min_map": 57.8267691480705,
+  "max_map": 78.22348656368662,
+  "min_do2i": 281.84684217665415,
+  "min_svo2": 0.5755351100408171,
+  "max_k": 4.775264723058068,
+  "min_hct": 0.25539573352587464,
+  "max_line": 168.25802586254844,
+  "max_lactate": 1.0207242386591426,
+  "min_ph": 7.404793864641791,
+  "max_paco2": 39.400766919776146,
+  "min_paco2": 31.783438803360585,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "jehovah_witness",
+  "band": "novice",
+  "seed": 50135,
+  "finished": true,
+  "stuck_in": null,
+  "score": 62,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "vent_off_early",
+    "INITIATE"
+   ],
+   [
+    "major",
+    "hyperthermia",
+    "REWARM"
+   ],
+   [
+    "critical",
+    "wean_no_vent",
+    "WEAN"
+   ],
+   [
+    "major",
+    "protamine_dose",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "protamine_dose"
+  ],
+  "callouts": {
+   "made": 5,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 98,
+  "case_min": 46.71933333329568,
+  "bypass_min": 46.11699999996289,
+  "clamp_min": 36.55833333330492,
+  "end_map": 64.91390106707341,
+  "end_cvp": 6.243384915251181,
+  "end_res": 1238.4808418078442,
+  "injury": 0.05646499999998689,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.28099999999999403,
+   "STABILIZE": 0.24866666666667847,
+   "COOL": 6.4983333333316775,
+   "CLAMP_ON": 0.38266666666631866,
+   "ANTEGRADE": 4.045333333329655,
+   "RETROGRADE": 1.3553333333321007,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6453333333309272,
+   "REWARM": 6.120333333327767,
+   "CLAMP_OFF": 1.7526666666650725,
+   "WEAN": 0.9156666666658339,
+   "POST": 0.3733333333329938
+  },
+  "errs": [
+   "hot_rewarm",
+   "protamine_half",
+   "vent_late_on_wean",
+   "vent_off_early",
+   "vent_on_antegrade"
+  ],
+  "wall_s": 1.6601320599999099,
+  "steps": 140158,
+  "min_res": 1137.775703106001,
+  "min_map": 53.991190961178546,
+  "max_map": 101.15970064439455,
+  "min_do2i": 283.3178654490112,
+  "min_svo2": 0.5351630206089464,
+  "max_k": 4.7504529074919235,
+  "min_hct": 0.2526946889571494,
+  "max_line": 200.29081991382452,
+  "max_lactate": 1.0240519748735655,
+  "min_ph": 7.361283180484157,
+  "max_paco2": 42.67968714229657,
+  "min_paco2": 37.35902133457241,
+  "min_flow": 0.0
+ },
+ {
+  "persona": "jehovah_witness",
+  "band": "novice",
+  "seed": 50136,
+  "finished": true,
+  "stuck_in": null,
+  "score": 68,
+  "critical": 1,
+  "findings": [
+   [
+    "major",
+    "csp_high",
+    "RETROGRADE"
+   ],
+   [
+    "major",
+    "cp_interval",
+    "OPERATE"
+   ],
+   [
+    "critical",
+    "protamine_on_bypass",
+    "POST"
+   ]
+  ],
+  "missed": [
+   "redose",
+   "suckers_off"
+  ],
+  "callouts": {
+   "made": 3,
+   "due": 13
+  },
+  "map_in": 97,
+  "do2_in": 98,
+  "case_min": 49.84466666662617,
+  "bypass_min": 49.185333333293435,
+  "clamp_min": 40.008999999968445,
+  "end_map": 76.24554922899243,
+  "end_cvp": 7.031667670428533,
+  "end_res": 1098.8838996232937,
+  "injury": 0.06629966666664254,
+  "dur": {
+   "PRE": 0.09999999999999934,
+   "INITIATE": 0.37833333333332525,
+   "STABILIZE": 0.22566666666669216,
+   "COOL": 6.290999999998453,
+   "CLAMP_ON": 0.5073333333328719,
+   "ANTEGRADE": 4.0909999999962805,
+   "RETROGRADE": 1.0359999999990577,
+   "OPERATE": 22.000333333313325,
+   "HOTSHOT": 2.6663333333309085,
+   "REWARM": 9.714333333324499,
+   "CLAMP_OFF": 1.3743333333320833,
+   "WEAN": 1.0483333333323799,
+   "POST": 0.41133333333295924
+  },
+  "errs": [
+   "no_redose",
+   "retro_fast",
+   "sucker_on_protamine"
+  ],
+  "wall_s": 1.6040963130000137,
+  "steps": 149534,
+  "min_res": 1177.5302819857743,
+  "min_map": 55.91324321729439,
+  "max_map": 94.61630259651398,
+  "min_do2i": 283.59096883326015,
+  "min_svo2": 0.5144904570700526,
+  "max_k": 4.764916667509416,
+  "min_hct": 0.2551774148159765,
+  "max_line": 201.40594199283598,
+  "max_lactate": 1.0284362059413887,
+  "min_ph": 7.377562737253431,
+  "max_paco2": 42.79660806597321,
+  "min_paco2": 37.23999704943296,
+  "min_flow": 0.0
+ }
+]

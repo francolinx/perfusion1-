@@ -28,8 +28,9 @@ headset on the same network, open `http://<spark-ip>:8080`.
 - **Start case**: you run it. Heparin and ACT, go on bypass, gases, cool to 34 C, cross-clamp,
   1 L antegrade and 250 mL retrograde cardioplegia, maintenance dose, hot shot, rewarm,
   clamp off, wean at three-quarter, half and quarter flow, come off, give volume, protamine.
-- **Seven patients**: standard adult (the 75 kg case from the lab video), small anemic,
-  large adult, low ejection fraction, kidney disease, heparin resistance, aortic insufficiency.
+- **Ten patients**: standard adult (the 75 kg case from the lab video), small anemic,
+  large adult, low ejection fraction, kidney disease, heparin resistance, aortic insufficiency,
+  vasoplegia, hypertension, Jehovah's Witness. `docs/BENCHMARK.md` has the 100-run benchmark.
 - **Debrief**: score, checklist, time in range for pressure and oxygen delivery, callouts made,
   and every finding with its timestamp. The sequencing error from the lab video (bringing flow
   back up before the clamp is off) is one of the things it catches.

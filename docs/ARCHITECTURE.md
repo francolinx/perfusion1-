@@ -44,8 +44,8 @@ Lumped parameters, explicit Euler at 20 ms. Flows in L/min, volumes in mL, press
   mixed with lung blood by flow. DO2i, VO2 (Q10 2.2 with temperature), SvO2, lactate from O2 debt.
 - **Heat**: heater-cooler water relaxes to set point, heat exchanger effectiveness 0.65, patient as
   one thermal mass.
-- **Cardioplegia**: arrest level rises with delivered volume and potassium, washes out over about
-  22 minutes while clamped and in about a minute once the clamp is off. Root vent, aortic
+- **Cardioplegia**: arrest level rises with delivered volume and potassium, washes out with an 18 minute
+  time constant while clamped (activity returns about 22 minutes after a full dose) and in about a minute once the clamp is off. Root vent, aortic
   insufficiency, missing clamp, coronary sinus pressure and systemic potassium load are modeled.
 - **Anticoagulation**: heparin with a 100 minute half-life, ACT linear in units/kg with a
   per-patient sensitivity, protamine 1 mg per 100 units. Protamine with the pump or suckers

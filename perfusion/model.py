@@ -28,6 +28,7 @@ class Persona:
     k0: float = 4.0
     bv_per_kg: float = 70.0
     target_temp: float = 34.0
+    no_transfusion: bool = False
 
     @property
     def bsa(self):
@@ -63,6 +64,7 @@ V_STATIC = 500.0     # oxygenator + tubing volume, mL
 V_RES0 = 900.0       # reservoir level after priming, mL
 RES_MAX = 4000.0
 CP_K = {"highK": 20.0, "lowK": 8.0, "hot": 8.0}
+CP_WASHOUT_MIN = 18.0  # time constant of cardioplegia washout while clamped; activity returns ~22 min after a full dose
 
 
 class Sim:
@@ -270,7 +272,7 @@ class Sim:
 
         # systemic resistance and arterial pressure
         self.pressor += (0.0 - self.pressor) * dtm / 5.0
-        hct_a = self.hct_c if qa > qh else self.hct_p
+        hct_a = self.hct_p
         visc = 0.55 + 0.45 * clamp(hct_a / p.hct, 0.3, 1.3)
         gas_w = max(qa, 0.0) / max(qa + qh, 0.05) if qa > 0 else 0.0     # anesthetic vapor reaches the patient via the oxygenator
         svr = self.svr0 * visc * (1.0 + 0.02 * (37.0 - self.temp)) * max(0.3, 1.0 + self.pressor) * (1.0 - 0.15 * (c["iso"] - 1.0) * gas_w)
@@ -325,7 +327,7 @@ class Sim:
     def _heart(self, dt, dtm):
         c = self.c
         if self.xclamp:
-            self.arrest *= math.exp(-dtm / 22.0)
+            self.arrest *= math.exp(-dtm / CP_WASHOUT_MIN)
             if self.arrest >= 1.0:
                 self.rhythm = "asystole"
                 self.injury += dtm * (0.003 if self.temp > 35.0 else 0.001)
@@ -391,7 +393,7 @@ class Sim:
         vol = q * dtm
         self.cp_dose += vol
         self.cp_total += vol
-        self.arrest = min(3.5, self.arrest + eff * vol / 350.0 * (0.5 + 0.5 * kc / 20.0))
+        self.arrest = min(3.5, self.arrest + eff * vol / 200.0 * (0.5 + 0.5 * kc / 20.0))
         if eff > 0:
             self.since_cp = 0.0
             if c["cp_type"] == "hot":
@@ -466,7 +468,7 @@ class Sim:
     def gas_snapshot(self):
         return dict(ph=round(self.ph, 2), pao2=round(self.pao2), paco2=round(self.paco2),
                     sao2=round(self.sao2 * 100), svo2=round(self.svo2 * 100),
-                    hct=round((self.hct_c if self.on_bypass else self.hct_p) * 100),
+                    hct=round(self.hct_p * 100),
                     k=round(self.k, 1), lactate=round(self.lactate, 1))
 
     def alarms(self):
@@ -513,7 +515,7 @@ class Sim:
             rpm=r(self.rpm), line_p=r(self.line_p), res=r(self.vr), res_frac=r(self.vr / RES_MAX, 3),
             temp=r(self.temp, 1), t_water=r(self.t_water, 1), t_art=r(self.t_art, 1),
             pao2=r(self.pao2), paco2=r(self.paco2, 1), sao2=r(self.sao2 * 100, 1), svo2=r(self.svo2 * 100, 1),
-            ph=r(self.ph, 2), hct=r((self.hct_c if self.on_bypass else self.hct_p) * 100, 1),
+            ph=r(self.ph, 2), hct=r(self.hct_p * 100, 1),
             do2i=r(self.do2i), k=r(self.k, 2), lactate=r(self.lactate, 1),
             rso2=r(clamp(22 + 0.62 * self.svo2 * 100 - max(0, 45 - self.pa) * 0.5, 15, 90)),
             arrest=r(self.arrest, 2), cp_dose=r(self.cp_dose), cp_total=r(self.cp_total),

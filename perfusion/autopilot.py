@@ -62,7 +62,7 @@ class Autopilot:
                 self.act(type="phenylephrine", mcg=100)
             if s.do2i < 290 and s.qa > 0.8 * s.target_flow:
                 self.mult = min(1.2, self.mult + 0.01)
-            if s.do2i < 290 and s.hct_c < 0.24 and self.case.t - self.mem.get("prbc", -999) > 45:
+            if s.do2i < 290 and s.hct_c < 0.24 and not s.p.no_transfusion and self.case.t - self.mem.get("prbc", -999) > 45:
                 self.mem["prbc"] = self.case.t
                 self.act(type="volume", ml=300, kind="prbc")
             if s.vr < 450 and self.case.t - self.mem.get("vol", -99) > 30:
@@ -97,8 +97,9 @@ class Autopilot:
     def p_INITIATE(self, s, tf):
         self.call("act_good")
         if s.c["art_clamp"]:
-            self.set("rpm_set", 1600.0)
-            if s.rpm > 1450:
+            need = max(1600.0, round(1000.0 * ((s.pa + 30.0) / 45.0) ** 0.5, -1))   # pump head must beat patient pressure
+            self.set("rpm_set", need)
+            if s.rpm > need - 60:
                 self.set("art_clamp", False)
                 self.set("sucker", True)
         else:

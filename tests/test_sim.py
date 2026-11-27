@@ -78,6 +78,14 @@ class TestModel(unittest.TestCase):
         self.assertEqual(s.rhythm, "asystole")
         self.assertGreater(s.k, s.p.k0 + 0.3)
 
+    def test_cardioplegia_washes_out_without_a_redose(self):
+        s = on_bypass(); s.xclamp = True
+        s.set("root_vent", True); s.set("cp_route", "retro"); s.set("cp_flow", 190); s.set("cp_on", True); settle(s, 400)
+        s.set("cp_on", False); self.assertEqual(s.rhythm, "asystole")
+        settle(s, 14 * 60); self.assertEqual(s.rhythm, "asystole")      # still protected at 14 minutes
+        settle(s, 11 * 60); self.assertNotEqual(s.rhythm, "asystole")   # activity back by 25 minutes
+        self.assertTrue(any(e["code"] == "activity_returning" for e in s.events))
+
     def test_heparin_resistance(self):
         a, b = Sim(P["standard_adult"]), Sim(P["heparin_resistant"])
         a.give_heparin(400 * a.p.weight); b.give_heparin(400 * b.p.weight)
@@ -117,6 +125,32 @@ class TestCase_(unittest.TestCase):
     def test_protamine_before_coming_off_is_critical(self):
         c = Case(P["standard_adult"])
         c.action(dict(type="protamine", mg=300))
+        self.assertEqual(c.score()["critical"], 1)
+
+    def test_transfusion_refusal_is_enforced(self):
+        c = Case(P["jehovah_witness"])
+        c.action(dict(type="volume", ml=300, kind="prbc"))
+        self.assertIn("transfusion_refused", [f["code"] for f in c.findings])
+
+    def test_surgeon_does_not_wait_forever_for_stable_bypass(self):
+        c = Case(P["standard_adult"])
+        c.sim.give_heparin(30000); c.sim.cannulated = True; c.phase = "STABILIZE"; c.flags["abg_t"] = 0.0
+        for _ in range(int(430 / c.sim.DT)):
+            c.tick()
+        self.assertEqual(c.phase, "COOL")
+        self.assertIn("unstable_bypass", [f["code"] for f in c.findings])
+
+    def test_surgeon_does_not_wait_forever_off_bypass(self):
+        c = Case(P["vasoplegic"]); c.phase = "POST"; c.sim.pressor = -0.5
+        c.sim.vp -= 900                       # empty, hypotensive patient that never stabilises
+        for _ in range(int(490 / c.sim.DT)):
+            c.sim.pressor = -0.5; c.tick()
+        self.assertTrue(c.flags.get("prot_asked"))
+        self.assertIn("unstable_off_bypass", [f["code"] for f in c.findings])
+
+    def test_one_error_one_penalty_for_protamine_with_suckers(self):
+        c = Case(P["standard_adult"]); c.phase = "POST"; c.sim.set("sucker", True)
+        c.action(dict(type="protamine", mg=300)); c.tick()
         self.assertEqual(c.score()["critical"], 1)
 
     def test_bad_action_rejected(self):
