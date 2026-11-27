@@ -82,6 +82,10 @@ def _dec(v):
     return v
 
 
+# model fields added after saves were first written (lab console and monitor). A save without them still loads,
+# with the field at its starting value; new controls are merged in the same way. Anything else missing is refused.
+_BACKFILL_SIM = {"t_cp_water", "urine_ml", "urine_rate", "q_suck", "q_vent", "last_act2"}
+
 # object references that are rebuilt on load instead of stored
 _SKIP = {"case": {"sim", "persona"}, "sim": {"p"}, "pilot": {"case", "on_act"}}
 
@@ -115,6 +119,10 @@ def restore(state):
             fresh = vars(Sim(persona)) if part == "sim" else None
             data = {k: _dec(v) for k, v in state[part].items()}
             if fresh is not None:
+                for k in _BACKFILL_SIM - set(data):      # older saves: fields added since get their starting values
+                    data[k] = fresh[k]
+                if isinstance(data.get("c"), dict):
+                    data["c"] = {**fresh["c"], **data["c"]}
                 missing = set(fresh) - set(data) - _SKIP["sim"]
                 if missing:
                     raise ValueError("the save is missing model fields: " + ", ".join(sorted(missing)))

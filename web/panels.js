@@ -87,8 +87,12 @@ export function buildPanels(act, state) {
       slider(b, 'Anesthetic vaporizer (lowers pressure)', 'iso', 0, 30, 1, (v) => `${(v / 10).toFixed(1)}%`, 10),
     ] },
     hc: { title: 'Heater-cooler', build: (b) => [
-      read(b, (S) => [['Water C', S.t_water.toFixed(1)], ['Arterial blood C', S.t_art.toFixed(1), S.t_art > 37.5 ? 'bad' : ''], ['Patient C', S.temp.toFixed(1)]]),
-      slider(b, 'Water set point', 'water_set', 150, 400, 5, (v) => `${(v / 10).toFixed(1)} C`, 10),
+      read(b, (S) => [['Water C', S.t_water.toFixed(1)], ['Arterial blood C', S.t_art.toFixed(1), S.t_art > 37.5 ? 'bad' : ''], ['Patient C', S.temp.toFixed(1)],
+        ['Cardioplegia water C', S.t_cp_water.toFixed(1)]]),
+      slider(b, 'Patient circuit water set point', 'water_set', 150, 400, 5, (v) => `${(v / 10).toFixed(1)} C`, 10),
+      buttons(b, [['Patient circuit pump on', () => set('hc_on', true), (S) => S.controls.hc_on], ['Off', () => set('hc_on', false), (S) => !S.controls.hc_on]]),
+      slider(b, 'Cardioplegia circuit water set point', 'cp_water_set', 10, 400, 5, (v) => `${(v / 10).toFixed(1)} C`, 10),
+      buttons(b, [['Cardioplegia circuit pump on', () => set('cp_hc_on', true), (S) => S.controls.cp_hc_on], ['Off', () => set('cp_hc_on', false), (S) => !S.controls.cp_hc_on]]),
       note(b, 'Keep the water within 10 C of the blood, and never send blood back over 37.5 C.'),
     ] },
     cp: { title: 'Cardioplegia', build: (b) => [
@@ -98,8 +102,11 @@ export function buildPanels(act, state) {
       buttons(b, [['High-K cold', () => set('cp_type', 'highK'), (S) => S.controls.cp_type === 'highK'], ['Low-K cold', () => set('cp_type', 'lowK'), (S) => S.controls.cp_type === 'lowK'],
         ['Hot shot', () => set('cp_type', 'hot'), (S) => S.controls.cp_type === 'hot']]),
       slider(b, 'Delivery flow', 'cp_flow', 0, 500, 10, (v) => `${v} mL/min`),
+      read(b, (S) => { const r = S.rollers.cardioplegia; return [['Pump RPM', r.rpm.toFixed(0)], ['Percent', r.pct.toFixed(0) + '%'], ['Tubing', r.tubing]]; }),
       buttons(b, [['Start delivery', () => set('cp_on', true), (S) => S.controls.cp_on], ['Stop', () => set('cp_on', false), (S) => !S.controls.cp_on]]),
       buttons(b, [['Root vent on', () => set('root_vent', true), (S) => S.controls.root_vent], ['Root vent off', () => set('root_vent', false), (S) => !S.controls.root_vent]]),
+      slider(b, 'Vent pump speed', 'vent_max', 0, 500, 5, (v) => `${v} mL/min`),
+      read(b, (S) => { const r = S.rollers.vent; return [['Vent RPM', r.rpm.toFixed(0)], ['Vent pump L/min', r.flow.toFixed(2)], ['Blood returned', S.vent_return.toFixed(3)]]; }),
       note(b, 'Vent off while giving antegrade so it does not steal the dose. Vent on the rest of the clamp time so the ventricle stays empty.'),
     ] },
     res: { title: 'Reservoir and suckers', build: (b) => [
@@ -107,6 +114,8 @@ export function buildPanels(act, state) {
       buttons(b, [['Transfuse 100 mL to patient', () => act({ type: 'transfuse', ml: 100 })], ['Add 250 mL crystalloid', () => act({ type: 'volume', ml: 250, kind: 'crystalloid' })],
         ['Add 1 unit red cells', () => act({ type: 'volume', ml: 300, kind: 'prbc' })]]),
       buttons(b, [['Suckers on', () => set('sucker', true), (S) => S.controls.sucker], ['Suckers off', () => set('sucker', false), (S) => !S.controls.sucker]]),
+      slider(b, 'Sucker pump speed', 'sucker_max', 0, 500, 5, (v) => `${v} mL/min`),
+      read(b, (S) => { const r = S.rollers.sucker; return [['Sucker RPM', r.rpm.toFixed(0)], ['Sucker pump L/min', r.flow.toFixed(2)], ['Blood returned', S.sucker_return.toFixed(3)]]; }),
       note(b, 'If this runs empty the pump sends air to the patient. Suckers must be off before protamine.'),
     ] },
     meds: { title: 'Drug cart', build: (b) => {
@@ -124,7 +133,7 @@ export function buildPanels(act, state) {
       buttons(b, [['Run ACT', () => act({ type: 'measure', what: 'act' }), null, 'primary'], ['Run blood gas', () => act({ type: 'measure', what: 'abg' }), null, 'primary']]),
       read(b, (S) => {
         const a = S.last_abg && S.last_abg[1];
-        return [['ACT s', S.last_act ? S.last_act[1] : '--', S.last_act && S.last_act[1] < 400 ? 'bad' : ''], ['Status', S.labs_pending ? 'running' : 'ready'], ['pH', a ? a.ph : '--'],
+        return [['ACT s', S.last_act ? S.last_act[1] : '--', S.last_act && S.last_act[1] < 400 ? 'bad' : ''], ['ACT channel 2 s', S.last_act2 ? S.last_act2[1] : '--'], ['Status', S.labs_pending ? 'running' : 'ready'], ['pH', a ? a.ph : '--'],
           ['PaCO2', a ? a.paco2 : '--'], ['PaO2', a ? a.pao2 : '--'], ['K+', a ? a.k : '--', a && a.k > 6 ? 'bad' : ''],
           ['Hct %', a ? a.hct : '--'], ['SvO2 %', a ? a.svo2 : '--'], ['Lactate', a ? a.lactate : '--']];
       }),

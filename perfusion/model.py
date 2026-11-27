@@ -29,6 +29,8 @@ class Persona:
     bv_per_kg: float = 70.0
     target_temp: float = 34.0
     no_transfusion: bool = False
+    age: int = 60
+    sex: str = "M"
 
     @property
     def bsa(self):
@@ -64,6 +66,15 @@ V_STATIC = 500.0     # oxygenator + tubing volume, mL
 V_RES0 = 900.0       # reservoir level after priming, mL
 RES_MAX = 4000.0
 CP_K = {"highK": 20.0, "lowK": 8.0, "hot": 8.0}
+PVR = 1.8           # pulmonary vascular resistance, mmHg per L/min of the heart's own output
+ROOM_T = 22.0       # water drifts toward room temperature when a heater-cooler circuit is off
+# Roller pumps on the console base. Stroke volume per revolution depends on the tubing in the raceway
+# (approximate values for a 150 mm raceway). The arterial roller is idle: the centrifugal pump is the arterial pump.
+ROLLER_ML_PER_REV = {'1/4"': 12.6, '3/8"': 27.0, '1/2"': 46.0}
+ROLLERS = (("arterial", '1/2"'), ("cardioplegia", '1/4"'), ("sucker", '1/4"'), ("vent", '1/4"'))
+ROLLER_MAX_RPM = 250.0
+# alarm limits, shared by alarms() and the console's pressure display
+ALARM_LIMITS = dict(line_p=300, cp_pressure=300, csp=40)
 CP_WASHOUT_MIN = 18.0  # time constant of cardioplegia washout while clamped; activity returns ~22 min after a full dose
 
 
@@ -83,7 +94,9 @@ class Sim:
         # controls (student)
         self.c = dict(rpm_set=0.0, art_clamp=True, ven_occl=1.0, sweep=2.0, fio2=0.8,
                       water_set=37.0, cp_route="ante", cp_type="highK", cp_flow=250.0,
-                      cp_on=False, root_vent=False, sucker=False, ventilator=True, epi=False, iso=1.0)
+                      cp_on=False, root_vent=False, sucker=False, ventilator=True, epi=False, iso=1.0,
+                      # roller pump speeds for sucker and vent (mL/min the pump moves); heater-cooler circuits
+                      sucker_max=100.0, vent_max=150.0, hc_on=True, cp_water_set=4.0, cp_hc_on=True)
         # instructor-controlled (perfusion/instructor.py); neutral values change nothing
         self.inst = dict(svr=1.0, contract=1.0, metabolic=1.0, bleed=0.0, oxy=1.0, art_kink=0.0, ven_block=0.0)
         # surgeon-controlled
@@ -99,6 +112,10 @@ class Sim:
         self.qa = self.qv = self.qh = 0.0
         self.temp = 36.6
         self.t_water = 37.0
+        self.t_cp_water = 4.0      # heater-cooler cardioplegia circuit
+        self.urine_ml = 0.0
+        self.urine_rate = 0.0      # mL/h
+        self.q_suck = self.q_vent = 0.0   # blood actually returned by sucker and vent, mL/min
         self.t_art = 36.6
         self.pao2, self.paco2, self.sao2, self.svo2 = 250.0, 38.0, 0.99, 0.75
         self.lactate = 1.0
@@ -128,6 +145,7 @@ class Sim:
         self.ph = 7.40
         self.max_gradient = 0.0
         self.last_act = None       # (time, value)
+        self.last_act2 = None      # second ACT channel (the lab runs two cartridges)
         self.last_abg = None
         self.pending = []          # (due_time, kind)
         self.events = []           # model-detected events (code, severity, msg, t)
@@ -163,7 +181,8 @@ class Sim:
 
     # ---- student actions -------------------------------------------------
     LIMITS = dict(rpm_set=(0, 4500), ven_occl=(0, 1), sweep=(0, 10), fio2=(0.21, 1.0),
-                  water_set=(15, 40), cp_flow=(0, 500), iso=(0, 3))
+                  water_set=(15, 40), cp_flow=(0, 500), iso=(0, 3),
+                  sucker_max=(0, 500), vent_max=(0, 500), cp_water_set=(1, 40))
 
     def set(self, key, value):
         if key not in self.c:
@@ -288,11 +307,17 @@ class Sim:
 
         # volumes (mL/min)
         bleed = 30.0 if (self.cannulated and self.hep > 1000 and self.act_true > 250) else 0.0
-        q_suck = bleed if c["sucker"] else 0.0
+        q_suck = min(bleed, c["sucker_max"]) if c["sucker"] else 0.0     # a sucker turned too slow leaves blood in the field
         lost = bleed - q_suck + self.inst["bleed"]
         q_vent = 0.0
         if c["root_vent"] and self.xclamp:
-            q_vent = 120.0 if (c["cp_on"] and c["cp_route"] == "ante") else 25.0
+            q_vent = min(120.0 if (c["cp_on"] and c["cp_route"] == "ante") else 25.0, c["vent_max"])
+        self.q_suck, self.q_vent = q_suck, q_vent
+        # urine: about 1 mL/kg/h at a normal pressure and temperature, less when pressure or temperature is low
+        u = (1.25 * p.renal * p.weight / 75.0 * clamp((self.pa - 45.0) / 25.0, 0.0, 1.4)
+             * (0.5 + 0.5 * clamp((self.temp - 28.0) / 8.0, 0.0, 1.0)))
+        self.urine_ml += u * dtm
+        self.urine_rate = u * 60.0
         q_tx = 0.0
         if self.transfuse_left > 0 and self.vr > 5:
             q_tx = min(400.0, self.transfuse_left / dtm, self.vr / dtm)
@@ -300,7 +325,7 @@ class Sim:
         hp, hc = self.hct_p, self.hct_c
         p_to_c = qv * 1000.0 + q_vent + q_suck + max(-qa, 0.0) * 1000.0
         c_to_p = max(qa, 0.0) * 1000.0 + 0.8 * q_cp + q_tx
-        self.vp += (c_to_p + 0.2 * q_cp - p_to_c - lost - 1.0) * dtm
+        self.vp += (c_to_p + 0.2 * q_cp - p_to_c - lost - u) * dtm
         self.vr = clamp(self.vr + (p_to_c - c_to_p) * dtm, 0.0, RES_MAX)
         self.rbc_p += (c_to_p * hc - (p_to_c + lost) * hp) * dtm
         self.rbc_c += (p_to_c * hp - c_to_p * hc) * dtm
@@ -324,6 +349,8 @@ class Sim:
             self.pending.remove((due, kind))
             if kind == "act":
                 self.last_act = (round(self.t, 1), round(self.act_true))
+                # second cartridge: a deterministic few-percent spread, so the same run always reads the same
+                self.last_act2 = (round(self.t, 1), round(self.act_true * (1.0 + 0.03 * math.sin(1.7 * self.t + 0.4))))
             else:
                 self.last_abg = (round(self.t, 1), self.gas_snapshot())
 
@@ -449,7 +476,13 @@ class Sim:
         self.k += -(self.k - self.p.k0) * (dt / 60.0) / (25.0 / self.p.renal)
 
     def _thermal(self, dt, dtm):
-        self.t_water += (self.c["water_set"] - self.t_water) * min(1.0, dt / 40.0)
+        c = self.c
+        if c["hc_on"]:
+            self.t_water += (c["water_set"] - self.t_water) * min(1.0, dt / 40.0)
+        else:
+            self.t_water += (ROOM_T - self.t_water) * min(1.0, dt / 600.0)
+        cp_target, tau = (c["cp_water_set"], 40.0) if c["cp_hc_on"] else (ROOM_T, 600.0)
+        self.t_cp_water += (cp_target - self.t_cp_water) * min(1.0, dt / tau)
         if self.qa > 0.3:
             self.t_art = self.temp + 0.65 * (self.t_water - self.temp)
             self.temp += self.qa * 3.6 * (self.t_art - self.temp) / (self.p.weight * 3.5 * 0.6) * dtm
@@ -481,7 +514,8 @@ class Sim:
             a.append(("critical", "Reservoir critically low"))
         elif self.cannulated and self.vr < 300:
             a.append(("warn", "Reservoir level low"))
-        if self.line_p > 300:
+        lim = ALARM_LIMITS
+        if self.line_p > lim["line_p"]:
             a.append(("critical", "Arterial line pressure high"))
         if self.qa < -0.1:
             a.append(("critical", "Retrograde flow"))
@@ -495,9 +529,9 @@ class Sim:
             a.append(("warn", "Venous saturation low"))
         if ob and self.act_true < 400 and self.last_act:
             a.append(("warn", "ACT below 400 on bypass"))
-        if self.csp > 40:
+        if self.csp > lim["csp"]:
             a.append(("warn", "Coronary sinus pressure high"))
-        if self.cp_pressure > 300:
+        if self.cp_pressure > lim["cp_pressure"]:
             a.append(("warn", "Cardioplegia line pressure high"))
         if self.k > 6.0:
             a.append(("warn", "Potassium high"))
@@ -509,9 +543,43 @@ class Sim:
             a.append(("critical", "Circuit clotted"))
         return a
 
+    @property
+    def pap(self):
+        """Mean pulmonary artery pressure: CVP plus what the heart's own output pushes through the lungs."""
+        return self.cvp + PVR * self.qh
+
+    @property
+    def mode(self):
+        """What the patient monitor's mode label shows: before, partial, full (on bypass) or after."""
+        if self.qa >= 0.8 * self.target_flow:
+            return "full"
+        if self.on_bypass:
+            return "partial"
+        return "after" if self.bypass_time > 60 else "before"
+
+    def rollers(self):
+        """Each roller pump: the flow it moves (L/min), its speed, percent of full speed, tubing size."""
+        c = self.c
+        sets = dict(arterial=0.0, cardioplegia=c["cp_flow"], sucker=c["sucker_max"], vent=c["vent_max"])
+        running = dict(arterial=False, cardioplegia=c["cp_on"], sucker=c["sucker"], vent=c["root_vent"])
+        out = {}
+        for name, tubing in ROLLERS:
+            q = sets[name] if running[name] else 0.0
+            rpm = q / ROLLER_ML_PER_REV[tubing]
+            out[name] = dict(on=running[name], set=round(sets[name]), flow=round(q / 1000.0, 3), rpm=round(rpm, 1),
+                             pct=round(100.0 * rpm / ROLLER_MAX_RPM, 1), tubing=tubing)
+        return out
+
     def snapshot(self):
         r = round
+        beat = self.pulse
         return dict(
+            art_sys=r(self.pa + 0.58 * beat, 1), art_dia=r(self.pa - 0.42 * beat, 1),
+            pap=r(self.pap, 1), pap_sys=r(self.pap + 0.27 * beat, 1), pap_dia=r(max(self.cvp, self.pap - 0.18 * beat), 1),
+            spo2=r(self.sao2 * 100) if beat >= 4 else None,     # pulse oximetry needs a pulse: none on full bypass
+            urine_ml=r(self.urine_ml), urine_rate=r(self.urine_rate), last_act2=self.last_act2,
+            t_cp_water=r(self.t_cp_water, 1), rollers=self.rollers(), mode=self.mode, limits=dict(ALARM_LIMITS),
+            sucker_return=r(self.q_suck / 1000.0, 3), vent_return=r(self.q_vent / 1000.0, 3),
             t=r(self.t, 1), map=r(self.pa, 1), cvp=r(self.cvp, 1), pulse=r(self.pulse, 1),
             rhythm=self.rhythm, hr=0 if self.rhythm in ("asystole", "vf") else (40 if self.rhythm == "brady" else 78),
             flow=r(self.qa, 2), ci=r(max(self.qa, 0) / self.bsa, 2), qh=r(self.qh, 2), qv=r(self.qv, 2),

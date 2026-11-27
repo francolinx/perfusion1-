@@ -101,6 +101,112 @@ class TestModel(unittest.TestCase):
         self.assertGreater(o2_sat(100), 0.97)
 
 
+class TestLabState(unittest.TestCase):
+    """State added for the pump console and patient monitor (docs/LAB_FIDELITY.md sections 1 and 2)."""
+
+    def test_pa_and_arterial_pulsatile_before_bypass_flat_on_full_bypass(self):
+        s = Sim(P["standard_adult"]); settle(s, 30); d = s.snapshot()
+        self.assertGreater(d["art_sys"] - d["art_dia"], 25)
+        self.assertGreater(d["pap_sys"] - d["pap_dia"], 8)
+        self.assertTrue(d["cvp"] < d["pap"] < 30, d["pap"])
+        self.assertIsNotNone(d["spo2"])
+        s = on_bypass(); d = s.snapshot()
+        self.assertLess(d["art_sys"] - d["art_dia"], 2)          # flat arterial line on full bypass
+        self.assertLess(d["pap_sys"] - d["pap_dia"], 2)
+        self.assertAlmostEqual(d["pap"], d["cvp"], delta=1.0)     # no output through the lungs
+        self.assertIsNone(d["spo2"])                              # pulse oximetry loses its signal
+
+    def test_monitor_mode_label(self):
+        s = Sim(P["standard_adult"]); self.assertEqual(s.mode, "before")
+        s = on_bypass(); self.assertEqual(s.snapshot()["mode"], "full")
+        s.set("rpm_set", 2000); settle(s, 20); self.assertEqual(s.mode, "partial")
+        s.set("art_clamp", True); s.set("rpm_set", 0); settle(s, 5); self.assertEqual(s.mode, "after")
+
+    def test_urine_output(self):
+        s = Sim(P["standard_adult"]); settle(s, 600); d = s.snapshot()
+        self.assertAlmostEqual(d["urine_rate"] / s.p.weight, 1.3, delta=0.5)   # about 1 mL/kg/h
+        self.assertAlmostEqual(d["urine_ml"], d["urine_rate"] / 6, delta=4)
+        low = Sim(P["ckd"]); settle(low, 600)
+        self.assertLess(low.urine_ml / low.p.weight, s.urine_ml / s.p.weight)   # poor kidneys make less
+        s.pa = 40.0; s.step(); self.assertEqual(s.urine_rate, 0.0)             # none below 45 mmHg
+
+    def test_second_act_channel(self):
+        a, b = on_bypass(), on_bypass()
+        for s in (a, b):
+            s.measure("act"); settle(s, 200)
+        self.assertIsNotNone(a.last_act2)
+        self.assertEqual(a.last_act2, b.last_act2)                # deterministic
+        self.assertAlmostEqual(a.last_act2[1], a.last_act[1], delta=0.04 * a.last_act[1])
+        self.assertEqual(a.last_act2[0], a.last_act[0])
+
+    def test_heater_cooler_circuits(self):
+        s = Sim(P["standard_adult"]); settle(s, 5)
+        self.assertAlmostEqual(s.t_cp_water, 4.0, delta=0.1)
+        s.set("cp_water_set", 37); settle(s, 300)
+        self.assertAlmostEqual(s.t_cp_water, 37, delta=0.3)       # warmed for a hot shot
+        s.set("cp_hc_on", False); settle(s, 600)
+        self.assertLess(s.t_cp_water, 32)                         # drifts toward the room
+        s.set("water_set", 30); s.set("hc_on", False); settle(s, 120)
+        self.assertGreater(s.t_water, 33)                         # patient circuit no longer follows its set point
+
+    def test_sucker_and_vent_speeds(self):
+        a, b = on_bypass(), on_bypass()
+        for s in (a, b):
+            s.set("sucker", True)
+        b.set("sucker_max", 10); settle(a, 60); settle(b, 60)
+        self.assertAlmostEqual(a.q_suck, 30.0, delta=0.1)         # default speed returns all the field blood
+        self.assertAlmostEqual(b.q_suck, 10.0, delta=0.1)         # too slow: the rest is lost
+        self.assertLess(b.vp + b.vr, a.vp + a.vr)
+        a.xclamp = True; a.set("root_vent", True); a.step()
+        self.assertAlmostEqual(a.q_vent, 25.0)
+        a.set("vent_max", 8); a.step(); self.assertAlmostEqual(a.q_vent, 8.0)
+        d = a.snapshot()
+        self.assertAlmostEqual(d["vent_return"], 0.008); self.assertAlmostEqual(d["sucker_return"], 0.03)
+
+    def test_roller_pumps(self):
+        s = Sim(P["standard_adult"]); r = s.snapshot()["rollers"]
+        self.assertEqual(set(r), {"arterial", "cardioplegia", "sucker", "vent"})
+        self.assertTrue(all(not x["on"] and x["rpm"] == 0 for x in r.values()))
+        s.set("cp_on", True); s.set("cp_flow", 252); s.set("sucker", True)
+        r = s.snapshot()["rollers"]
+        self.assertEqual((r["cardioplegia"]["flow"], r["cardioplegia"]["rpm"], r["cardioplegia"]["tubing"]), (0.252, 20.0, '1/4"'))
+        self.assertAlmostEqual(r["cardioplegia"]["pct"], 8.0)
+        self.assertEqual(r["sucker"]["flow"], 0.1)
+        self.assertEqual(r["arterial"]["rpm"], 0)                 # idle: the centrifugal pump is the arterial pump
+        s.set("cp_on", False)
+        self.assertEqual(s.snapshot()["rollers"]["cardioplegia"]["rpm"], 0)
+        self.assertEqual(s.snapshot()["rollers"]["cardioplegia"]["set"], 252)   # the dial keeps its setting
+
+    def test_alarm_limits_are_the_ones_shown(self):
+        s = Sim(P["standard_adult"]); lim = s.snapshot()["limits"]
+        s.line_p = lim["line_p"] + 1
+        self.assertIn(("critical", "Arterial line pressure high"), s.alarms())
+        s.line_p = lim["line_p"] - 1
+        self.assertNotIn(("critical", "Arterial line pressure high"), s.alarms())
+
+    def test_every_persona_has_age_and_sex(self):
+        for pid, p in P.items():
+            self.assertTrue(18 <= p.age <= 100 and p.sex in ("F", "M"), pid)
+        snap = Case(P["small_anemic"]).snapshot()["persona"]
+        self.assertEqual((snap["age"], snap["sex"]), (78, "F"))
+
+    def test_older_saves_without_the_new_fields_still_load(self):
+        from perfusion.saves import capture, restore
+        from perfusion.autopilot import Autopilot
+        c = Case(P["standard_adult"]); state = capture(c, Autopilot(c))
+        for k in ("t_cp_water", "urine_ml", "urine_rate", "q_suck", "q_vent", "last_act2"):
+            del state["sim"][k]
+        for k in ("sucker_max", "vent_max", "hc_on", "cp_water_set", "cp_hc_on"):
+            del state["sim"]["c"][k]
+        del state["persona"]["age"], state["persona"]["sex"]
+        case, _ = restore(state)
+        self.assertEqual(case.sim.c["sucker_max"], 100.0)
+        self.assertEqual(case.sim.urine_ml, 0.0)
+        del state["sim"]["vp"]
+        with self.assertRaises(ValueError):                       # anything else missing is still refused
+            restore(state)
+
+
 class TestCase_(unittest.TestCase):
     def test_expert_plays_clean_case_every_persona(self):
         for pid in P:
