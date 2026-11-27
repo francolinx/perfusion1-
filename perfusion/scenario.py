@@ -31,6 +31,16 @@ EXPECTED = dict(PRE="act_good", INITIATE="on_bypass", STABILIZE="gases_good", CO
                 HOTSHOT="hotshot_in", REWARM="warm", CLAMP_OFF="full_flow", WEAN="off_bypass",
                 POST="prot_in")
 PENALTY = dict(minor=2, major=6, critical=20)
+# Student-run timers (docs/LAB_SESSION_NOTES.md item 1). The student starts, stops and resets them; the surgeon
+# asks for the times. Grading compares what the timers read with the true times (rubric C1b, D4, F5b).
+CLOCKS = ("bypass", "clamp", "cp")
+CLOCK_TITLES = dict(bypass="Bypass", clamp="Cross-clamp", cp="Since cardioplegia")
+TIME_TOLERANCE = 60.0      # seconds a reported time may be off and still count
+REPORTS = dict(clamp_time="clamp", bypass_time="bypass", cp_time="cp")
+
+
+def new_clocks():
+    return {k: dict(run=False, since=0.0, acc=0.0) for k in CLOCKS}
 SMALL_TALK = ["How are the kids?", "Did you catch anything on that fishing trip?",
               "Somebody brought a banana on the boat. Bad luck.", "Going on vacation anytime soon?"]
 
@@ -49,6 +59,9 @@ class Case:
         self.callout_log = []
         self.flags = {}
         self.timers = {}
+        self.clocks = new_clocks()
+        self.clock_log = []       # (t, clock, op) for the debrief and grading
+        self.reports = []         # times the student reported: what, said, true, t
         self.operate_s = operate_minutes * 60.0
         self.in_range = dict(map=0.0, do2=0.0, total=0.0)
         self._seen_events = 0
@@ -91,6 +104,58 @@ class Case:
         for k in [k for k in self.timers if k.startswith("h_")]:
             del self.timers[k]
 
+    # ---- student timers --------------------------------------------------------
+    def clock(self, name):
+        c = self.clocks[name]
+        return c["acc"] + (self.t - c["since"] if c["run"] else 0.0)
+
+    def clock_op(self, name, op):
+        if name not in CLOCKS or op not in ("start", "stop", "reset"):
+            raise ValueError(f"bad timer action {name} {op}")
+        c = self.clocks[name]
+        if op == "start" and not c["run"]:
+            c.update(run=True, since=self.t)
+        elif op == "stop" and c["run"]:
+            c.update(run=False, acc=self.clock(name))
+        elif op == "reset":
+            c.update(acc=0.0, since=self.t)
+        else:
+            return
+        self.clock_log.append(dict(t=round(self.t, 1), clock=name, op=op))
+        if name == "bypass" and op == "start" and self.phase in ("INITIATE", "STABILIZE") and "bp_on_t" in self.flags \
+                and self.t > self.flags["bp_on_t"] + 30:
+            self.flags["bp_timer_late"] = True
+
+    def true_time(self, name):
+        s = self.sim
+        return dict(bypass=s.bypass_time, clamp=s.clamp_time, cp=s.since_cp)[name]
+
+    def report(self, what):
+        if what not in REPORTS:
+            raise ValueError(f"unknown report {what}")
+        name = REPORTS[what]
+        said, true = self.clock(name), self.true_time(name)
+        self.reports.append(dict(what=what, said=round(said), true=round(true), t=round(self.t, 1),
+                                 asked=self.flags.get("ask_" + name) is not None))
+        mins = said / 60.0
+        if said < 1:
+            self.say(f"Zero? Is your {CLOCK_TITLES[name].lower()} timer running?")
+        else:
+            self.say(f"{mins:.0f} minutes. Thank you." if mins >= 1.5 else f"{said:.0f} seconds. Thank you.")
+        self.flags.pop("ask_" + name, None)
+
+    def answered(self, name):
+        """The student's answer to the surgeon's question about this timer, if one was asked: (said, true) or None."""
+        for r in reversed(self.reports):
+            if REPORTS[r["what"]] == name and r["asked"]:
+                return r
+        return None
+
+    def ask(self, name, line):
+        self.flags["ask_" + name] = self.t
+        self.flags["asked_" + name] = True
+        self.say(line)
+
     @property
     def frac(self):
         return max(self.sim.qa, 0.0) / self.sim.target_flow
@@ -132,6 +197,10 @@ class Case:
                 self.callouts_done.add(self.phase)
             elif EXPECTED.get(self.prev_phase) == cid and self.t - self.phase_t0 < 20:
                 self.callouts_done.add(self.prev_phase)
+        elif kind == "timer":
+            self.clock_op(a.get("which"), a.get("op"))
+        elif kind == "report":
+            self.report(a.get("what"))
         elif kind == "speed":
             self.speed = min(30.0, max(0.0, float(a.get("x", 1))))
         elif kind == "autopilot":
@@ -152,8 +221,21 @@ class Case:
         self._global_rules()
         getattr(self, "ph_" + self.phase)()
 
+    def _timer_marks(self):
+        """Note when bypass and the clamp start and what the student's timers read 30 s later (rubric C1b, D4)."""
+        s, f = self.sim, self.flags
+        if s.on_bypass and "bp_on_t" not in f:
+            f["bp_on_t"] = self.t
+        if "bp_on_t" in f and "bp_clock_30" not in f and self.t >= f["bp_on_t"] + 30:
+            f["bp_clock_30"] = dict(run=self.clocks["bypass"]["run"], read=round(self.clock("bypass")))
+        if s.xclamp and "clamp_on_t" not in f:
+            f["clamp_on_t"] = self.t
+        if "clamp_on_t" in f and "clamp_clock_30" not in f and self.t >= f["clamp_on_t"] + 30:
+            f["clamp_clock_30"] = dict(run=self.clocks["clamp"]["run"], read=round(self.clock("clamp")))
+
     def _global_rules(self):
         s = self.sim
+        self._timer_marks()
         if not s.on_bypass:
             return
         dt = s.DT
@@ -337,6 +419,8 @@ class Case:
             self.flags["redosed"] = True
         if self.flags.get("redosed") and not s.c["cp_on"]:
             self.credits.add("redose")
+        if el >= 600 and not self.flags.get("asked_cp") and not s.c["cp_on"]:
+            self.ask("cp", "How long since the last dose?")
         if self.held("h_cp_late", s.since_cp > 1200, 1):
             self.find("cp_interval", "major", "More than 20 minutes since the last cardioplegia dose.")
             if not self.flags.get("cp_nag"):
@@ -373,6 +457,8 @@ class Case:
             self.say("Fibrillating. Shocking. Sinus rhythm.")
         if not self.flags.get("after_unclamp") and self._clamp_dance(False):
             self.flags["after_unclamp"] = True
+        if not s.xclamp and self.flags.get("clamp_on_t") is not None and not self.flags.get("asked_clamp"):
+            self.ask("clamp", "What was the clamp time?")
         if self.flags.get("after_unclamp") and s.rhythm == "sinus" and not s.xclamp:
             self.flags["wean_i"] = 0
             self.say("Let's wean. Come down to three-quarter flow and give the heart some volume.")
@@ -402,8 +488,10 @@ class Case:
         else:
             if self.held("h_off", s.qa < 0.1 and s.qa > -0.1 and s.c["art_clamp"] and s.c["ven_occl"] >= 0.98, 3):
                 self.credits.add("off_bypass")
+                self.flags["off_t"] = self.t
                 self.say("We are off. Give me 100 at a time until the pressure is where I want it.")
                 self.goto("POST")
+                self.ask("bypass", "What is the bypass time?")
 
     def ph_POST(self):
         s = self.sim
@@ -476,26 +564,31 @@ class Case:
         o = {
             "PRE": [f"Give heparin: 300 to 400 units per kg ({300*self.persona.weight:.0f} to {400*self.persona.weight:.0f} units)",
                     "Run an ACT at the analyzer and confirm it is over 480 seconds"],
-            "INITIATE": ["Spin the pump until its pressure beats the patient's (about 1500 RPM, more if pressure is high), then unclamp the arterial line",
+            "INITIATE": ["Start the bypass timer as you go on",
+                         "Spin the pump until its pressure beats the patient's (about 1500 RPM, more if pressure is high), then unclamp the arterial line",
                          "Open the venous clamp", f"Bring flow up to about {tf:.1f} L/min",
                          "Turn the ventilator off once you are at full flow"],
             "STABILIZE": ["Run a blood gas", "Sweep gas: CO2 35 to 45. Oxygen: PaO2 150 to 400",
                           "Pressure 50 to 80 (vaporizer down or phenylephrine to raise it, vaporizer up to lower it)", "Oxygen delivery over 280: more flow or red cells"],
             "COOL": [f"Set the heater-cooler to cool the patient to {self.persona.target_temp:.0f} C",
                      "Keep the water within 10 C of the blood"],
-            "CLAMP_ON": ["Drop flow to under a third and hold it there", "Wait for 'clamp is on', then return to full flow"],
+            "CLAMP_ON": ["Drop flow to under a third and hold it there", "Wait for 'clamp is on', then return to full flow",
+                         "Start the clamp timer"],
             "ANTEGRADE": ["Root vent off", "Deliver 1000 mL high-K antegrade at 150 to 300 mmHg", "Stop, then root vent back on"],
-            "RETROGRADE": ["Switch route to retrograde", "Deliver 250 mL, coronary sinus pressure 40 or less"],
+            "RETROGRADE": ["Switch route to retrograde", "Deliver 250 mL, coronary sinus pressure 40 or less",
+                           "Once arrested, reset and start the cardioplegia timer"],
             "OPERATE": ["Hold flow, pressure and oxygen delivery in range", "Run a blood gas",
-                        "Re-dose cardioplegia (low-K, about 300 mL) before 20 minutes",
+                        "Re-dose cardioplegia (low-K, about 300 mL) before 20 minutes, then restart the cardioplegia timer",
+                        "Tell the surgeon the time since the last dose when asked",
                         "Speed up time with the clock control if you like"],
             "HOTSHOT": ["Select the hot shot solution", "Deliver 500 mL, then stop"],
             "REWARM": ["Warm the water, at most 10 C above blood and blood never over 37.5 C", "Reach 36 C"],
-            "CLAMP_OFF": ["Drop flow to under a third", "Stay down until you hear 'clamp is off'", "Then back to full flow"],
+            "CLAMP_OFF": ["Drop flow to under a third", "Stay down until you hear 'clamp is off'", "Then back to full flow",
+                          "Stop the clamp timer and give the clamp time"],
             "WEAN": ["Ventilator back on", "Partly clamp the venous line to fill the heart",
                      "Step flow down as the surgeon asks, once you see a pulse",
-                     "To come off: venous clamp shut, flow to zero, arterial line clamped"],
-            "POST": ["Transfuse 100 mL at a time from the reservoir", "Suckers off, then protamine: 1 mg per 100 units of heparin"],
+                     "To come off: venous clamp shut, flow to zero, arterial line clamped", "Stop the bypass timer"],
+            "POST": ["Give the bypass time", "Transfuse 100 mL at a time from the reservoir", "Suckers off, then protamine: 1 mg per 100 units of heparin"],
             "DONE": ["Case complete"],
         }
         return o[p]
@@ -507,6 +600,8 @@ class Case:
                  lines=self.lines[-6:], n_lines=len(self.lines), objectives=self.objectives(),
                  expected_callout=EXPECTED.get(self.phase), callout_made=self.phase in self.callouts_done,
                  speed=self.speed, autopilot=self.autopilot,
+                 clocks={k: dict(s=round(self.clock(k), 1), run=self.clocks[k]["run"]) for k in CLOCKS},
+                 asked=[k for k in CLOCKS if self.flags.get("ask_" + k) is not None],
                  persona=dict(id=self.persona.id, name=self.persona.name, weight=self.persona.weight,
                               height=self.persona.height, age=self.persona.age, sex=self.persona.sex),
                  score=self.score(detail=self.phase == "DONE"))     # the full rubric report only once the case is over

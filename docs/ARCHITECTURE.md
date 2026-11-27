@@ -140,6 +140,12 @@ leaderboard. There is no login: run the simulator on a trusted network.
 
 ## Grading (perfusion/scenario.py, perfusion/rubric.py)
 
+Student timers: bypass, cross-clamp and cardioplegia timers that the student starts, stops and resets
+(`timer` action; console buttons, the Timers panel). Nothing runs by itself, and the live displays show these
+timers, not the simulator's own clocks. The surgeon asks for the clamp time, the time since the last dose and
+the bypass time; a `report` action answers with what the student's timer reads. Rubric C1b, D4 and F5b
+compare the timers and answers with the true times (within a minute).
+
 Deterministic. The scenario records credits (steps done), callouts and findings (errors, each with a
 severity). `rubric.py` turns that record into a component rubric: six sections worth 100 points
 (A setup and air-free prime 30, B calculations and readiness 10, C going on bypass 15, D management on
@@ -149,7 +155,7 @@ cost it. The pass mark is 80. Any critical finding fails the run whatever the po
 
 A component the simulator cannot observe yet (all of section A, some calculations, sample labelling,
 the venous sample) is marked not observed: it scores nothing and is left out of the total. The score is
-the share of observable points earned (55 of the 100 today), and the debrief says how many points are
+the share of observable points earned (57.5 of the 100 today), and the debrief says how many points are
 not simulated, so it is never presented as a complete examination total. Mid-case, only components
 whose phase is over are graded. Findings with no rubric component are still listed in the debrief.
 To make a component observable, add the rule and its test, then replace its `_na` entry in `COMPONENTS`.

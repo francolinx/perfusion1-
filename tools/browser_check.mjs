@@ -138,7 +138,8 @@ const aimAt = async (id) => {
   await place(px, pz, Math.atan2(-(x - px), -(z - pz)), Math.atan2(y - eyeY, Math.hypot(x - px, z - pz))); await sleep(350);
 };
 const ctlIds = await ev(`window.P1.console.controls.map((c) => c.id).sort().join(',')`);
-check('console has centrifugal dial and roller modules with dials and stop buttons', ctlIds === 'art_dial,art_stop,cf_dial,cp_dial,cp_stop,suck_dial,suck_stop,vent_dial,vent_stop', ctlIds);
+check('console has centrifugal dial, roller modules with dials and stop buttons, and timer buttons',
+  ctlIds === 'art_dial,art_stop,cf_dial,cp_dial,cp_stop,suck_dial,suck_stop,tm_bypass,tm_bypass_reset,tm_clamp,tm_clamp_reset,tm_cp,tm_cp_reset,vent_dial,vent_stop', ctlIds);
 await aimAt('cp_dial');
 check('aiming at a dial names it and says how to turn it', (await ev('window.P1.control()')) === 'cp_dial' && /Cardioplegia pump.*wheel or drag/.test(await ev(`document.getElementById('hint').textContent`)));
 const cp0 = (await state()).controls.cp_flow;
@@ -162,6 +163,14 @@ check('the roller head turns at its pump speed', Math.abs((await ev(`window.P1.c
 await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: 800, y: 450, button: 'left', clickCount: 1 });
 await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: 800, y: 450, button: 'left', clickCount: 1 }); await sleep(500);
 check('...and clicking it again stops it', !(await state()).controls.sucker);
+// ---- student timers (docs/LAB_SESSION_NOTES.md item 1)
+await aimAt('tm_bypass');
+await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: 800, y: 450, button: 'left', clickCount: 1 });
+await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: 800, y: 450, button: 'left', clickCount: 1 }); await sleep(1300);
+const tOn = await state();
+check('the bypass timer button on the console starts the student timer', tOn.clocks.bypass.run && tOn.clocks.bypass.s > 0.5 && !tOn.clocks.clamp.run, `${tOn.clocks.bypass.s} s`);
+await act({ type: 'timer', which: 'bypass', op: 'stop' }); await act({ type: 'timer', which: 'bypass', op: 'reset' });
+check('timers read zero after a reset', (await state()).clocks.bypass.s === 0);
 // ---- patient monitor (docs/LAB_FIDELITY.md 2)
 const mon = await ev(`(() => { const c = window.P1.monitor.canvas, d = c.getContext('2d').getImageData(10, 98 + 2 * 122 + 22, 760, 92).data; let pa = 0;
   for (let i = 0; i < d.length; i += 4) if (d[i] > 200 && d[i + 1] > 180 && d[i + 2] < 120) pa++; return { pa, shared: window.P1.monitor.shared() }; })()`);

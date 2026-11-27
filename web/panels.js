@@ -97,7 +97,7 @@ export function buildPanels(act, state) {
     ] },
     cp: { title: 'Cardioplegia', build: (b) => [
       read(b, (S) => [['This dose mL', S.cp_dose], ['Line pressure', S.cp_pressure, S.cp_pressure > 300 ? 'bad' : ''], ['Sinus pressure', S.csp.toFixed(0), S.csp > 40 ? 'bad' : ''],
-        ['Total mL', S.cp_total], ['Since last dose', S.xclamp ? mmss(S.since_cp) : '--', S.since_cp > 1200 ? 'warn' : ''], ['Rhythm', S.rhythm]]),
+        ['Total mL', S.cp_total], ['Your cardioplegia timer', mmss(S.clocks.cp.s), S.clocks.cp.s > 1200 ? 'warn' : ''], ['Rhythm', S.rhythm]]),
       buttons(b, [['Antegrade (aortic root)', () => set('cp_route', 'ante'), (S) => S.controls.cp_route === 'ante'], ['Retrograde (coronary sinus)', () => set('cp_route', 'retro'), (S) => S.controls.cp_route === 'retro']]),
       buttons(b, [['High-K cold', () => set('cp_type', 'highK'), (S) => S.controls.cp_type === 'highK'], ['Low-K cold', () => set('cp_type', 'lowK'), (S) => S.controls.cp_type === 'lowK'],
         ['Hot shot', () => set('cp_type', 'hot'), (S) => S.controls.cp_type === 'hot']]),
@@ -139,6 +139,17 @@ export function buildPanels(act, state) {
       }),
       note(b, 'Results take a few seconds. ACT over 480 before bypass; under 400 on bypass is an emergency.'),
     ] },
+    timers: { title: 'Timers', build: (b) => {
+      const T = [['bypass', 'Bypass', 'bypass_time'], ['clamp', 'Cross-clamp', 'clamp_time'], ['cp', 'Since cardioplegia', 'cp_time']];
+      const timer = (which, op) => act({ type: 'timer', which, op });
+      return [
+        read(b, (S) => T.map(([k, label]) => [label + (S.clocks[k].run ? '' : ' (stopped)'), mmss(S.clocks[k].s), S.asked.includes(k) ? 'warn' : ''])),
+        ...T.map(([k, label]) => buttons(b, [[`${label}: start`, () => timer(k, 'start'), (S) => S.clocks[k].run], [`Stop`, () => timer(k, 'stop'), (S) => !S.clocks[k].run],
+          ['Reset', () => timer(k, 'reset')]])),
+        buttons(b, T.map(([k, label, what]) => [`Tell the surgeon the ${label.toLowerCase()} time`, () => act({ type: 'report', what }), (S) => S.asked.includes(k)])),
+        note(b, 'Timer first, then sweep gas, then the pump. Start the clamp timer as the clamp goes on, restart the cardioplegia timer after each dose, and stop the bypass timer when you come off. Nothing here runs by itself: the surgeon will ask for these times.'),
+      ];
+    } },
     vent: { title: 'Ventilator', build: (b) => [
       buttons(b, [['Ventilator on', () => set('ventilator', true), (S) => S.controls.ventilator], ['Ventilator off', () => set('ventilator', false), (S) => !S.controls.ventilator]]),
       read(b, (S) => [['SaO2 %', S.sao2.toFixed(0), S.sao2 < 92 ? 'bad' : ''], ['Pump flow', S.flow.toFixed(2)], ['Heart output', S.qh.toFixed(2)]]),
@@ -152,6 +163,10 @@ export function buildPanels(act, state) {
         btn.onclick = () => { act({ type: 'callout', id: c.id }); btn.classList.add('on'); };
         w.appendChild(btn);
       });
+      items.push(buttons(b, [['Clamp time is...', () => act({ type: 'report', what: 'clamp_time' }), (S2) => S2.asked.includes('clamp')],
+        ['Bypass time is...', () => act({ type: 'report', what: 'bypass_time' }), (S2) => S2.asked.includes('bypass')],
+        ['Time since the last dose is...', () => act({ type: 'report', what: 'cp_time' }), (S2) => S2.asked.includes('cp')]]));
+      items.push(note(b, 'A time you tell the surgeon is read off your own timer.'));
       const log = el('div', 'note'); b.appendChild(log);
       items.push({ update: (S2) => { log.innerHTML = S2.lines.slice(-4).map((l) => `Surgeon: ${l.text}`).join('<br>'); } });
       return items;

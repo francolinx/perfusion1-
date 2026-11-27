@@ -397,6 +397,7 @@ addInteract('pump', 'Pump console', CART.x - 0.6, 1.3, CART.z - 0.1, 1.55);
 addInteract('venous', 'Venous clamp', -0.15, 0.92, -0.5, 1.1);
 addInteract('gas', 'Gas blender', CART.x + 0.3, 1.55, CART.z - 0.12, 1.8);
 addInteract('cp', 'Cardioplegia', CART.x - 0.23, 0.5, CART.z + 0.29, 1.0);
+addInteract('timers', 'Timers', CART.x - 0.1, 1.39, CART.z - 0.19, 1.27);
 addInteract('res', 'Reservoir', CART.x + RES.x, RES.y, CART.z + RES.z, RES.y + 0.42);
 addInteract('hc', 'Heater-cooler', -2.4, 0.75, -1.5, 1.08);
 addInteract('meds', 'Drug cart', -3.7, 1.0, -2.6, 1.3);
@@ -424,7 +425,7 @@ function drawScreens(S) {
   cell('ART TEMP', fmt(S.t_art, 1), `C   pt ${fmt(S.temp, 1)}`, 20, 230, '#ffd24d');
   cell('HCT', fmt(S.hct), '%', 230, 230);
   cell('PaCO2 / PaO2', `${fmt(S.paco2)} / ${fmt(S.pao2)}`, 'mmHg', 400, 230);
-  text(g, `BYPASS ${mmss(S.bypass_time)}    CLAMP ${mmss(S.clamp_time)}    SINCE CPG ${S.xclamp ? mmss(S.since_cp) : '--'}`, 20, 360, 22, '#9fd0ff');
+  text(g, `YOUR TIMERS  BYPASS ${mmss(S.clocks.bypass.s)}   CLAMP ${mmss(S.clocks.clamp.s)}   CPG ${mmss(S.clocks.cp.s)}`, 20, 360, 22, '#9fd0ff');
   t.needsUpdate = true;
   // heater-cooler
   ({ ctx: g, t } = P.hc);
@@ -476,7 +477,7 @@ const VITALS = [
   ['Hct %', (S) => fmt(S.hct), (S) => (S.hct < 21 ? 'warn' : '')],
   ['K+', (S) => fmt(S.k, 1), (S) => (S.k > 6 ? 'bad' : S.k > 5.5 ? 'warn' : '')],
   ['Last ACT', (S) => (S.last_act ? String(S.last_act[1]) : '--'), (S) => (S.last_act && S.last_act[1] < 400 && S.on_bypass ? 'bad' : '')],
-  ['Clamp time', (S) => mmss(S.clamp_time), () => ''],
+  ['Clamp timer', (S) => mmss(S.clocks.clamp.s) + (S.clocks.clamp.run ? '' : ' ■'), () => ''],
 ];
 const vitEls = VITALS.map(([k]) => {
   const d = document.createElement('div'); d.className = 'v'; d.innerHTML = `<div class="k">${k}</div><div class="n">--</div>`;
@@ -654,6 +655,7 @@ function sendDial(kv) {
 }
 function pressControl(c) {
   if (c.kind === 'button' && c.toggle && !c.inert) act({ type: 'set', key: c.toggle, value: !state.S.controls[c.toggle] });
+  if (c.timer) act({ type: 'timer', which: c.timer, op: c.op === 'reset' ? 'reset' : state.S.clocks[c.timer].run ? 'stop' : 'start' });
 }
 window.addEventListener('wheel', (e) => {
   if (!ctl || ctl.kind !== 'dial' || uiBlocked() || !state.S) return;

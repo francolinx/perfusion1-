@@ -102,7 +102,8 @@ get through, and the student cannot choose or change the patient.
 Ordered by how often it came up in the runs. Each needs its rule, its test and, where noted, a rubric item.
 
 1. **Student-run timers** for bypass, cross-clamp and cardioplegia, with the surgeon asking for the times.
-   Unlocks rubric C1b, D4 and F5b.
+   Unlocks rubric C1b, D4 and F5b. *Built: `timer` and `report` actions, console timer buttons, Timers panel,
+   surgeon asks for clamp time, time since the last dose and bypass time; graded against the true times.*
 2. **Rhythm before weaning**: after the clamp comes off the heart may be flat, fibrillating or in sinus rhythm.
    Drugs (lidocaine, magnesium, esmolol, calcium at 10 minutes) and a defibrillator the student calls for.
    Starting to wean with no rhythm or no pulse is a critical finding.
