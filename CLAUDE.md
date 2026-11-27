@@ -33,6 +33,7 @@ Open 3D cardiopulmonary bypass trainer. Read `README.md`, `docs/ARCHITECTURE.md`
 - Expert policy: `perfusion/autopilot.py`
 - Server and API: `perfusion/server.py`
 - 3D room, HUD, input: `web/main.js`; equipment control panels: `web/panels.js`
+- Smash mode (cosmetic rage room, client only, never graded): `web/smash.js`
 
 ## Next work
 

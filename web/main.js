@@ -1,6 +1,7 @@
 // perfusion1 walk-around sim lab client. Talks to perfusion/server.py over plain HTTP.
 import * as THREE from 'three';
 import { buildPanels } from './panels.js';
+import { initSmash } from './smash.js';
 
 const $ = (id) => document.getElementById(id);
 const post = (p, body) => fetch(p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then((r) => r.json());
@@ -18,6 +19,7 @@ renderer.toneMappingExposure = 1.05;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1a1f26);
 const camera = new THREE.PerspectiveCamera(70, 1, 0.05, 60);
+scene.add(camera);   // so things held in the hand (smash mode bat) render
 const player = { x: 0.9, z: 1.6, yaw: 0.72, pitch: -0.16, h: 1.65 };
 
 function resize() {
@@ -259,6 +261,7 @@ const tableG = new THREE.Group(); tableG.position.copy(TABLE); scene.add(tableG)
   P.heart.scale.set(1, 0.8, 0.85);
   P.aorta = cyl(P.body, 0.016, 0.016, 0.12, mat(0xd24a4a), 0.19, 0.38, -0.02); P.aorta.rotation.z = -0.9;
   P.xclamp = box(P.body, 0.012, 0.1, 0.03, steel, 0.2, 0.42, -0.02); P.xclamp.rotation.z = -0.9;
+  P.body.traverse((m) => { m.userData.person = 'patient'; });
   block(TABLE.x - 1.15, TABLE.x + 1.15, TABLE.z - 0.4, TABLE.z + 0.4);
 })();
 function person(x, z, rotY, scrub, name) {
@@ -273,7 +276,7 @@ function person(x, z, rotY, scrub, name) {
   box(g, 0.25, 0.1, 0.03, mat(0xdfeef5), 0, 1.5, 0.125);     // mask
   box(g, 0.05, 0.03, 0.01, sh, -0.06, 1.6, 0.125); box(g, 0.05, 0.03, 0.01, sh, 0.06, 1.6, 0.125);
   block(x - 0.3, x + 0.3, z - 0.25, z + 0.25);
-  g.name = name;
+  g.name = name; g.traverse((m) => { m.userData.person = name; });
   return g;
 }
 const surgeon = person(2.5, -1.95, 0, 0x2e8b6f, 'surgeon');
@@ -519,6 +522,8 @@ $('btn-auto').onclick = () => act({ type: 'autopilot', on: !(state.S && state.S.
 $('btn-voice').onclick = () => { voiceOn = !voiceOn; $('btn-voice').textContent = 'Voice: ' + (voiceOn ? 'on' : 'off'); if (!voiceOn) window.speechSynthesis?.cancel(); };
 document.querySelectorAll('#hud-bottom [data-speed]').forEach((b) => (b.onclick = () => act({ type: 'speed', x: Number(b.dataset.speed) })));
 
+const smash = initSmash({ scene, camera, room: ROOM, onQuip: (t) => { drawBubble(t); say(t); }, pause: () => act({ type: 'speed', x: 0 }) });
+$('btn-smash').onclick = () => { if (!uiBlocked()) smash.toggle(); };
 const keys = {};
 let focus = null;
 const uiBlocked = () => openId || !$('start').classList.contains('hidden') || !$('debrief').classList.contains('hidden');
@@ -528,12 +533,15 @@ window.addEventListener('keydown', (e) => {
   if (e.code === 'Escape') { closePanel(); tablet.classList.add('hidden'); return; }
   if (uiBlocked()) return;
   keys[e.code] = true;
+  if (e.code === 'KeyB') { smash.toggle(); return; }
+  if (smash.state.on) { if (e.code === 'Space' || e.code === 'KeyF') { e.preventDefault(); smash.swing(); } return; }
   if (e.code === 'KeyE' && focus) openPanel(focus.id);
   if (e.code === 'KeyT') openPanel('talk');
 });
 window.addEventListener('keyup', (e) => { keys[e.code] = false; });
 canvas.addEventListener('click', () => {
   if (uiBlocked()) return;
+  if (smash.state.on) { if (document.pointerLockElement !== canvas) canvas.requestPointerLock?.(); smash.swing(); return; }
   if (document.pointerLockElement === canvas) { if (focus) openPanel(focus.id); } else canvas.requestPointerLock?.();
 });
 let dragging = false;
@@ -567,7 +575,7 @@ canvas.addEventListener('touchmove', (e) => {
 canvas.addEventListener('touchend', (e) => {
   for (const t of e.changedTouches) {
     if (touch.move && t.identifier === touch.move.id) { touch.move = null; touch.mx = touch.mz = 0; $('touch-stick').style.transform = ''; }
-    if (touch.look && t.identifier === touch.look.id) { if (touch.look.moved < 8 && focus && !uiBlocked()) openPanel(focus.id); touch.look = null; }
+    if (touch.look && t.identifier === touch.look.id) { if (touch.look.moved < 8 && !uiBlocked()) { if (smash.state.on) smash.swing(); else if (focus) openPanel(focus.id); } touch.look = null; }
   }
 });
 
@@ -579,12 +587,13 @@ function movePlayer(dt) {
   const sp = (keys.ShiftLeft ? 4.2 : 2.3) * dt, sin = Math.sin(player.yaw), cos = Math.cos(player.yaw);
   const dx = (-sin * f + cos * s) * sp, dz = (-cos * f - sin * s) * sp, r = 0.28;
   const free = (x, z) => x > ROOM.x0 + r && x < ROOM.x1 - r && z > ROOM.z0 + r && z < ROOM.z1 - r &&
-    !obstacles.some(([x0, x1, z0, z1]) => x > x0 - r && x < x1 + r && z > z0 - r && z < z1 + r);
+    (smash.state.on || !obstacles.some(([x0, x1, z0, z1]) => x > x0 - r && x < x1 + r && z > z0 - r && z < z1 + r));
   if (free(player.x + dx, player.z)) player.x += dx;
   if (free(player.x, player.z + dz)) player.z += dz;
 }
 const fwd = new THREE.Vector3(), to = new THREE.Vector3();
 function findFocus() {
+  if (smash.state.on) { focus = null; $('hint').textContent = ''; interact.forEach((it) => { it.sprite.visible = false; }); return; }
   camera.getWorldDirection(fwd); let best = null, bestA = 0.3;
   for (const it of interact) {
     to.copy(it.pos).sub(camera.position); const d = to.length();
@@ -685,14 +694,15 @@ function frame(nowMs) {
   const S = state.S;
   if (S) {
     const run = S.speed > 0 ? dt : 0;
-    updateScene(S, run, now);
+    if (!smash.state.on) updateScene(S, run, now);
     if (run) sampleWaves(S, dt);
     screenT += dt;
     if (screenT > 0.07) { screenT = 0; drawScreens(S); }
   }
+  smash.update(dt);
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
 }
-window.P1 = { player, camera, openPanel, closePanel, state };
+window.P1 = { player, camera, openPanel, closePanel, state, smash };
 boot();
 requestAnimationFrame(frame);

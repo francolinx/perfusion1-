@@ -35,7 +35,9 @@ headset on the same network, open `http://<spark-ip>:8080`.
   back up before the clamp is off) is one of the things it catches.
 
 Controls: W A S D to move, mouse to look (click the room first), E or click to use equipment,
-T to talk to the surgeon, Tab for every control panel, Esc to close. On a phone: left pad moves,
+T to talk to the surgeon, Tab for every control panel, Esc to close. B toggles smash mode: a
+just-for-fun rage room with a baseball bat where the equipment breaks, with sound. It pauses the
+case, is never graded, and leaving it rebuilds the lab. On a phone: left pad moves,
 drag to look, Controls button for the panels.
 
 ## How it is built
