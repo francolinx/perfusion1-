@@ -199,7 +199,7 @@ await ev(`document.getElementById('sv-name').value = ${JSON.stringify(TAG)}; doc
 await click('#sv-save'); await sleep(900);
 check('save with a typed description', (await saves()).some((x) => x.id === TAG_ID && x.description === 'typed description') && !(await visible('confirm')));
 const meta = await ev(`[...document.querySelectorAll('#saves-body .sv-row')].find((r) => r.textContent.includes(${JSON.stringify(TAG)})).querySelector('.sv-meta').textContent`);
-check('saves list shows name, persona, phase, case time, date', /Standard adult CABG · Before bypass · case time \d+:\d\d · score \d+ · /.test(meta), meta);
+check('saves list shows name, persona, phase, case time, date', /Standard adult CABG · Before bypass · case time \d+:\d\d · score [\d.]+ · /.test(meta), meta);
 await ev(`document.getElementById('sv-name').focus()`);   // Save / Load is still open
 const before = await P('[p.x, p.z]'); await down('KeyW'); await sleep(400); await up('KeyW'); await down('KeyS'); await sleep(300); await up('KeyS');
 const after = await P('[p.x, p.z]');
@@ -238,6 +238,7 @@ if (FULL) {
   check('expert score 100', s.score.score === 100, `score ${s.score.score}, callouts ${s.score.callouts.made}/${s.score.callouts.due}`);
   await shot('debrief');
   check('debrief shows standing, leaderboard and analysis links, and a quiz', (await ev(`!!document.getElementById('btn-board') && !!document.getElementById('btn-analyze')`)) && (await ev(`document.querySelectorAll('#quiz-box .qz').length`)) === 4);
+  check('debrief scores against the rubric and explains lost points', await ev(`!!document.getElementById('rb-outcome') && document.getElementById('rubric-report').innerText.includes('Where you lost points') && document.querySelectorAll('.rb-sec-d').length === 6`), await ev(`document.getElementById('rb-outcome').innerText.slice(0, 120)`));
   check('expert runs are not ranked', (await ev(`document.getElementById('debrief-game').innerText`)).includes('not ranked'));
   await click('#btn-summary'); await sleep(900);
   check('debrief links to the session summary', (await ev(`document.getElementById('sessions-body').innerText`)).includes('Three things to improve'));

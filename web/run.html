@@ -12,11 +12,13 @@
 <h2>The run over time</h2>
 <p class="muted">Coloured vertical lines mark findings (yellow minor, orange major, red critical). Grey lines are phase changes. Green bands are the ranges the simulator scores as in range. Teaching values, not clinical reference values.</p>
 <div id="charts"></div>
+<h2>Rubric score</h2><div id="rubric"></div>
 <h2>What was flagged</h2><div id="findings"></div>
 <h2>Summary</h2><div class="card"><pre id="summary"></pre></div>
 <h2>Checklist</h2><div id="check" class="check"></div>
 <h2>Quiz</h2><div id="quiz" class="card"></div>
 </main>
+<script src="rubric.js"></script>
 <script>
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -91,6 +93,7 @@ async function main() {
     $('charts').innerHTML = CHARTS.map((c, i) => `<div><b>${esc(c.title)}</b><canvas class="chart" id="c${i}"></canvas></div>`).join('');
     const redraw = () => CHARTS.forEach((c, i) => draw($('c' + i), c, doc)); redraw(); window.addEventListener('resize', redraw);
   } else $('charts').innerHTML = '<p class="muted">This run was recorded before charts were added, so it has no time series.</p>';
+  $('rubric').innerHTML = fin.rubric ? window.rubricHTML(fin.rubric) : '<p class="muted">This run was recorded before rubric scoring.</p>';
   const f = fin.findings || [];
   $('findings').innerHTML = f.length ? f.map((x) => `<div class="find ${esc(x.sev)}"><b>${esc(x.sev)}</b> at ${mmss(x.t)} (${esc(x.phase)}): ${esc(x.msg)}</div>`).join('') : '<div class="find">Nothing flagged.</div>';
   $('summary').textContent = (doc.summary && doc.summary.text) || 'No summary yet.';

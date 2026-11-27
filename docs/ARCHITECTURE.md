@@ -111,9 +111,20 @@ Lumped parameters, explicit Euler at 20 ms. Flows in L/min, volumes in mL, press
 Constants are at the top of the file. Each is a teaching approximation; `docs/ROADMAP.md` lists
 the validation work.
 
-## Grading (perfusion/scenario.py)
+## Grading (perfusion/scenario.py, perfusion/rubric.py)
 
-Deterministic. The score starts at 100 and loses 2, 6 or 20 points per minor, major or critical
-finding. Findings come from model events (air, retrograde flow, clotting, distension) and from
-scenario rules (sequence, ranges held over time, doses). Language models are never the grader of
-record; when voice is added they only map speech to callout IDs and write the debrief prose.
+Deterministic. The scenario records credits (steps done), callouts and findings (errors, each with a
+severity). `rubric.py` turns that record into a component rubric: six sections worth 100 points
+(A setup and air-free prime 30, B calculations and readiness 10, C going on bypass 15, D management on
+bypass 15, E cardioplegia delivery 15, F weaning and coming off 15). Each component earns full, half or
+zero of its points, and every lost point carries the reason, taken from the finding or missed step that
+cost it. The pass mark is 80. Any critical finding fails the run whatever the points.
+
+A component the simulator cannot observe yet (all of section A, some calculations, sample labelling,
+the venous sample) is marked not observed: it scores nothing and is left out of the total. The score is
+the share of observable points earned (55 of the 100 today), and the debrief says how many points are
+not simulated, so it is never presented as a complete examination total. Mid-case, only components
+whose phase is over are graded. Findings with no rubric component are still listed in the debrief.
+To make a component observable, add the rule and its test, then replace its `_na` entry in `COMPONENTS`.
+Language models are never the grader of record; when voice is added they only map speech to callout IDs
+and write the debrief prose.

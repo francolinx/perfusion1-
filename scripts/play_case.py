@@ -35,6 +35,10 @@ if __name__ == "__main__":
           f"MAP in range {sc['map_in_range']}%  DO2 in range {sc['do2_in_range']}%")
     for f in sc["findings"]:
         print(f"  [{f['sev']}] {f['t']/60:5.1f} min {f['phase']}: {f['msg']}")
+    rb = sc["rubric"]
+    print(f"\nrubric: {rb['outcome']}  {rb['earned']} of {rb['possible']} observable points ({rb['not_observed']} of 100 not simulated)")
+    for m in rb["missed"]:
+        print(f"  -{m['lost']} {m['id']} {m['label']}: {' '.join(m['why'])}")
     missing = [x["label"] for x in sc["checklist"] if not x["done"]]
     if missing:
         print("  not done:", "; ".join(missing))
