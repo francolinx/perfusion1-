@@ -65,3 +65,9 @@ they can be graded; each is an `_na` entry there:
 - D1b and D2, 4.5 points: sample labelling and a venous sample to draw and act on.
 - C1b, D4, F5b, 2.5 points: timers the student starts and stops instead of the simulator.
 
+## Lab script parity
+
+`docs/LAB_SESSION_NOTES.md` records how the students run the case out loud in the lab and ends with nine build
+items in priority order (timers, rhythm before weaning, weaning by volume, scored surgeon questions, the
+pre-bypass line checks, cardioplegia as ordered, sweep gas off by default, doses in millilitres, instructor
+wrenches). Several of them make rubric items observable; see the list above.
