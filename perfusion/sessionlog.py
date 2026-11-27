@@ -204,6 +204,8 @@ def summarize(doc, objectives=None):
         else:
             bits.append("nothing flagged")
         phase_text.append(dict(phase=p["phase"], title=title, start=p["start"], end=p["end"],
+                               callout=CALLOUT_LABEL[exp] if exp else None, called=(exp in p["said"]) if exp else None,
+                               findings=[dict(sev=f["sev"], msg=f["msg"], t=f["t"]) for f in p["findings"]],
                                text=f"{title} ({mmss(p['start'])} to {mmss(p['end'])}): " + "; ".join(bits) + "."))
 
     findings = fin.get("findings") or [dict(code=e["code"], sev=e["sev"], msg=e["msg"], t=e["t"], phase=e["phase"]) for e in ev if e["kind"] == "finding"]

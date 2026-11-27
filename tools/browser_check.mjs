@@ -222,6 +222,25 @@ await click('#sessions-body [data-open="0"]'); await sleep(900);
 const body = await ev(`document.getElementById('sessions-body').innerText`);
 check('session opens to summary and timeline', ['What was done', 'What went well', 'What was flagged', 'Three things to improve', 'Timeline'].every((h) => body.includes(h)));
 await tap('Escape'); await sleep(300);
+
+// ---- H info panel
+await tap('KeyH'); await sleep(900);
+const help = await ev(`({ open: !document.getElementById('help').classList.contains('hidden'), text: document.getElementById('help-body').innerText,
+  hud: [...document.querySelectorAll('#objectives li')].map((li) => li.textContent), steps: [...document.querySelectorAll('#help .steps li')].map((li) => li.textContent),
+  use: document.querySelectorAll('#help [data-panel]').length, phase: document.getElementById('phase-title').textContent })`);
+check('H opens the info panel on the current step', help.open && help.text.includes(help.phase) && help.text.includes('Do this'), help.phase);
+check('info panel steps match the HUD objectives', help.steps.length > 0 && JSON.stringify(help.steps) === JSON.stringify(help.hud), `${help.steps.length} steps`);
+check('info panel has why, use, callout, mistakes, whole case', ['Use', 'Tell the surgeon', 'Common mistakes', 'The whole case'].every((h) => help.text.includes(h)) && help.use > 0);
+const hx = await P('player.x'); await down('KeyW'); await sleep(400); await up('KeyW');
+check('keys typed while the info panel is open do not move the player', Math.abs((await P('player.x')) - hx) < 0.01);
+await click('#help [data-phase="REWARM"]'); await sleep(300);
+check('whole-case list previews another step', (await ev(`document.getElementById('help-body').innerText`)).includes('Preview: step 10'));
+await click('#help-now'); await sleep(300);
+await click('#help .where [data-panel]'); await sleep(500);
+check('Use button opens that equipment panel', !(await visible('help')) && (await visible('panel')), await ev(`document.getElementById('panel-title').textContent`));
+await tap('Escape'); await sleep(200); await tap('KeyH'); await sleep(500); await tap('Escape'); await sleep(300);
+check('Esc closes the info panel', !(await visible('help')));
+await shot('help');
 await send('Page.reload'); await sleep(3000);
 
 // ---- full expert case
@@ -236,6 +255,13 @@ if (FULL) {
   const s = await state();
   check('expert case at 20x reaches the debrief', await ev(`!document.getElementById('debrief').classList.contains('hidden')`), `${Math.round((Date.now() - t0) / 1000)} s, ${phases.size} phases`);
   check('expert score 100', s.score.score === 100, `score ${s.score.score}, callouts ${s.score.callouts.made}/${s.score.callouts.due}`);
+  const db = await ev(`document.getElementById('debrief-body').innerText`);
+  check('debrief explains the score line by line', db.includes('Why this score') && db.includes('100, nothing deducted'));
+  for (let i = 0; i < 20 && !(await ev(`document.querySelectorAll('#debrief .trend svg').length`)); i++) await sleep(250);
+  const db2 = await ev(`document.getElementById('debrief-body').innerText`);
+  check('debrief has phase by phase, improvements and the expert benchmark', ['Phase by phase', 'What went well', 'You and the expert benchmark', 'Expert autopilot'].every((h) => db2.includes(h)));
+  check('debrief has trend charts', (await ev(`document.querySelectorAll('#debrief .trend svg path[d^="M"]').length`)) === 4);
+  check('debrief phase table marks every callout said', (await ev(`document.querySelectorAll('#debrief table.phases .ok').length`)) === 13);
   await shot('debrief');
   check('debrief shows standing, leaderboard and analysis links, and a quiz', (await ev(`!!document.getElementById('btn-board') && !!document.getElementById('btn-analyze')`)) && (await ev(`document.querySelectorAll('#quiz-box .qz').length`)) === 4);
   check('debrief scores against the rubric and explains lost points', await ev(`!!document.getElementById('rb-outcome') && document.getElementById('rubric-report').innerText.includes('Where you lost points') && document.querySelectorAll('.rb-sec-d').length === 6`), await ev(`document.getElementById('rb-outcome').innerText.slice(0, 120)`));

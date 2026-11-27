@@ -121,3 +121,24 @@ canvas.trend { width: 100%; height: 90px; border-radius: 8px; display: block; }
 .rb-item small { display: block; opacity: .8; }
 .rb-item.zero { color: #ff8a8a; } .rb-item.half { color: #f0c36a; } .rb-item.not_observed, .rb-item.pending { opacity: .55; }
 .rb-n { white-space: nowrap; text-align: right; }
+/* H info panel: a drawer on the right, so the room stays visible */
+#help { background: transparent; justify-content: flex-end; align-items: stretch; pointer-events: none; }
+#help .modal { pointer-events: auto; width: min(460px, 100%); max-height: none; height: 100%; background: rgba(18, 23, 29, 0.96); }
+#help h1 { font-size: 22px; } #help h3 { margin: 14px 0 6px; font-size: 14px; color: #c5cad1; }
+#help .why { background: rgba(79, 192, 141, 0.12); border-left: 3px solid #4fc08d; padding: 6px 9px; border-radius: 4px; }
+#help .steps { margin: 0; padding-left: 22px; } #help .steps li { margin: 3px 0; }
+#help .where, #help .road { display: flex; flex-wrap: wrap; gap: 5px; }
+#help .road button { font-size: 12px; padding: 3px 7px; } #help .road .past { opacity: 0.55; }
+#help .road .cur { border-color: #4fc08d; background: rgba(79, 192, 141, 0.25); } #help .road .sel { outline: 2px solid #8ab4f8; }
+#help .said { font-size: 13px; color: #c5cad1; margin: 2px 0; } #help .said span { color: #9aa3ad; font-variant-numeric: tabular-nums; }
+#help .ok, #debrief .ok { color: #7fd6a4; font-weight: 600; } #help .due { color: #ffb84d; font-weight: 600; } #debrief .bad { color: #ff8a8a; font-weight: 600; }
+/* extended debrief */
+#debrief table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+#debrief th, #debrief td { text-align: left; padding: 4px 6px; border-bottom: 1px solid rgba(255,255,255,0.07); vertical-align: top; }
+#debrief th { color: #9aa3ad; font-weight: 500; } #debrief td.num { text-align: right; white-space: nowrap; }
+#debrief .sev { font-size: 12px; } #debrief .sev.minor { color: #e8c15f; } #debrief .sev.major { color: #f0a06a; } #debrief .sev.critical { color: #ff8a8a; }
+#debrief .improve li { margin: 4px 0; } #debrief .improve .sub { margin: 2px 0 0; font-size: 12px; }
+#debrief .scroll { overflow-x: auto; }
+.trend { margin: 4px 0; } .trend svg { width: 100%; height: auto; display: block; background: rgba(255,255,255,0.03); border-radius: 6px; }
+.trend text { fill: #9aa3ad; font-size: 9px; font-family: system-ui, sans-serif; } .trend text.tl { fill: #c5cad1; font-size: 10px; font-weight: 600; }
+.trend .band { fill: #7fd6a4; font-weight: 400; } .trend .axis { stroke: rgba(255,255,255,0.15); }

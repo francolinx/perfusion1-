@@ -8,6 +8,8 @@ import { initGame } from './game.js';
 import { recordTrend } from './panels.js';
 import { initGfx, pickTier } from './gfx.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { initHelp } from './help.js';
+import { trendCharts } from './charts.js';
 
 const $ = (id) => document.getElementById(id);
 const STATE_URL = '/api/state?c=' + Math.random().toString(36).slice(2, 10);   // per-tab id, so /dashboard can count connected clients
@@ -565,22 +567,55 @@ function updateHud(S) {
   $('clock').textContent = 'case ' + mmss(S.t);
   if (S.phase === 'DONE' && !debriefShown) showDebrief(S);
 }
+const escH = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function showDebrief(S) {
   debriefShown = true; document.exitPointerLock?.();
   const sc = S.score;
   $('debrief-body').innerHTML = `
-    <div class="row"><div><h1>Debrief</h1><p class="sub">${S.persona.name}, ${mmss(S.t)} case time, ${mmss(S.bypass_time)} on bypass, ${mmss(S.clamp_time)} clamp time</p></div>
+    <div class="row"><div><h1>Debrief</h1><p class="sub">${escH(S.persona.name)}, ${mmss(S.t)} case time, ${mmss(S.bypass_time)} on bypass, ${mmss(S.clamp_time)} clamp time</p></div>
     <div class="big">${sc.score}</div></div>
     <p>Pressure in range ${sc.map_in_range}% of bypass time. Oxygen delivery on target ${sc.do2_in_range}%. Closed-loop callouts ${sc.callouts.made} of ${sc.callouts.due}.</p>
-    ${S.session && S.session.practice ? `<div class="find minor"><b>Practice (resumed from save${S.session.resumed_from ? ': ' + S.session.resumed_from.name.replace(/[<>&]/g, '') : ''})</b>. This score is kept out of comparisons with clean start-to-finish runs.</div>` : ''}
+    ${S.session && S.session.practice ? `<div class="find minor"><b>Practice (resumed from save${S.session.resumed_from ? ': ' + escH(S.session.resumed_from.name) : ''})</b>. This score is kept out of comparisons with clean start-to-finish runs.</div>` : ''}
     ${window.rubricHTML(sc.rubric)}
+    <div id="db-more"><p class="sub">Loading the phase-by-phase review...</p></div>
     <h3>Checklist</h3>
-    <div class="check">${sc.checklist.map((c) => `<div class="${c.done ? 'yes' : 'no'}">${c.done ? 'done' : 'missed'}: ${c.label}</div>`).join('')}</div>
+    <div class="check">${sc.checklist.map((c) => `<div class="${c.done ? 'yes' : 'no'}">${c.done ? 'done' : 'missed'}: ${escH(c.label)}</div>`).join('')}</div>
     <div class="row gap"><button class="primary" id="btn-again">Run another case</button><button id="btn-summary">Session summary and timeline</button></div>`;
   $('debrief').classList.remove('hidden');
   $('btn-again').onclick = () => { $('debrief').classList.add('hidden'); $('start').classList.remove('hidden'); started = false; };
   $('btn-summary').onclick = () => savesUI.openSessions(S.session && S.session.id);
   game.debrief(S);
+  extendDebrief(S).catch(() => { const m = $('db-more'); if (m) m.innerHTML = '<p class="sub">The phase-by-phase review could not be loaded.</p>'; });
+}
+async function extendDebrief(S) {
+  const sid = S.session && S.session.id;
+  const [doc, bench] = await Promise.all([
+    sid ? fetch('/api/sessions/' + encodeURIComponent(sid)).then((r) => (r.ok ? r.json() : null)).catch(() => null) : null,
+    fetch('/api/benchmark?persona=' + encodeURIComponent(S.persona.id)).then((r) => r.json()).catch(() => null),
+  ]);
+  const sum = doc && doc.summary, sc = S.score;
+  let html = '';
+  if (sum && sum.improve) {
+    html += `<h3>Three things to improve</h3>${sum.improve.length ? `<ol class="improve">${sum.improve.map((x) => `<li>${escH(x.what)}${x.how ? `<div class="sub">${escH(x.how)}</div>` : ''}</li>`).join('')}</ol>` : '<p>Nothing to improve on this run.</p>'}`;
+    if (sum.went_well && sum.went_well.length) html += `<h3>What went well</h3><ul>${sum.went_well.map((w) => `<li>${escH(w)}</li>`).join('')}</ul>`;
+  }
+  if (sum && sum.phases && sum.phases.length) {
+    html += `<h3>Phase by phase</h3><div class="scroll"><table class="phases"><tr><th>Step</th><th>From</th><th>Took</th><th>Callout</th><th>Problems</th></tr>
+      ${sum.phases.map((p) => `<tr><td>${escH(p.title)}</td><td>${mmss(p.start)}</td><td>${p.end === null || p.end === undefined ? '-' : mmss(p.end - p.start)}</td>
+        <td>${p.callout ? (p.called ? `<span class="ok">said</span>` : `<span class="bad">missed</span>`) : '-'}</td>
+        <td>${p.findings && p.findings.length ? p.findings.map((f) => `<span class="sev ${f.sev}">${escH(f.msg)}</span>`).join('<br>') : 'none'}</td></tr>`).join('')}</table></div>`;
+  }
+  if (bench && bench.available) {
+    const mins = (s) => (s / 60).toFixed(1);
+    const rows = [['Pressure in range', sc.map_in_range + '%', bench.map_in_range + '%'],
+      ['Oxygen delivery on target', sc.do2_in_range + '%', bench.do2_in_range + '%'], ['Time on bypass (min)', mins(S.bypass_time), bench.bypass_min],
+      ['Clamp time (min)', mins(S.clamp_time), bench.clamp_min], ['Callouts', `${sc.callouts.made} of ${sc.callouts.due}`, 'all']];
+    html += `<h3>You and the expert benchmark</h3><table class="bench"><tr><th></th><th>You</th><th>Expert autopilot</th></tr>
+      ${rows.map(([k, a, b]) => `<tr><td>${k}</td><td>${escH(a)}</td><td>${escH(b)}</td></tr>`).join('')}</table>
+      <p class="sub">Expert: the autopilot on this patient, average of ${bench.runs} runs (docs/BENCHMARK.md). Training-model numbers, not clinical reference values.${S.session && S.session.practice ? ' This run is practice, so compare with care.' : ''}</p>`;
+  }
+  if (doc && doc.events) html += `<h3>Trends</h3>${trendCharts(doc.events)}`;
+  const m = $('db-more'); if (m) m.innerHTML = html || '<p class="sub">No session log for this run.</p>';
 }
 
 // ---------------------------------------------------------------- panels, input
@@ -618,7 +653,12 @@ const savesUI = initSaves({
     savesUI.toast(`Loaded "${info.name}" (${info.phase_title}, ${mmss(info.case_time)}). Paused: press 1x to carry on. This run is now practice.`, 6000);
   },
 });
-const uiBlocked = () => openId || savesUI.isOpen() || !$('start').classList.contains('hidden') || !$('debrief').classList.contains('hidden');
+const helpUI = initHelp({
+  getState: () => state.S, panelTitle: (id) => (panels[id] ? panels[id].title : id), openPanel,
+  vitals: (S) => VITALS.map(([k, f, c]) => ({ k, v: f(S), cls: c(S) })),
+});
+$('btn-help').onclick = () => helpUI.toggle();
+const uiBlocked = () => openId || savesUI.isOpen() || helpUI.isOpen() || !$('start').classList.contains('hidden') || !$('debrief').classList.contains('hidden');
 const typing = (e) => e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT';
 let lastW = 0;
 window.addEventListener('keydown', (e) => {
@@ -627,6 +667,8 @@ window.addEventListener('keydown', (e) => {
   if (e.code === 'F9') { e.preventDefault(); savesUI.toggleSaves(); return; }
   if (e.code === 'Escape' && savesUI.isOpen()) { savesUI.close(); return; }
   if (typing(e)) return;
+  if (e.code === 'Escape' && helpUI.isOpen()) { helpUI.close(); return; }
+  if (e.code === 'KeyH' && !e.repeat && !savesUI.isOpen()) { if (openId) closePanel(); helpUI.toggle(); return; }
   if (e.code === 'Space') e.preventDefault();    // Space is jump, never "click the focused button" or scroll
   if (e.code === 'Tab') { e.preventDefault(); tablet.classList.toggle('hidden'); return; }
   if (e.code === 'Escape') { closePanel(); tablet.classList.add('hidden'); return; }
