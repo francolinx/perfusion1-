@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."
 from perfusion import server
 from perfusion.guide import GUIDE, guide
 from perfusion.model import load_personas
-from perfusion.scenario import EXPECTED, PENALTY, PHASES, Case
+from perfusion.scenario import EXPECTED, PHASES, Case
 from perfusion.server import VITALS_EVERY, Session, expert_benchmark
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -36,7 +36,7 @@ class TestGuide(unittest.TestCase):
         for pid in ("standard_adult", "small_anemic"):
             case = Case(P[pid])
             g = guide(case)
-            self.assertEqual(g["penalty"], PENALTY)
+            self.assertNotIn("penalty", g)               # scoring is the rubric's (perfusion/rubric.py), not per-finding deductions
             self.assertEqual([x["id"] for x in g["phases"]], PHASES)
             for x in g["phases"]:
                 self.assertEqual(x["objectives"], case.objectives(x["id"]))
@@ -115,8 +115,9 @@ class TestDebriefData(unittest.TestCase):
             phases = [p for p in doc["summary"]["phases"] if p["callout"]]
             self.assertEqual(sum(p["called"] for p in phases), sc["callouts"]["made"], mistake)
             self.assertEqual(sum(len(p["findings"]) for p in doc["summary"]["phases"]), len(sc["findings"]), mistake)
-            # the score is exactly 100 minus the per-finding deductions the debrief shows
-            self.assertEqual(sc["score"], max(0, round(100 - sum(PENALTY[f["sev"]] for f in sc["findings"]))))
+            # the logged score is the rubric's, and the log carries the rubric report the debrief shows
+            self.assertEqual(sc["score"], sc["rubric"]["score"])
+            self.assertEqual(sc["outcome"], sc["rubric"]["outcome"])
 
     def test_expert_still_scores_100_with_the_trend_log(self):
         doc = self.run_expert()

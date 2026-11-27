@@ -256,7 +256,7 @@ if (FULL) {
   check('expert case at 20x reaches the debrief', await ev(`!document.getElementById('debrief').classList.contains('hidden')`), `${Math.round((Date.now() - t0) / 1000)} s, ${phases.size} phases`);
   check('expert score 100', s.score.score === 100, `score ${s.score.score}, callouts ${s.score.callouts.made}/${s.score.callouts.due}`);
   const db = await ev(`document.getElementById('debrief-body').innerText`);
-  check('debrief explains the score line by line', db.includes('Why this score') && db.includes('100, nothing deducted'));
+  check('debrief scoring is the rubric report, with no per-finding deductions', db.includes('Where you lost points') && !db.includes('Why this score') && !db.includes('What to fix') && !/nothing deducted|minus/i.test(db));
   for (let i = 0; i < 20 && !(await ev(`document.querySelectorAll('#debrief .trend svg').length`)); i++) await sleep(250);
   const db2 = await ev(`document.getElementById('debrief-body').innerText`);
   check('debrief has phase by phase, improvements and the expert benchmark', ['Phase by phase', 'What went well', 'You and the expert benchmark', 'Expert autopilot'].every((h) => db2.includes(h)));

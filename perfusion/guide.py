@@ -4,7 +4,7 @@ Teaching text only. It does not compute physiology and it does not affect the sc
 come from Case.objectives(), the same list the HUD shows. Wording is a teaching approximation pending review
 by a certified clinical perfusionist, not clinical guidance.
 """
-from .scenario import CALLOUTS, EXPECTED, PENALTY, PHASES, PHASE_TITLES
+from .scenario import CALLOUTS, EXPECTED, PHASES, PHASE_TITLES
 
 CALLOUT_LABEL = dict(CALLOUTS)
 
@@ -112,5 +112,5 @@ def guide(case):
                            why=g["why"], objectives=case.objectives(p), where=list(g["where"]),
                            watch=list(g["watch"]), pitfalls=list(g["pitfalls"]),
                            callout=dict(id=exp, label=CALLOUT_LABEL[exp]) if exp else None))
-    return dict(phases=phases, penalty=dict(PENALTY),
+    return dict(phases=phases,
                 note="Teaching text. Numbers are approximations from the training model, not clinical reference values.")
