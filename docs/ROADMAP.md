@@ -52,3 +52,16 @@ Still open:
 9. Face and content validity study with perfusionists, then a study of time to competency.
    Nothing published yet shows a simulator reduces the clinical cases a student needs; this
    project should measure it rather than claim it.
+
+## Rubric coverage (45 of 100 points not simulated yet)
+
+The score follows the component rubric in `perfusion/rubric.py`. These need new simulator features before
+they can be graded; each is an `_na` entry there:
+
+- Section A, 30 points: circuit setup, priming and de-airing, with the 45-minute limit on assembly and prime
+  (the inventory and setup mode). Missing the limit should fail the run, as on the rubric.
+- B1 and B2c, 4 points: the student enters body surface area, target flow and doses with units before the case.
+- B3c, C4a, E1a, E1b, 4 points: inspection steps (cannula connections, venous drainage, cardioplegia set-up).
+- D1b and D2, 4.5 points: sample labelling and a venous sample to draw and act on.
+- C1b, D4, F5b, 2.5 points: timers the student starts and stops instead of the simulator.
+

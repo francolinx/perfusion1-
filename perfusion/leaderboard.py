@@ -9,7 +9,7 @@ import os
 import re
 import time
 
-PASS_SCORE = 70
+PASS_SCORE = 80      # the rubric's pass mark (rubric.PASS_SCORE)
 LEVELS = [
     dict(n=1, title="Level 1: the routine case", personas=["standard_adult"]),
     dict(n=2, title="Level 2: size and blood", personas=["small_anemic", "obese_adult", "jehovah_witness"]),

@@ -6,6 +6,7 @@ hot shot, rewarm, clamp off, wean, come off, give volume, protamine.
 Grading is rule-based from the event log so the same run always scores the same.
 """
 from .model import Sim, Persona
+from . import rubric
 
 PHASES = ["PRE", "INITIATE", "STABILIZE", "COOL", "CLAMP_ON", "ANTEGRADE", "RETROGRADE",
           "OPERATE", "HOTSHOT", "REWARM", "CLAMP_OFF", "WEAN", "POST", "DONE"]
@@ -63,7 +64,7 @@ class Case:
     def say(self, text):
         self.lines.append(dict(t=round(self.sim.t, 1), text=text))
 
-    def find(self, code, sev, msg, once=True, cooldown=120.0):
+    def find(self, code, sev, msg, once=True, cooldown=120.0, **extra):
         key = "f_" + code
         last = self.timers.get(key)
         if last is not None and (once or self.t - last < cooldown):
@@ -73,7 +74,7 @@ class Case:
             return
         self.timers["n_" + code] = n + 1
         self.timers[key] = self.t
-        self.findings.append(dict(code=code, sev=sev, msg=msg, t=round(self.t, 1), phase=self.phase))
+        self.findings.append(dict(code=code, sev=sev, msg=msg, t=round(self.t, 1), phase=self.phase, **extra))
 
     def held(self, name, cond, seconds):
         """True once cond has been continuously true for `seconds` of sim time."""
@@ -207,6 +208,8 @@ class Case:
 
     def ph_INITIATE(self):
         s = self.sim
+        if self.frac >= 0.5 and "sweep_at_init" not in self.flags:
+            self.flags["sweep_at_init"] = s.c["sweep"] > 0      # rubric C2a: gas on as flow comes up
         if self.frac >= 0.9:
             self.credits.add("full_flow")
         if not s.c["ventilator"] and self.frac >= 0.8:
@@ -224,6 +227,9 @@ class Case:
         s = self.sim
         if s.last_abg and s.last_abg[0] > self.flags["abg_t"]:
             self.credits.add("abg")
+            self.flags.setdefault("abg1", dict(pao2=s.last_abg[1]["pao2"], paco2=s.last_abg[1]["paco2"]))
+        # what the rubric grades when the surgeon moves on: gases, pressure and oxygen delivery as they stand
+        self.flags["gas_end"] = dict(pao2=round(s.pao2), paco2=round(s.paco2), map=round(s.pa), do2i=round(s.do2i))
         ok = 35 <= s.paco2 <= 45 and 150 <= s.pao2 <= 400 and 50 <= s.pa <= 80 and s.do2i >= 280
         if self.held("h_ok", ok and "abg" in self.credits, 5):
             self.credits.add("gases_in_range")
@@ -388,7 +394,7 @@ class Case:
             near = abs(self.frac - target) <= 0.12
             if self.frac < target - 0.2 and s.pulse < 8:
                 self.find("wean_before_ejecting", "major",
-                          "Flow reduced before the heart was ejecting: wait for the pulse on the arterial trace.", once=False)
+                          "Flow reduced before the heart was ejecting: wait for the pulse on the arterial trace.", once=False, step=i)
             if self.held("h_w%d" % i, near and s.pulse >= 6 + 6 * i and s.pa >= 50, 10):
                 self.credits.add("wean_%d" % i)
                 self.flags["wean_i"] = i + 1
@@ -449,13 +455,13 @@ class Case:
         ("protamine_dose", "Protamine dose correct"),
     ]
 
-    def score(self):
-        pen = sum(PENALTY[f["sev"]] for f in self.findings)
+    def score(self, detail=True):
+        rb = rubric.evaluate(self)
         idx = PHASES.index(self.phase)
         due = [k for k in EXPECTED if PHASES.index(k) < idx]
         tot = self.in_range["total"] or 1.0
         return dict(
-            score=max(0, round(100 - pen)),
+            score=rb["score"], outcome=rb["outcome"], rubric=rb if detail else None,
             critical=sum(1 for f in self.findings if f["sev"] == "critical"),
             checklist=[dict(id=k, label=l, done=k in self.credits) for k, l in self.CHECKLIST],
             callouts=dict(made=len([k for k in due if k in self.callouts_done]), due=len(due)),
@@ -502,5 +508,5 @@ class Case:
                  expected_callout=EXPECTED.get(self.phase), callout_made=self.phase in self.callouts_done,
                  speed=self.speed, autopilot=self.autopilot,
                  persona=dict(id=self.persona.id, name=self.persona.name, weight=self.persona.weight),
-                 score=self.score())
+                 score=self.score(detail=self.phase == "DONE"))     # the full rubric report only once the case is over
         return d

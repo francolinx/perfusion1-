@@ -54,12 +54,12 @@ class TestBoard(unittest.TestCase):
         self.assertEqual([l["unlocked"] for l in lb.levels([], "Ana")], [True, False, False, False])
         rows = [lb.row_of(doc("a", score=65))]
         self.assertFalse(lb.levels(rows, "Ana")[1]["unlocked"])                 # below the pass score
-        rows = [lb.row_of(doc("a", score=80, findings=[("critical", "air_embolism")]))]
+        rows = [lb.row_of(doc("a", score=90, findings=[("critical", "air_embolism")]))]
         self.assertFalse(lb.levels(rows, "Ana")[1]["unlocked"])                 # a critical never passes
-        rows = [lb.row_of(doc("a", score=74))]
+        rows = [lb.row_of(doc("a", score=84))]
         lv = lb.levels(rows, "ana")
         self.assertEqual([l["unlocked"] for l in lv], [True, True, False, False])
-        self.assertEqual(lv[0]["best"], {"standard_adult": 74})
+        self.assertEqual(lv[0]["best"], {"standard_adult": 84})
         self.assertFalse(lb.levels(rows, "Someone else")[1]["unlocked"])
         every = {p for l in lb.LEVELS for p in l["personas"]}
         from perfusion.model import load_personas

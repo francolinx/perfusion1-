@@ -51,7 +51,7 @@ tokens per second, requests and last error, or "not running"; CPU, unified memor
 - **A four-question quiz after each run**, picked from what went wrong in that run.
 - **Graphics tiers**: image-based lighting, soft shadows, bloom and ambient occlusion on desktop GPUs,
   stepping down by itself on slower machines. `?gfx=high`, `?gfx=med` or `?gfx=low` pins a tier.
-- **Debrief**: score, checklist, time in range for pressure and oxygen delivery, callouts made,
+- **Debrief**: rubric score by section with the reason for every lost point (pass at 80, critical event fails), checklist, time in range for pressure and oxygen delivery, callouts made,
   and every finding with its timestamp. The sequencing error from the lab video (bringing flow
   back up before the clamp is off) is one of the things it catches.
 

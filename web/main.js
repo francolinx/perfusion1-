@@ -553,7 +553,7 @@ function setVoiceLabel() { const b = $('btn-voice'); if (b) b.textContent = 'Voi
 setVoiceLabel();
 function updateHud(S) {
   $('phase-title').textContent = S.phase_title;
-  const chip = $('score-chip'); chip.textContent = S.score.score; chip.className = 'chip' + (S.score.score < 70 ? ' bad' : S.score.score < 90 ? ' mid' : '');
+  const chip = $('score-chip'); chip.textContent = S.score.score; chip.className = 'chip' + (S.score.score < 80 ? ' bad' : S.score.score < 90 ? ' mid' : '');
   const line = S.lines.length ? S.lines[S.lines.length - 1].text : '';
   $('surgeon-line').textContent = line ? 'Surgeon: ' + line : '';
   if (S.n_lines !== lastLineN) { if (lastLineN >= 0 || started) { drawBubble(line); if (started && S.n_lines > lastLineN) say(line); } else drawBubble(line); lastLineN = S.n_lines; }
@@ -573,8 +573,7 @@ function showDebrief(S) {
     <div class="big">${sc.score}</div></div>
     <p>Pressure in range ${sc.map_in_range}% of bypass time. Oxygen delivery on target ${sc.do2_in_range}%. Closed-loop callouts ${sc.callouts.made} of ${sc.callouts.due}.</p>
     ${S.session && S.session.practice ? `<div class="find minor"><b>Practice (resumed from save${S.session.resumed_from ? ': ' + S.session.resumed_from.name.replace(/[<>&]/g, '') : ''})</b>. This score is kept out of comparisons with clean start-to-finish runs.</div>` : ''}
-    <h3>What to fix</h3>
-    ${sc.findings.length ? sc.findings.map((f) => `<div class="find ${f.sev}"><b>${f.sev}</b> at ${mmss(f.t)}: ${f.msg}</div>`).join('') : '<div class="find">Nothing flagged. Clean run.</div>'}
+    ${window.rubricHTML(sc.rubric)}
     <h3>Checklist</h3>
     <div class="check">${sc.checklist.map((c) => `<div class="${c.done ? 'yes' : 'no'}">${c.done ? 'done' : 'missed'}: ${c.label}</div>`).join('')}</div>
     <div class="row gap"><button class="primary" id="btn-again">Run another case</button><button id="btn-summary">Session summary and timeline</button></div>`;

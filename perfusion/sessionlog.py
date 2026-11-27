@@ -99,7 +99,7 @@ class SessionLog:
                         case_time_end=round(case.t, 1),
                         final=dict(phase=case.phase, score=sc["score"], critical=sc["critical"], checklist=sc["checklist"],
                                    callouts=sc["callouts"], map_in_range=sc["map_in_range"], do2_in_range=sc["do2_in_range"],
-                                   findings=sc["findings"]))
+                                   findings=sc["findings"], outcome=sc["outcome"], rubric=sc["rubric"]))
         self.add("end", case.t, reason=reason, score=sc["score"])
         self.doc["summary"] = summarize(self.doc, objectives=case.objectives)
         self.flush(force=True)

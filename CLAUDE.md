@@ -6,7 +6,7 @@ Open 3D cardiopulmonary bypass trainer. Read `README.md`, `docs/ARCHITECTURE.md`
 ## Commands
 
 - Run: `./run.sh` (serves http://localhost:8080; `PORT=9000 ./run.sh` to change port)
-- Test: `./run.sh --test` (the gate: all tests pass and the expert case scores 100; writes `logs/last_test.json`)
+- Test: `./run.sh --test` (the gate: all tests pass and the expert case scores 100 on the rubric; writes `logs/last_test.json`)
   or `python3 -m unittest discover -s tests -v`
 - Dashboard: `http://localhost:9000/dashboard` (simulator, AI services, machine, build)
 - Browser check (headless, no window, needs Node 22 and Chrome): `node tools/browser_check.mjs --url http://localhost:9000 --gpu`
@@ -38,7 +38,9 @@ Open 3D cardiopulmonary bypass trainer. Read `README.md`, `docs/ARCHITECTURE.md`
 
 - Patient + circuit model: `perfusion/model.py` (constants at the top, `Sim.step`)
 - Patients: `perfusion/personas.json`
-- Case flow, surgeon script, grading rules: `perfusion/scenario.py`
+- Case flow, surgeon script, grading rules: `perfusion/scenario.py`; rubric that turns them into the score
+  (sections, points, reasons for lost points, pass at 80): `perfusion/rubric.py`, report shared by the debrief and
+  run page: `web/rubric.js`
 - Expert policy: `perfusion/autopilot.py`
 - Server and API: `perfusion/server.py`
 - 3D room, HUD, input: `web/main.js`; equipment control panels: `web/panels.js`
