@@ -178,6 +178,14 @@ check('drug cart has the clamp-off drugs and a defibrillator', ['Lidocaine 100 m
 await ev(`[...document.querySelectorAll('#panel button')].find((b) => b.textContent === 'Lidocaine 100 mg').click()`); await sleep(600);
 check('giving a drug from the cart reaches the model', 'lidocaine' in ((await state()).drugs || {}));
 await tap('Escape'); await sleep(200);
+// ---- weaning by volume (docs/LAB_SESSION_NOTES.md item 3)
+await ev(`window.P1.openPanel('venous')`); await sleep(400);
+const venBtns = await ev(`[...document.querySelectorAll('#panel button')].map((b) => b.textContent)`);
+check('venous panel has bites and take-back', ['Give a 100 mL bite', 'Give a 200 mL bite', 'Take back 100 mL', 'Take back 200 mL'].every((t) => venBtns.includes(t)) &&
+  (await ev(`document.getElementById('panel-body').innerText`)).includes('Dicrotic notch'));
+await ev(`[...document.querySelectorAll('#panel button')].find((b) => b.textContent === 'Take back 100 mL').click()`); await sleep(300);
+check('take back reaches the model', (await state()).taking_back > 0, `${(await state()).taking_back} mL to go`);
+await tap('Escape'); await sleep(200);
 // ---- patient monitor (docs/LAB_FIDELITY.md 2)
 const mon = await ev(`(() => { const c = window.P1.monitor.canvas, d = c.getContext('2d').getImageData(10, 98 + 2 * 122 + 22, 760, 92).data; let pa = 0;
   for (let i = 0; i < d.length; i += 4) if (d[i] > 200 && d[i + 1] > 180 && d[i + 2] < 120) pa++; return { pa, shared: window.P1.monitor.shared() }; })()`);

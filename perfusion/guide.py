@@ -91,6 +91,8 @@ GUIDE = {
         where=["meds", "vent", "venous", "pump", "timers", "talk"],
         watch=["MAP", "CVP", "Flow L/min"],
         pitfalls=["Coming down from full flow with no rhythm or no pulse: that fails the run.", "Shocking a flat line.",
+                  "Filling with big boluses instead of bites, or coming down before the notch shows.",
+                  "Overfilling: CVP over 14. Take volume back when the surgeon asks.", "Skipping a hold level.",
                   "Weaning with the ventilator still off.", "Stepping down before there is a pulse.",
                   "Coming off with the arterial line still open."]),
     "POST": dict(

@@ -285,6 +285,18 @@ class Autopilot:
         if s.p.ef < 0.7:
             self.set("epi", True)
         i = self.case.flags["wean_i"]
+        if self.case.flags.get("tb_ask") is not None and self.once("tb_%.0f" % self.case.flags["tb_ask"]):
+            self.act(type="take_back", ml=200)              # "take 200 back"
+        if i == 0 and not self.case.flags.get("wean_started"):
+            # fill at full flow: venous line partly clamped, bites of 150 mL, until the dicrotic notch is clear
+            if s.c["ven_occl"] < 0.3:
+                self.set("ven_occl", 0.3)
+            if s.pulse < 11:
+                self.flow_to(tf)
+                if s.cvp < 11 and s.transfuse_left <= 0 and self.case.t - self.mem.get("bite", -99) > 8:
+                    self.mem["bite"] = self.case.t
+                    self.act(type="transfuse", ml=150)
+                return
         if i < 3:
             target = self.case.WEAN_STEPS[i][0]
             # fill the heart first by restricting venous return, then come down

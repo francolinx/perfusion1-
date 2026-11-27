@@ -5,7 +5,7 @@ checks, cool, cross-clamp, antegrade and retrograde cardioplegia, maintenance,
 hot shot, rewarm, clamp off, wean, come off, give volume, protamine.
 Grading is rule-based from the event log so the same run always scores the same.
 """
-from .model import Sim, Persona, DEFIB_J, DRUGS
+from .model import Sim, Persona, DEFIB_J, DRUGS, NOTCH_PULSE
 from . import rubric
 
 PHASES = ["PRE", "INITIATE", "STABILIZE", "COOL", "CLAMP_ON", "ANTEGRADE", "RETROGRADE",
@@ -38,6 +38,11 @@ CLOCK_TITLES = dict(bypass="Bypass", clamp="Cross-clamp", cp="Since cardioplegia
 TIME_TOLERANCE = 60.0      # seconds a reported time may be off and still count
 CALCIUM_WAIT = 600.0       # calcium about 10 minutes after the clamp comes off, unless the heart is flat
 NO_PULSE = 3.0             # arterial pulse pressure below this: no pulsatile pressure to wean on
+# Weaning by volume (docs/LAB_SESSION_NOTES.md item 3). Teaching approximations from the lab.
+BITE_MAX = 250.0           # mL given at once while weaning; the lab fills in bites of 100 to 200
+CVP_MAX = 14.0             # the surgeon wants CVP no higher than about this while filling
+WEAN_MAP = (75, 80)        # mean pressure the surgeon wants while filling
+STEP_NAMES = ("three-quarter", "half", "quarter")
 REPORTS = dict(clamp_time="clamp", bypass_time="bypass", cp_time="cp")
 
 
@@ -188,7 +193,11 @@ class Case:
                 self.find("transfusion_refused", "critical", "Red cells given to a patient who refused blood products.")
             s.add_volume(a.get("ml", 250), a.get("kind", "crystalloid"))
         elif kind == "transfuse":
-            s.transfuse(a.get("ml", 100))
+            ml = float(a.get("ml", 100))
+            if self.phase == "WEAN" and s.transfuse_left + ml > BITE_MAX:
+                self.find("big_bite", "minor", f"Gave {s.transfuse_left + ml:.0f} mL at once while weaning: fill in bites of "
+                          "100 to 200 mL and watch the arterial trace between them.", once=False, cooldown=60)
+            s.transfuse(ml)
             self.flags["tx_given"] = self.flags.get("tx_given", 0) + a.get("ml", 100)
         elif kind == "measure":
             s.measure(a.get("what", "abg"))
@@ -199,6 +208,12 @@ class Case:
                 self.callouts_done.add(self.phase)
             elif EXPECTED.get(self.prev_phase) == cid and self.t - self.phase_t0 < 20:
                 self.callouts_done.add(self.prev_phase)
+        elif kind == "take_back":
+            ml = float(a.get("ml", 200))
+            if not 50 <= ml <= 500:
+                raise ValueError("take back between 50 and 500 mL")
+            s.take_back(ml)
+            self.flags.pop("tb_ask", None)
         elif kind == "drug":
             name = a.get("name")
             if name not in DRUGS:
@@ -506,7 +521,8 @@ class Case:
             self.ask("clamp", "What was the clamp time?")
         if self.flags.get("after_unclamp") and not s.xclamp:
             self.flags["wean_i"] = 0
-            self.say("Get the heart ready to wean: I want a rhythm and a pulse first. Then three-quarter flow, and give it some volume.")
+            self.say("Get the heart ready to wean: I want a rhythm and a pulse first. Partly clamp the venous line and fill "
+                     "in bites of 100 to 200 until you see the notch, CVP no more than 14, pressure 75 to 80. Then three-quarter flow.")
             self.goto("WEAN")
 
     WEAN_STEPS = [(0.75, "Half flow."), (0.5, "Quarter flow."), (0.25, "Looking stable. Come off bypass.")]
@@ -526,6 +542,20 @@ class Case:
             elif s.pulse < NO_PULSE:
                 self.find("wean_no_pulse", "critical",
                           "Started weaning with no pulsatile pressure: fill the heart until it ejects before coming down.")
+            elif not s.notch:
+                self.find("wean_no_notch", "minor",
+                          "Came down from full flow before the dicrotic notch showed on the arterial trace: fill another bite first.")
+        # filling: the surgeon wants CVP under 14 and pressure about 75 to 80, and asks for volume back when too full
+        if self.held("h_cvp_hi", s.cvp > CVP_MAX, 10) and not self.flags.get("tb_ask"):
+            self.flags["tb_ask"] = self.t
+            self.say("The heart is getting too full. Take 200 back.")
+        if s.cvp <= CVP_MAX - 2:
+            self.flags.pop("tb_ask", None)
+        if self.held("h_overfull", s.cvp > CVP_MAX, 45):
+            self.find("overfilled", "minor", f"CVP stayed over {CVP_MAX:.0f} while weaning: the heart was overfilled. Take volume back when asked.")
+        if self.held("h_wmap", s.pa > WEAN_MAP[1] + 15, 20) and not self.flags.get("wmap_nag"):
+            self.flags["wmap_nag"] = True
+            self.say(f"Pressure is high. I want {WEAN_MAP[0]} to {WEAN_MAP[1]}: come down on the flow or take some volume back.")
         if s.c["ventilator"]:
             self.credits.add("vent_on")
         elif self.frac < 0.7:
@@ -536,6 +566,12 @@ class Case:
             target, line = self.WEAN_STEPS[i]
             near = abs(self.frac - target) <= 0.12
             no_start = any(f["code"] in ("wean_no_rhythm", "wean_no_pulse") for f in self.findings)
+            skip = self.frac < target - 0.18 and s.pulse >= NOTCH_PULSE and not self.flags.get("skipped_%d" % i)
+            if self.held("h_skip%d" % i, skip, 5):                                  # once per step
+                self.flags["skipped_%d" % i] = True
+                self.find("wean_skipped_step", "minor", f"Went below {STEP_NAMES[i]} flow without holding it: hold and assess at each level.",
+                          once=False, step=i)
+                self.say(f"I asked for {STEP_NAMES[i]} flow. Come back up and hold it there.")
             if self.frac < target - 0.2 and s.pulse < 8 and not no_start:     # one error, one penalty
                 self.find("wean_before_ejecting", "major",
                           "Flow reduced before the heart was ejecting: wait for the pulse on the arterial trace.", once=False, step=i)
@@ -644,7 +680,10 @@ class Case:
             "CLAMP_OFF": ["Give lidocaine and magnesium (esmolol if the surgeon wants it)",
                           "Drop flow to under a third", "Stay down until you hear 'clamp is off'", "Then back to full flow",
                           "Stop the clamp timer and give the clamp time"],
-            "WEAN": ["Look at the ECG: fibrillating, ask for the defibrillator (10 J, then 20, 30); flat, give calcium. Never shock a flat line",
+            "WEAN": ["Partly clamp the venous line and fill in bites of 100 to 200 mL until the dicrotic notch shows (400 to 600 mL is usually enough)",
+                     "CVP no more than 14, pressure 75 to 80; take volume back if the surgeon asks",
+                     "Hold at three-quarter, half and quarter flow",
+                     "Look at the ECG: fibrillating, ask for the defibrillator (10 J, then 20, 30); flat, give calcium. Never shock a flat line",
                      "Do not come down from full flow without a rhythm and a pulse",
                      "Calcium about 10 minutes after the clamp came off",
                      "Ventilator back on", "Partly clamp the venous line to fill the heart",
