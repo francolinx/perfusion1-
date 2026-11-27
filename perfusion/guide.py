@@ -81,16 +81,17 @@ GUIDE = {
     "CLAMP_OFF": dict(
         why="The clamp comes off and blood reaches the heart again. Flow comes down for the moment of release, "
             "then goes back up.",
-        where=["pump", "timers", "talk"],
+        where=["meds", "pump", "timers", "talk"],
         watch=["Flow L/min", "MAP"],
         pitfalls=["Bringing flow back up before the surgeon says the clamp is off "
                   "(the sequencing error from the lab video)."]),
     "WEAN": dict(
         why="Weaning hands the work back to the heart step by step: the lungs go back on, the heart is filled, "
             "and pump flow comes down as the heart shows it can take over.",
-        where=["vent", "venous", "pump", "timers", "talk"],
+        where=["meds", "vent", "venous", "pump", "timers", "talk"],
         watch=["MAP", "CVP", "Flow L/min"],
-        pitfalls=["Weaning with the ventilator still off.", "Stepping down before there is a pulse.",
+        pitfalls=["Coming down from full flow with no rhythm or no pulse: that fails the run.", "Shocking a flat line.",
+                  "Weaning with the ventilator still off.", "Stepping down before there is a pulse.",
                   "Coming off with the arterial line still open."]),
     "POST": dict(
         why="Off bypass: give back volume from the circuit as needed, then reverse the heparin. Suckers must be "

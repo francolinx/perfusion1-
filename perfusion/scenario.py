@@ -5,7 +5,7 @@ checks, cool, cross-clamp, antegrade and retrograde cardioplegia, maintenance,
 hot shot, rewarm, clamp off, wean, come off, give volume, protamine.
 Grading is rule-based from the event log so the same run always scores the same.
 """
-from .model import Sim, Persona
+from .model import Sim, Persona, DEFIB_J, DRUGS
 from . import rubric
 
 PHASES = ["PRE", "INITIATE", "STABILIZE", "COOL", "CLAMP_ON", "ANTEGRADE", "RETROGRADE",
@@ -36,6 +36,8 @@ PENALTY = dict(minor=2, major=6, critical=20)
 CLOCKS = ("bypass", "clamp", "cp")
 CLOCK_TITLES = dict(bypass="Bypass", clamp="Cross-clamp", cp="Since cardioplegia")
 TIME_TOLERANCE = 60.0      # seconds a reported time may be off and still count
+CALCIUM_WAIT = 600.0       # calcium about 10 minutes after the clamp comes off, unless the heart is flat
+NO_PULSE = 3.0             # arterial pulse pressure below this: no pulsatile pressure to wean on
 REPORTS = dict(clamp_time="clamp", bypass_time="bypass", cp_time="cp")
 
 
@@ -197,6 +199,28 @@ class Case:
                 self.callouts_done.add(self.phase)
             elif EXPECTED.get(self.prev_phase) == cid and self.t - self.phase_t0 < 20:
                 self.callouts_done.add(self.prev_phase)
+        elif kind == "drug":
+            name = a.get("name")
+            if name not in DRUGS:
+                raise ValueError(f"unknown drug {name}")
+            flat = s.rhythm == "asystole" and s.reperf_t is not None      # reperfused and still flat
+            if name == "calcium" and not flat:
+                off = self.flags.get("clamp_off_t")
+                if off is None or self.t - off < CALCIUM_WAIT:
+                    when = "before the clamp came off" if off is None else f"{(self.t - off) / 60:.0f} minutes after the clamp came off"
+                    self.find("calcium_early", "minor", f"Calcium was given {when}: wait about 10 minutes unless the heart is flat.")
+            s.give_drug(name)
+        elif kind == "defib":
+            j = a.get("joules", 20)
+            if j not in DEFIB_J:
+                raise ValueError(f"defibrillator energy must be one of {DEFIB_J}")
+            if s.rhythm != "vf":
+                what = "a flat line" if s.rhythm == "asystole" else f"a heart in {s.rhythm} rhythm"
+                self.find("shock_no_vf", "major", f"Asked for a shock on {what}: only fibrillation is shocked.", once=False)
+                self.say("That is not a shockable rhythm. I am not shocking that.")
+            else:
+                ok = s.defibrillate(j)
+                self.say(f"Shocking at {j}. " + ("Sinus rhythm." if ok else "Still fibrillating."))
         elif kind == "timer":
             self.clock_op(a.get("which"), a.get("op"))
         elif kind == "report":
@@ -342,6 +366,8 @@ class Case:
                 if self.t - self.flags["down_t"] >= 6.0:
                     s.xclamp = apply
                     self.flags[done_flag] = True
+                    if not apply:
+                        self.flags["clamp_off_t"] = self.t
                     self.credits.add("flow_down_on" if apply else "flow_down_off")
                     self.say("Clamp is on. Come back up." if apply else "Clamp is off. Flow back up.")
             else:
@@ -354,6 +380,8 @@ class Case:
                 if self.t - self.phase_t0 > 45 and "down_t" not in self.flags:
                     s.xclamp = apply
                     self.flags[done_flag] = True
+                    if not apply:
+                        self.flags["clamp_off_t"] = self.t
                     self.find("clamp_full_flow", "major",
                               "Cross-clamp " + ("applied" if apply else "removed") + " at full flow: aortic injury risk.")
                     self.say("I could not wait. Clamp is " + ("on." if apply else "off."))
@@ -450,25 +478,54 @@ class Case:
             self.say("Ready for the clamp to come off. Flow down.")
             self.goto("CLAMP_OFF")
 
+    def _rhythm_rules(self):
+        """After reperfusion: the surgeon prompts on fibrillation or a flat heart, and shocks if left too long."""
+        s = self.sim
+        if s.reperf_t is None:
+            return
+        if self.held("r_vf", s.rhythm == "vf", 30) and not self.flags.get("vf_nag"):
+            self.flags["vf_nag"] = True
+            self.say("It is fibrillating. Do you want the paddles?")
+        if s.rhythm != "vf":
+            self.flags.pop("vf_nag", None)
+        if self.held("r_vf_long", s.rhythm == "vf", 120):
+            self.timers.pop("r_vf_long", None)
+            self.find("vf_untreated", "major", "Fibrillation went untreated for two minutes: call for the defibrillator.")
+            s.defibrillate(30)
+            self.say("I am shocking it myself. Thirty joules.")
+        if self.held("r_flat", s.rhythm == "asystole", 45) and not self.flags.get("flat_nag"):
+            self.flags["flat_nag"] = True
+            self.say("The heart is flat. What do you want to give?")
+
     def ph_CLAMP_OFF(self):
         s = self.sim
-        if s.rhythm == "vf" and s.vf_timer > 15:
-            s.defibrillate()
-            self.say("Fibrillating. Shocking. Sinus rhythm.")
+        self._rhythm_rules()
         if not self.flags.get("after_unclamp") and self._clamp_dance(False):
             self.flags["after_unclamp"] = True
         if not s.xclamp and self.flags.get("clamp_on_t") is not None and not self.flags.get("asked_clamp"):
             self.ask("clamp", "What was the clamp time?")
-        if self.flags.get("after_unclamp") and s.rhythm == "sinus" and not s.xclamp:
+        if self.flags.get("after_unclamp") and not s.xclamp:
             self.flags["wean_i"] = 0
-            self.say("Let's wean. Come down to three-quarter flow and give the heart some volume.")
+            self.say("Get the heart ready to wean: I want a rhythm and a pulse first. Then three-quarter flow, and give it some volume.")
             self.goto("WEAN")
 
     WEAN_STEPS = [(0.75, "Half flow."), (0.5, "Quarter flow."), (0.25, "Looking stable. Come off bypass.")]
 
     def ph_WEAN(self):
         s = self.sim
+        self._rhythm_rules()
         i = self.flags["wean_i"]
+        if not self.flags.get("wean_started") and self.frac < 0.85:
+            self.flags["wean_started"] = True        # flow is coming down: this is where weaning starts
+            missing = [DRUGS[d] for d in ("lidocaine", "magnesium") if d not in s.drugs]
+            if missing:
+                self.find("drugs_missing", "minor", "Started weaning without " + " and ".join(missing).lower() + ".")
+            if s.rhythm not in ("sinus", "brady"):
+                self.find("wean_no_rhythm", "critical", "Started weaning with no rhythm: the heart was "
+                          + ("flat." if s.rhythm == "asystole" else "fibrillating."))
+            elif s.pulse < NO_PULSE:
+                self.find("wean_no_pulse", "critical",
+                          "Started weaning with no pulsatile pressure: fill the heart until it ejects before coming down.")
         if s.c["ventilator"]:
             self.credits.add("vent_on")
         elif self.frac < 0.7:
@@ -478,7 +535,8 @@ class Case:
         if i < 3:
             target, line = self.WEAN_STEPS[i]
             near = abs(self.frac - target) <= 0.12
-            if self.frac < target - 0.2 and s.pulse < 8:
+            no_start = any(f["code"] in ("wean_no_rhythm", "wean_no_pulse") for f in self.findings)
+            if self.frac < target - 0.2 and s.pulse < 8 and not no_start:     # one error, one penalty
                 self.find("wean_before_ejecting", "major",
                           "Flow reduced before the heart was ejecting: wait for the pulse on the arterial trace.", once=False, step=i)
             if self.held("h_w%d" % i, near and s.pulse >= 6 + 6 * i and s.pa >= 50, 10):
@@ -583,9 +641,13 @@ class Case:
                         "Speed up time with the clock control if you like"],
             "HOTSHOT": ["Select the hot shot solution", "Deliver 500 mL, then stop"],
             "REWARM": ["Warm the water, at most 10 C above blood and blood never over 37.5 C", "Reach 36 C"],
-            "CLAMP_OFF": ["Drop flow to under a third", "Stay down until you hear 'clamp is off'", "Then back to full flow",
+            "CLAMP_OFF": ["Give lidocaine and magnesium (esmolol if the surgeon wants it)",
+                          "Drop flow to under a third", "Stay down until you hear 'clamp is off'", "Then back to full flow",
                           "Stop the clamp timer and give the clamp time"],
-            "WEAN": ["Ventilator back on", "Partly clamp the venous line to fill the heart",
+            "WEAN": ["Look at the ECG: fibrillating, ask for the defibrillator (10 J, then 20, 30); flat, give calcium. Never shock a flat line",
+                     "Do not come down from full flow without a rhythm and a pulse",
+                     "Calcium about 10 minutes after the clamp came off",
+                     "Ventilator back on", "Partly clamp the venous line to fill the heart",
                      "Step flow down as the surgeon asks, once you see a pulse",
                      "To come off: venous clamp shut, flow to zero, arterial line clamped", "Stop the bypass timer"],
             "POST": ["Give the bypass time", "Transfuse 100 mL at a time from the reservoir", "Suckers off, then protamine: 1 mg per 100 units of heparin"],
@@ -600,6 +662,7 @@ class Case:
                  lines=self.lines[-6:], n_lines=len(self.lines), objectives=self.objectives(),
                  expected_callout=EXPECTED.get(self.phase), callout_made=self.phase in self.callouts_done,
                  speed=self.speed, autopilot=self.autopilot,
+                 drugs={k: v[-1] for k, v in self.sim.drugs.items()}, defib_j=list(DEFIB_J),
                  clocks={k: dict(s=round(self.clock(k), 1), run=self.clocks[k]["run"]) for k in CLOCKS},
                  asked=[k for k in CLOCKS if self.flags.get("ask_" + k) is not None],
                  persona=dict(id=self.persona.id, name=self.persona.name, weight=self.persona.weight,

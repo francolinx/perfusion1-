@@ -106,7 +106,9 @@ Ordered by how often it came up in the runs. Each needs its rule, its test and, 
    surgeon asks for clamp time, time since the last dose and bypass time; graded against the true times.*
 2. **Rhythm before weaning**: after the clamp comes off the heart may be flat, fibrillating or in sinus rhythm.
    Drugs (lidocaine, magnesium, esmolol, calcium at 10 minutes) and a defibrillator the student calls for.
-   Starting to wean with no rhythm or no pulse is a critical finding.
+   Starting to wean with no rhythm or no pulse is a critical finding. *Built: reperfusion rhythm rules, `drug`
+   and `defib` actions (10, 20, 30 J), surgeon prompts, critical `wean_no_rhythm` / `wean_no_pulse`; drug
+   timing and shock handling scored under rubric F1c.*
 3. **Weaning by volume**: fill in bites, watch for the dicrotic notch, the surgeon asks for volume back,
    CVP and pressure targets, holds at three-quarter, half and quarter flow.
 4. **Surgeon questions that are scored**: height and weight, high and low flow, heparin dose, hematocrit after

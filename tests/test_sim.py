@@ -292,6 +292,125 @@ class TestStudentTimers(unittest.TestCase):
         self.assertEqual(case.snapshot()["clocks"]["clamp"]["run"], False)
 
 
+def reperfuse(pid="standard_adult", hot_shot=500.0, temp=36.5, k=4.5):
+    """A sim whose clamp has just come off after cardioplegia; one step decides the rhythm it comes back in."""
+    s = Sim(P[pid])
+    s.cp_total, s.hot_shot_ml, s.temp, s.k = 1300.0, hot_shot, temp, k
+    s.rhythm, s.arrest, s.xclamp = "asystole", 0.4, False
+    s.step()
+    return s
+
+
+def case_at_wean():
+    """An expert run stopped as weaning is announced (restored fresh for each test)."""
+    if not hasattr(case_at_wean, "state"):
+        from perfusion.saves import capture
+        from perfusion.autopilot import Autopilot
+        c = Case(P["standard_adult"]); pilot = Autopilot(c)
+        while not (c.phase == "WEAN" and c.sim.rhythm == "sinus" and c.sim.c["ventilator"]):
+            pilot.step(); c.tick()
+        assert not c.flags.get("wean_started")
+        case_at_wean.state = capture(c, pilot)
+    from perfusion.saves import restore
+    import copy
+    return restore(copy.deepcopy(case_at_wean.state))[0]
+
+
+def drop_flow(c, rpm=1900, seconds=8):
+    c.sim.set("rpm_set", rpm)
+    for _ in range(int(seconds / c.sim.DT)):
+        c.tick()
+
+
+class TestRhythmBeforeWeaning(unittest.TestCase):
+    """docs/LAB_SESSION_NOTES.md item 2: the heart may come back flat, fibrillating or in sinus rhythm."""
+
+    def test_reperfusion_rhythm_is_decided_by_conduct_potassium_and_patient(self):
+        self.assertEqual(reperfuse().rhythm, "sinus")
+        s = reperfuse(hot_shot=0.0)
+        self.assertEqual(s.rhythm, "vf"); self.assertIn("vf", [e["code"] for e in s.events])
+        self.assertEqual(reperfuse(temp=33.0).rhythm, "vf")
+        self.assertEqual(reperfuse(k=6.0).rhythm, "asystole")             # hyperkalemic heart comes back flat
+        self.assertEqual(reperfuse("low_ef").rhythm, "vf")                  # this patient's heart fibrillates
+        self.assertEqual(reperfuse().reperf_rhythm, reperfuse().reperf_rhythm)   # deterministic
+
+    def test_shock_energy_and_antiarrhythmics(self):
+        s = reperfuse(hot_shot=0.0)
+        self.assertFalse(s.defibrillate(10)); self.assertEqual(s.rhythm, "vf")   # 10 J is not enough on its own
+        self.assertTrue(s.defibrillate(20)); self.assertEqual(s.rhythm, "sinus")
+        s = reperfuse(hot_shot=0.0); s.give_drug("lidocaine"); s.give_drug("magnesium")
+        self.assertTrue(s.defibrillate(10))                                    # lidocaine and magnesium lower the energy
+        s = reperfuse(temp=33.0)
+        self.assertFalse(s.defibrillate(20)); self.assertTrue(s.defibrillate(30))   # a cold heart needs more
+        s = reperfuse(k=6.0)
+        self.assertFalse(s.defibrillate(30)); self.assertEqual(s.rhythm, "asystole")   # a flat line does not convert
+
+    def test_flat_heart_restarts_with_calcium_or_epinephrine_not_by_itself(self):
+        s = reperfuse(k=6.0); settle(s, 60)
+        self.assertEqual(s.rhythm, "asystole")
+        s.give_drug("calcium"); settle(s, 25); self.assertEqual(s.rhythm, "asystole")
+        settle(s, 10); self.assertEqual(s.rhythm, "sinus")
+        s = reperfuse(k=6.0); s.set("epi", True); settle(s, 65)
+        self.assertEqual(s.rhythm, "sinus")
+        with self.assertRaises(ValueError):
+            s.give_drug("aspirin")
+
+    def test_shocking_a_flat_line_is_refused_and_scored(self):
+        c = case_at_wean(); c.sim.rhythm, c.sim.reperf_t = "asystole", c.t
+        c.action(dict(type="defib", joules=20))
+        self.assertEqual(c.sim.rhythm, "asystole")
+        self.assertIn("not a shockable rhythm", c.lines[-1]["text"])
+        self.assertEqual(c.findings[-1]["code"], "shock_no_vf")
+        with self.assertRaises(ValueError):
+            c.action(dict(type="defib", joules=200))
+
+    def test_calcium_waits_ten_minutes_unless_the_heart_is_flat(self):
+        c = case_at_wean(); off = c.flags["clamp_off_t"]
+        c.action(dict(type="drug", name="calcium"))
+        self.assertEqual(c.findings[-1]["code"], "calcium_early")
+        c = case_at_wean(); c.sim.rhythm = "asystole"                      # reperfused and flat
+        c.action(dict(type="drug", name="calcium"))
+        self.assertNotIn("calcium_early", [f["code"] for f in c.findings])
+        c = case_at_wean(); c.flags["clamp_off_t"] = off - 601
+        c.action(dict(type="drug", name="calcium"))
+        self.assertNotIn("calcium_early", [f["code"] for f in c.findings])
+
+    def test_weaning_without_a_rhythm_is_critical(self):
+        c = case_at_wean(); c.sim.rhythm = "vf"
+        drop_flow(c)
+        codes = [f["code"] for f in c.findings]
+        self.assertIn("wean_no_rhythm", codes)
+        self.assertNotIn("wean_before_ejecting", codes)                    # one error, one penalty
+        self.assertEqual(c.score()["rubric"]["outcome"], "FAIL")
+
+    def test_weaning_without_a_pulse_is_critical(self):
+        c = case_at_wean(); c.sim.set("ven_occl", 0.0)                      # heart left empty: no pulsatile pressure
+        settle(c.sim, 20)
+        self.assertLess(c.sim.pulse, 3)
+        drop_flow(c)
+        self.assertIn("wean_no_pulse", [f["code"] for f in c.findings])
+
+    def test_weaning_needs_lidocaine_and_magnesium(self):
+        c = case_at_wean(); c.sim.drugs = {}
+        c.sim.set("ven_occl", 0.9); settle(c.sim, 40)
+        drop_flow(c, rpm=2600)
+        f = [f for f in c.findings if f["code"] == "drugs_missing"]
+        self.assertTrue(f); self.assertIn("lidocaine 100 mg and magnesium 2 g", f[0]["msg"])
+        self.assertNotIn("wean_no_pulse", [x["code"] for x in c.findings])
+        f1c = rubric_items(c)["F1c"]
+        self.assertEqual(f1c["status"], "half"); self.assertIn(f[0]["msg"], f1c["why"])   # scored under the clamp-off sequence
+
+    def test_untreated_fibrillation_is_shocked_by_the_surgeon_and_scored(self):
+        c = case_at_wean(); c.sim.rhythm, c.sim.reperf_t = "vf", c.t
+        for _ in range(int(35 / c.sim.DT)):
+            c.tick()
+        self.assertIn("Do you want the paddles?", c.lines[-1]["text"])
+        for _ in range(int(90 / c.sim.DT)):
+            c.tick()
+        self.assertIn("vf_untreated", [f["code"] for f in c.findings])
+        self.assertEqual(c.sim.rhythm, "sinus")
+
+
 class TestCase_(unittest.TestCase):
     def test_expert_plays_clean_case_every_persona(self):
         for pid in P:

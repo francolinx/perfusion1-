@@ -29,6 +29,7 @@ class Persona:
     bv_per_kg: float = 70.0
     target_temp: float = 34.0
     no_transfusion: bool = False
+    reperfusion: str = "sinus"     # how this heart restarts after a well-run clamp: sinus, vf or asystole
     age: int = 60
     sex: str = "M"
 
@@ -75,6 +76,11 @@ ROLLERS = (("arterial", '1/2"'), ("cardioplegia", '1/4"'), ("sucker", '1/4"'), (
 ROLLER_MAX_RPM = 250.0
 # alarm limits, shared by alarms() and the console's pressure display
 ALARM_LIMITS = dict(line_p=300, cp_pressure=300, csp=40)
+# Rhythm after the clamp comes off (docs/LAB_SESSION_NOTES.md item 2). Teaching approximations.
+DRUGS = dict(lidocaine="Lidocaine 100 mg", magnesium="Magnesium 2 g", esmolol="Esmolol 50 mg", calcium="Calcium 1 g")
+DEFIB_J = (10, 20, 30)          # internal paddles: start low, raise the energy if fibrillation persists
+DEFIB_THRESHOLD = 20.0          # joules needed to convert; 10 after lidocaine and magnesium; +10 if the heart is cold
+K_FLAT = 5.5                    # potassium above this at reperfusion: the heart comes back flat
 CP_WASHOUT_MIN = 18.0  # time constant of cardioplegia washout while clamped; activity returns ~22 min after a full dose
 
 
@@ -128,6 +134,10 @@ class Sim:
         self.rhythm = "sinus"
         self.vf_timer = 0.0
         self.injury = 0.0          # myocardial injury 0..1
+        self.reperf_t = None       # when the heart was reperfused (clamp off, arrest washed out)
+        self.reperf_rhythm = None  # the rhythm it came back in
+        self.drugs = {}            # drug name -> list of times given
+        self.flat_until = None     # a flat heart restarts at this time once calcium or epinephrine has worked
         self.distension = 0.0
         self.hot_shot_ml = 0.0
         self.cp_dose = 0.0         # mL in current dose
@@ -232,10 +242,32 @@ class Sim:
     def measure(self, kind):
         self.pending.append((self.t + 6.0, kind))
 
-    def defibrillate(self):
-        if self.rhythm == "vf":
+    def give_drug(self, name):
+        if name not in DRUGS:
+            raise ValueError(name)
+        self.drugs.setdefault(name, []).append(round(self.t, 1))
+        if name == "calcium" and self.rhythm == "asystole" and self.reperf_t is not None and self.flat_until is None:
+            self.flat_until = self.t + 30.0          # calcium reverses the potassium: the heart picks up in about 30 s
+
+    @property
+    def antiarrhythmic(self):
+        """Lidocaine and magnesium both given since the hot shot window (they lower the shock energy needed)."""
+        return "lidocaine" in self.drugs and "magnesium" in self.drugs
+
+    def shock_needed(self):
+        return (DEFIB_THRESHOLD - (10.0 if self.antiarrhythmic else 0.0)) + (10.0 if self.temp < 35.0 else 0.0)
+
+    def defibrillate(self, joules=20.0):
+        """Internal shock. Converts fibrillation if the energy is enough; does nothing for a flat line or sinus.
+        Returns True if the rhythm converted."""
+        if self.rhythm != "vf":
+            return False
+        self.injury = min(1.0, self.injury + 0.002 * joules)
+        if joules >= self.shock_needed():
             self.rhythm = "sinus"
-            self.injury = min(1.0, self.injury + 0.02)
+            self.vf_timer = 0.0
+            return True
+        return False
 
     # ---- integration -----------------------------------------------------
     def step(self, dt=None):
@@ -384,11 +416,23 @@ class Sim:
         else:
             self.distension = 0.0
             self.arrest *= math.exp(-dtm / 1.0)
-            if self.rhythm in ("asystole", "brady") and self.arrest < 0.5:
-                ok = self.hot_shot_ml >= 300 and self.temp >= 34.0
-                self.rhythm = "sinus" if (ok or self.cp_total == 0) else "vf"
-                if self.rhythm == "vf":
-                    self.emit("vf", "minor", "Heart came back fibrillating and needed a shock.", 1e9)
+            if self.rhythm in ("asystole", "brady") and self.arrest < 0.5 and self.reperf_t is None:
+                self.reperf_t = self.t
+                if self.cp_total == 0:
+                    r = "sinus"
+                elif self.hot_shot_ml < 300 or self.temp < 34.0:
+                    r = "vf"
+                    self.emit("vf", "minor", "Heart came back fibrillating: the hot shot or rewarming was not enough.", 1e9)
+                elif self.k > K_FLAT:
+                    r = "asystole"
+                else:
+                    r = self.p.reperfusion
+                self.rhythm = self.reperf_rhythm = r
+            if self.rhythm == "asystole" and self.reperf_t is not None:
+                if c["epi"] and self.flat_until is None:
+                    self.flat_until = self.t + 60.0
+                if self.flat_until is not None and self.t >= self.flat_until:
+                    self.rhythm = "sinus"
         if self.rhythm == "vf":
             self.vf_timer += dt
         else:
