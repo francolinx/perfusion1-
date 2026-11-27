@@ -100,7 +100,16 @@ Lumped parameters, explicit Euler at 20 ms. Flows in L/min, volumes in mL, press
 - **Gas exchange**: PaO2 from FiO2 and oxygenator efficiency, PaCO2 from CO2 production over sweep,
   mixed with lung blood by flow. DO2i, VO2 (Q10 2.2 with temperature), SvO2, lactate from O2 debt.
 - **Heat**: heater-cooler water relaxes to set point, heat exchanger effectiveness 0.65, patient as
-  one thermal mass.
+  one thermal mass. A second water circuit feeds cardioplegia (`cp_water_set`); either circuit's pump can be
+  switched off (`hc_on`, `cp_hc_on`), and its water then drifts toward room temperature.
+- **Monitor values**: PA pressure is CVP plus `PVR` times the heart's own output, so it falls to CVP and goes
+  flat on full bypass; arterial and PA systolic/diastolic come from the pulse; pulse oximetry reads only with
+  a pulse. Urine is about 1 mL/kg/h at normal pressure and temperature, scaled by the persona's `renal`
+  factor, and is part of the patient's volume loss. The ACT result has a second, deterministic channel.
+- **Roller pumps** (`Sim.rollers()`): arterial (idle; the centrifugal pump is the arterial pump), cardioplegia,
+  sucker and vent, each with flow, RPM from tubing stroke volume (`ROLLER_ML_PER_REV`), percent of full speed
+  and tubing size. Sucker and vent speeds (`sucker_max`, `vent_max`) cap the blood they return; a sucker that
+  is too slow leaves the rest in the field.
 - **Cardioplegia**: arrest level rises with delivered volume and potassium, washes out with an 18 minute
   time constant while clamped (activity returns about 22 minutes after a full dose) and in about a minute once the clamp is off. Root vent, aortic
   insufficiency, missing clamp, coronary sinus pressure and systemic potassium load are modeled.
@@ -110,6 +119,15 @@ Lumped parameters, explicit Euler at 20 ms. Flows in L/min, volumes in mL, press
 
 Constants are at the top of the file. Each is a teaching approximation; `docs/ROADMAP.md` lists
 the validation work.
+
+## Pump console and patient monitor (web/console.js, web/monitor.js)
+
+The cart is laid out like the lab's machine (docs/LAB_FIDELITY.md sections 1 and 2): roller pump modules on the
+base with their own screens, dials with light rings and stop buttons, roller heads that turn at the RPM in
+`/api/state`, a centrifugal pump console on its own mast, a mast column of pressures with limits, timers and
+temperatures, and a tray. Aim the centre of the view at a dial and use the mouse wheel or drag to turn it, or
+click a stop button; both post the same `set` actions as the panels (throttled to one every 80 ms). The patient
+monitor by the table and the wall repeater share one canvas. Both modules only draw state and post actions.
 
 ## Instructor (perfusion/instructor.py)
 

@@ -66,6 +66,7 @@ const P = (expr) => ev(`(() => { const p = window.P1.player; return ${expr}; })(
 const place = (x, z, yaw, pitch) => ev(`Object.assign(window.P1.player, {x: ${x}, z: ${z}, yaw: ${yaw}, pitch: ${pitch}}), 0`);
 const fps = (ms) => ev(`new Promise((res) => { let n = 0; const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < ${ms}) requestAnimationFrame(f); else res(Math.round(n * 1000 / (performance.now() - t0))); }; requestAnimationFrame(f); })`);
 const state = () => ev(`fetch('/api/state').then((r) => r.json())`);
+const act = (a) => ev(`fetch('/api/action', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: ${JSON.stringify(JSON.stringify(a))}}).then((r) => r.json())`);
 
 await send('Runtime.enable'); send('Inspector.enable'); await send('Page.enable');
 // without a GPU the high tier is a slideshow in software rendering, so the timing checks pin the plain tier
@@ -128,6 +129,45 @@ check('Esc closes the panel', await ev(`document.getElementById('panel').classLi
 await tap('KeyV'); await tap('KeyV'); await sleep(200);
 check('V cycles back to first person', (await P('p.view')) === 0);
 check('frame rate', (await fps(2000)) >= 30, `${await fps(2000)} fps`);
+
+// ---- pump console: roller modules, dials with light rings, stop buttons, roller heads (docs/LAB_FIDELITY.md 1)
+// stand in front of the cart and aim the centre of the view at a control
+const aimAt = async (id) => {
+  const [x, y, z] = await ev(`(() => { const c = window.P1.console.controls.find((k) => k.id === '${id}'); const v = c.hit.getWorldPosition(c.hit.position.clone()); return [v.x, v.y, v.z]; })()`);
+  const px = x, pz = z + 0.75, eyeY = await P('p.h');
+  await place(px, pz, Math.atan2(-(x - px), -(z - pz)), Math.atan2(y - eyeY, Math.hypot(x - px, z - pz))); await sleep(350);
+};
+const ctlIds = await ev(`window.P1.console.controls.map((c) => c.id).sort().join(',')`);
+check('console has centrifugal dial and roller modules with dials and stop buttons', ctlIds === 'art_dial,art_stop,cf_dial,cp_dial,cp_stop,suck_dial,suck_stop,vent_dial,vent_stop', ctlIds);
+await aimAt('cp_dial');
+check('aiming at a dial names it and says how to turn it', (await ev('window.P1.control()')) === 'cp_dial' && /Cardioplegia pump.*wheel or drag/.test(await ev(`document.getElementById('hint').textContent`)));
+const cp0 = (await state()).controls.cp_flow;
+for (let i = 0; i < 3; i++) { await send('Input.dispatchMouseEvent', { type: 'mouseWheel', x: 800, y: 450, deltaX: 0, deltaY: -100 }); await sleep(60); }
+await sleep(500);
+check('mouse wheel turns the cardioplegia dial', (await state()).controls.cp_flow === cp0 + 30, `${cp0} -> ${(await state()).controls.cp_flow} mL/min`);
+await aimAt('cf_dial');
+await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: 800, y: 450, button: 'left', clickCount: 1 });
+for (let i = 1; i <= 8; i++) { await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 800, y: 450 - i * 10, button: 'left', buttons: 1 }); await sleep(30); }
+await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: 800, y: 370, button: 'left', clickCount: 1 }); await sleep(500);
+const rpmSet = (await state()).controls.rpm_set;
+check('dragging the centrifugal dial turns it, not the view', rpmSet > 0 && (await ev('window.P1.control()')) === 'cf_dial', `rpm set ${rpmSet}`);
+await act({ type: 'set', key: 'rpm_set', value: 0 }); await act({ type: 'set', key: 'cp_flow', value: cp0 });
+await aimAt('suck_stop');
+const spin0 = await ev(`window.P1.console.heads.find((h) => h.name === 'sucker').rotor.rotation.y`);
+await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: 800, y: 450, button: 'left', clickCount: 1 });
+await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: 800, y: 450, button: 'left', clickCount: 1 }); await sleep(900);
+const sOn = await state();
+check('clicking a stop button starts and stops that pump', sOn.controls.sucker && sOn.rollers.sucker.rpm > 0, `sucker ${sOn.rollers.sucker.rpm} RPM, ${sOn.rollers.sucker.tubing}`);
+check('the roller head turns at its pump speed', Math.abs((await ev(`window.P1.console.heads.find((h) => h.name === 'sucker').rotor.rotation.y`)) - spin0) > 0.2);
+await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: 800, y: 450, button: 'left', clickCount: 1 });
+await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: 800, y: 450, button: 'left', clickCount: 1 }); await sleep(500);
+check('...and clicking it again stops it', !(await state()).controls.sucker);
+// ---- patient monitor (docs/LAB_FIDELITY.md 2)
+const mon = await ev(`(() => { const c = window.P1.monitor.canvas, d = c.getContext('2d').getImageData(10, 98 + 2 * 122 + 22, 760, 92).data; let pa = 0;
+  for (let i = 0; i < d.length; i += 4) if (d[i] > 200 && d[i + 1] > 180 && d[i + 2] < 120) pa++; return { pa, shared: window.P1.monitor.shared() }; })()`);
+const ms = await state();
+check('patient monitor draws the PA trace and the wall repeats it', mon.pa > 200 && mon.shared, `${mon.pa} PA trace pixels`);
+check('monitor values come from the model', ['pap', 'pap_sys', 'art_sys', 'urine_ml', 't_cp_water', 'mode'].every((k) => k in ms) && 'last_act2' in ms && ms.persona.age > 0, `PA ${ms.pap_sys}/${ms.pap_dia} (${ms.pap}), mode ${ms.mode}`);
 
 // ---- smash mode: Space jumps, F and click swing, own body is never smashed
 await tap('KeyV'); await sleep(100); await tap('KeyB'); await sleep(600);
