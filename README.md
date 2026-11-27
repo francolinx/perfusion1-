@@ -18,6 +18,8 @@ cd perfusion1-
 That is the whole install. It needs Python 3.9+ and a browser, nothing else: no pip, no npm,
 no internet (three.js is vendored). It opens `http://localhost:8080`. From a laptop, phone or
 headset on the same network, open `http://<spark-ip>:8080`.
+If another program already uses port 8080 (on the Spark used for bring-up, a local gateway did),
+the server says so; start it on another port with `PORT=9000 ./run.sh`.
 
 `./run.sh --test` runs the test suite and plays a full expert case headless.
 

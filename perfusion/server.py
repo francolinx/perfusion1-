@@ -7,6 +7,7 @@ actions are POSTed. Everything is Python standard library so it installs
 anywhere, including aarch64 DGX Spark, with no pip step.
 """
 import argparse
+import errno
 import json
 import mimetypes
 import os
@@ -117,6 +118,19 @@ class Handler(BaseHTTPRequestHandler):
             self._send(400, dict(error=str(e)))
 
 
+def bind(host, port):
+    """Open the HTTP server, or exit with a plain message if the port is taken."""
+    try:
+        srv = ThreadingHTTPServer((host, port), Handler)
+    except OSError as e:
+        if e.errno != errno.EADDRINUSE:
+            raise
+        raise SystemExit(f"Port {port} is already in use by another program. "
+                         f"Start on a free port instead, for example:  PORT={port + 920} ./run.sh")
+    srv.daemon_threads = True
+    return srv
+
+
 def main():
     global SESSION
     ap = argparse.ArgumentParser(description="perfusion1 simulator server")
@@ -124,10 +138,9 @@ def main():
     ap.add_argument("--port", type=int, default=8080)
     ap.add_argument("--open", action="store_true", help="open a browser on this machine")
     a = ap.parse_args()
+    srv = bind(a.host, a.port)
     SESSION = Session()
     threading.Thread(target=SESSION.loop, daemon=True).start()
-    srv = ThreadingHTTPServer((a.host, a.port), Handler)
-    srv.daemon_threads = True
     url = f"http://localhost:{a.port}"
     print(f"perfusion1 running. Open {url} (or http://<this machine's IP>:{a.port} from another device).")
     if a.open:
