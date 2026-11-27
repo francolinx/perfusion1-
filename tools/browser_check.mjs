@@ -52,7 +52,7 @@ const send = (method, params = {}) => new Promise((res, rej) => {
   ws.send(JSON.stringify({ id: i, method, params }));
 });
 const ev = async (expr) => { const r = await send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true }); if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description || r.exceptionDetails.text); return r.result.value; };
-const KEYS = { F5: ['F5', 116], F9: ['F9', 120], Enter: ['Enter', 13], Space: [' ', 32], KeyW: ['w', 87], KeyS: ['s', 83], KeyC: ['c', 67], KeyV: ['v', 86], KeyE: ['e', 69], KeyB: ['b', 66], KeyF: ['f', 70], Escape: ['Escape', 27], ShiftLeft: ['Shift', 16], ControlLeft: ['Control', 17], Tab: ['Tab', 9] };
+const KEYS = { F5: ['F5', 116], F9: ['F9', 120], Enter: ['Enter', 13], Space: [' ', 32], KeyW: ['w', 87], KeyS: ['s', 83], KeyC: ['c', 67], KeyV: ['v', 86], KeyE: ['e', 69], KeyB: ['b', 66], KeyF: ['f', 70], KeyH: ['h', 72], Escape: ['Escape', 27], ShiftLeft: ['Shift', 16], ControlLeft: ['Control', 17], Tab: ['Tab', 9] };
 const down = (code) => send('Input.dispatchKeyEvent', { type: code === 'Space' ? 'keyDown' : 'rawKeyDown', code, key: KEYS[code][0], windowsVirtualKeyCode: KEYS[code][1] });
 const up = (code) => send('Input.dispatchKeyEvent', { type: 'keyUp', code, key: KEYS[code][0], windowsVirtualKeyCode: KEYS[code][1] });
 const tap = async (code) => { await down(code); await sleep(40); await up(code); };
@@ -231,8 +231,8 @@ const help = await ev(`({ open: !document.getElementById('help').classList.conta
 check('H opens the info panel on the current step', help.open && help.text.includes(help.phase) && help.text.includes('Do this'), help.phase);
 check('info panel steps match the HUD objectives', help.steps.length > 0 && JSON.stringify(help.steps) === JSON.stringify(help.hud), `${help.steps.length} steps`);
 check('info panel has why, use, callout, mistakes, whole case', ['Use', 'Tell the surgeon', 'Common mistakes', 'The whole case'].every((h) => help.text.includes(h)) && help.use > 0);
-const hx = await P('player.x'); await down('KeyW'); await sleep(400); await up('KeyW');
-check('keys typed while the info panel is open do not move the player', Math.abs((await P('player.x')) - hx) < 0.01);
+const hx = await P('p.x'); await down('KeyW'); await sleep(400); await up('KeyW');
+check('keys typed while the info panel is open do not move the player', Math.abs((await P('p.x')) - hx) < 0.01);
 await click('#help [data-phase="REWARM"]'); await sleep(300);
 check('whole-case list previews another step', (await ev(`document.getElementById('help-body').innerText`)).includes('Preview: step 10'));
 await click('#help-now'); await sleep(300);
