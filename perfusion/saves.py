@@ -84,7 +84,8 @@ def _dec(v):
 
 # model fields added after saves were first written (lab console and monitor). A save without them still loads,
 # with the field at its starting value; new controls are merged in the same way. Anything else missing is refused.
-_BACKFILL_SIM = {"t_cp_water", "urine_ml", "urine_rate", "q_suck", "q_vent", "last_act2"}
+_BACKFILL_SIM = {"t_cp_water", "urine_ml", "urine_rate", "q_suck", "q_vent", "last_act2",
+                 "reperf_t", "reperf_rhythm", "drugs", "flat_until"}
 # case fields added since (student timers): older saves start with the timers reset and nothing reported
 _BACKFILL_CASE = dict(clocks=new_clocks, clock_log=list, reports=list)
 

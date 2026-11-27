@@ -126,6 +126,12 @@ export function buildPanels(act, state) {
         number(b, 'Protamine', '', 'mg', (v) => act({ type: 'protamine', mg: v }), 'Give'),
         buttons(b, [['Phenylephrine 100 mcg (raises pressure)', () => act({ type: 'phenylephrine', mcg: 100 })],
           ['Epinephrine infusion', () => set('epi', !state.S.controls.epi), (S) => S.controls.epi]]),
+        (b.appendChild(el('h3', '', 'Clamp off and rhythm')), {}),
+        buttons(b, [['Lidocaine 100 mg', 'lidocaine'], ['Magnesium 2 g', 'magnesium'], ['Esmolol 50 mg', 'esmolol'], ['Calcium 1 g', 'calcium']]
+          .map(([label, name]) => [label, () => act({ type: 'drug', name }), (S) => S.drugs && name in S.drugs])),
+        read(b, (S) => [['Rhythm', S.rhythm, S.rhythm === 'sinus' ? '' : 'bad'], ...['lidocaine', 'magnesium', 'calcium'].map((k) => [k[0].toUpperCase() + k.slice(1) + ' given', S.drugs && k in S.drugs ? mmss(S.drugs[k]) : '--'])]),
+        buttons(b, (state.S ? state.S.defib_j : [10, 20, 30]).map((j) => [`Defibrillator ${j} J`, () => act({ type: 'defib', joules: j })])),
+        note(b, 'Fibrillating: ask the surgeon for the paddles, 10 J first, more if it persists. Flat: drugs, never a shock. Calcium about 10 minutes after the clamp comes off unless the heart is flat. No weaning without a rhythm and a pulse.'),
         note(b, `Patient weight ${w} kg. Say the units out loud: 300 what?`),
       ];
     } },

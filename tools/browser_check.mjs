@@ -171,6 +171,13 @@ const tOn = await state();
 check('the bypass timer button on the console starts the student timer', tOn.clocks.bypass.run && tOn.clocks.bypass.s > 0.5 && !tOn.clocks.clamp.run, `${tOn.clocks.bypass.s} s`);
 await act({ type: 'timer', which: 'bypass', op: 'stop' }); await act({ type: 'timer', which: 'bypass', op: 'reset' });
 check('timers read zero after a reset', (await state()).clocks.bypass.s === 0);
+// ---- clamp-off drugs and the defibrillator (docs/LAB_SESSION_NOTES.md item 2)
+await ev(`window.P1.openPanel('meds')`); await sleep(400);
+const medBtns = await ev(`[...document.querySelectorAll('#panel button')].map((b) => b.textContent)`);
+check('drug cart has the clamp-off drugs and a defibrillator', ['Lidocaine 100 mg', 'Magnesium 2 g', 'Esmolol 50 mg', 'Calcium 1 g', 'Defibrillator 10 J', 'Defibrillator 30 J'].every((t) => medBtns.includes(t)));
+await ev(`[...document.querySelectorAll('#panel button')].find((b) => b.textContent === 'Lidocaine 100 mg').click()`); await sleep(600);
+check('giving a drug from the cart reaches the model', 'lidocaine' in ((await state()).drugs || {}));
+await tap('Escape'); await sleep(200);
 // ---- patient monitor (docs/LAB_FIDELITY.md 2)
 const mon = await ev(`(() => { const c = window.P1.monitor.canvas, d = c.getContext('2d').getImageData(10, 98 + 2 * 122 + 22, 760, 92).data; let pa = 0;
   for (let i = 0; i < d.length; i += 4) if (d[i] > 200 && d[i + 1] > 180 && d[i + 2] < 120) pa++; return { pa, shared: window.P1.monitor.shared() }; })()`);

@@ -113,6 +113,11 @@ Lumped parameters, explicit Euler at 20 ms. Flows in L/min, volumes in mL, press
 - **Cardioplegia**: arrest level rises with delivered volume and potassium, washes out with an 18 minute
   time constant while clamped (activity returns about 22 minutes after a full dose) and in about a minute once the clamp is off. Root vent, aortic
   insufficiency, missing clamp, coronary sinus pressure and systemic potassium load are modeled.
+- **Rhythm after the clamp**: the heart's first rhythm on reperfusion is decided by rules: fibrillation if the
+  hot shot was short or the heart is cold, flat if potassium is over `K_FLAT`, otherwise the persona's
+  `reperfusion` rhythm (sinus for most). A shock converts fibrillation if its energy reaches `shock_needed()`
+  (20 J, 10 J after lidocaine and magnesium, 10 J more if cold); a flat heart restarts 30 s after calcium or
+  60 s after epinephrine. The scenario makes starting to wean with no rhythm or no pulse a critical finding.
 - **Anticoagulation**: heparin with a 100 minute half-life, ACT linear in units/kg with a
   per-patient sensitivity, protamine 1 mg per 100 units. Protamine with the pump or suckers
   running clots the circuit.

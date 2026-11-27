@@ -50,6 +50,18 @@ class Autopilot:
                 if self.mistake != "no_timers":
                     self.act(type="report", what=what)
 
+    def rhythm_care(self, s):
+        """After the clamp: antiarrhythmics, shocks for fibrillation, calcium for a flat heart or at 10 minutes."""
+        case = self.case
+        if s.rhythm == "vf" and case.t - self.mem.get("shock_t", -99) > 6:
+            n = self.mem.get("shocks", 0)
+            self.mem["shock_t"], self.mem["shocks"] = case.t, n + 1
+            self.act(type="defib", joules=(10, 20, 30)[min(n, 2)])
+        off = case.flags.get("clamp_off_t")
+        flat = s.rhythm == "asystole" and s.reperf_t is not None
+        if "calcium" not in s.drugs and (flat or (off is not None and case.t - off > 610)):
+            self.act(type="drug", name="calcium")
+
     def flow_to(self, target):
         s = self.case.sim
         if target >= 0.9 * s.target_flow:
@@ -101,6 +113,8 @@ class Autopilot:
         s, ph, tf = case.sim, case.phase, case.sim.target_flow
         getattr(self, "p_" + ph)(s, tf)
         self.answer()
+        if ph in ("CLAMP_OFF", "WEAN", "POST"):
+            self.rhythm_care(s)
         if ph not in ("PRE", "WEAN", "POST"):
             self.keep_gases()
         elif ph == "WEAN" and s.vr < 500 and case.t - self.mem.get("vol", -99) > 15:
@@ -242,6 +256,9 @@ class Autopilot:
 
     def p_CLAMP_OFF(self, s, tf):
         self.set("water_set", 37.0)
+        if self.once("clamp_off_drugs"):
+            self.act(type="drug", name="lidocaine")
+            self.act(type="drug", name="magnesium")
         if not s.xclamp:
             self.timer("clamp", "stop")
         if s.xclamp:
@@ -258,8 +275,13 @@ class Autopilot:
                 self.call("full_flow")
 
     def p_WEAN(self, s, tf):
+        if self.once("full_flow_after_unclamp"):
+            self.act(type="callout", id="full_flow")     # the clamp-off call, made as weaning is announced
         self.set("ventilator", True)
         self.set("root_vent", False)
+        if s.rhythm not in ("sinus", "brady"):
+            self.flow_to(tf)                     # no rhythm: stay at full flow and treat it first
+            return
         if s.p.ef < 0.7:
             self.set("epi", True)
         i = self.case.flags["wean_i"]
