@@ -111,6 +111,15 @@ Lumped parameters, explicit Euler at 20 ms. Flows in L/min, volumes in mL, press
 Constants are at the top of the file. Each is a teaching approximation; `docs/ROADMAP.md` lists
 the validation work.
 
+## Instructor (perfusion/instructor.py)
+
+`GET /api/instructor` returns the state plus true values the student cannot see and the instructor's current
+settings; `POST /api/instructor` takes one operation (`knob`, `rhythm`, `event`, `say`, `speed`, `neutral`).
+Knobs are multipliers and offsets inside `Sim.step` (`Sim.inst`); at their neutral values the model is
+unchanged. The instructor never writes findings, credits or the score: the model reacts and the usual rules
+grade the student. Any change other than pace marks the run `instructor_used`, which keeps it off the
+leaderboard. There is no login: run the simulator on a trusted network.
+
 ## Grading (perfusion/scenario.py, perfusion/rubric.py)
 
 Deterministic. The scenario records credits (steps done), callouts and findings (errors, each with a

@@ -87,6 +87,7 @@ async function main() {
   const notes = [];
   if (doc.status !== 'complete') notes.push('This run was not finished, so it has no final score.');
   if (doc.practice) notes.push('Practice run (resumed from a save): not ranked.');
+  if (doc.instructor_used) notes.push('An instructor changed the patient or the circuit during this run: not ranked. Their changes are in the session timeline.');
   if (doc.autopilot_used) notes.push('The expert autopilot flew some or all of this run: not ranked.');
   $('notes').innerHTML = notes.map((n) => `<div class="find minor">${esc(n)}</div>`).join('');
   if (doc.series && doc.series.length > 1) {

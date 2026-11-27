@@ -17,7 +17,7 @@ import urllib.parse
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from . import leaderboard, quiz
+from . import instructor, leaderboard, quiz
 from .autopilot import Autopilot
 from .model import load_personas
 from .monitor import Clients, Monitor, SimMeter
@@ -60,6 +60,8 @@ class Session:
         self._next_sample = case.t
         self.log = SessionLog(self.sessions.folder, case.persona, self.saves.build, practice=practice, resumed_from=resumed_from,
                               student=leaderboard.clean_name(student))
+        if case.flags.get("instructor"):
+            self.log.doc["instructor_used"] = True
         pilot.on_act = lambda a: self.log.add("action", self.case.t, source="autopilot", action=dict(a))
         self._seen = (case.phase, len(case.lines), len(case.findings))
         self._done_logged = case.phase == "DONE"
@@ -148,7 +150,26 @@ class Session:
             d = self.case.snapshot()
             d["session"] = dict(id=self.log.id, practice=self.log.doc["practice"], resumed_from=self.log.doc["resumed_from"],
                                 student=self.log.doc.get("student", ""),
-                                autopilot_used=self.log.doc["autopilot_used"])
+                                autopilot_used=self.log.doc["autopilot_used"],
+                                instructor_used=bool(self.log.doc.get("instructor_used")))
+            return d
+
+    def instruct(self, op):
+        """One instructor operation. The run is marked instructor-led and leaves the leaderboard."""
+        with self.lock:
+            note = instructor.apply(self.case, op)
+            if self.case.flags.get("instructor"):
+                self.log.doc["instructor_used"] = True
+            self.log.add("instructor", self.case.t, note=note, op={k: v for k, v in op.items() if k in ("op", "id", "value")})
+            return dict(ok=True, note=note)
+
+    def instructor_view(self):
+        with self.lock:
+            d = self.case.snapshot()
+            d["instructor"] = instructor.view(self.case)
+            d["session"] = dict(id=self.log.id, student=self.log.doc.get("student", ""), practice=self.log.doc["practice"],
+                                autopilot_used=self.log.doc["autopilot_used"],
+                                notes=[dict(t=e["t"], note=e["note"]) for e in self.log.doc["events"] if e["kind"] == "instructor"][-12:])
             return d
 
     def act(self, a):
@@ -312,7 +333,11 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, MONITOR.snapshot(SESSION.sim_status, SESSION.saves.build, FEATURES))
         if path == "/dashboard":
             path = "/dashboard.html"
-        if path in ("/leaderboard", "/run"):
+        if path == "/api/instructor":
+            return self._send(200, SESSION.instructor_view())
+        if path == "/api/instructor/meta":
+            return self._send(200, instructor.describe())
+        if path in ("/leaderboard", "/run", "/instructor"):
             path += ".html"
         if path == "/api/leaderboard":
             q = urllib.parse.parse_qs(self.path.partition("?")[2])
@@ -354,6 +379,8 @@ class Handler(BaseHTTPRequestHandler):
             body = json.loads(self.rfile.read(n) or b"{}")
             if self.path == "/api/action":
                 SESSION.act(body)
+            elif self.path == "/api/instructor":
+                return self._api(SESSION.instruct, body)
             elif self.path == "/api/reset":
                 pid = body.get("persona", "standard_adult")
                 if pid not in SESSION.personas:

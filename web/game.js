@@ -40,8 +40,8 @@ export function initGame({ $, state, onSelect }) {
   async function debrief(S) {
     const box = document.createElement('div'); box.id = 'debrief-game'; $('debrief-body').appendChild(box);
     const sid = S.session && S.session.id, who = (S.session && S.session.student) || '';
-    const ranked = who && !S.session.practice && !S.session.autopilot_used;
-    let rankLine = ranked ? '' : `<div class="find minor">${!who ? 'No student name on this run' : S.session.practice ? 'Practice run' : 'The expert autopilot flew part of this run'}: it is not ranked.</div>`;
+    const ranked = who && !S.session.practice && !S.session.autopilot_used && !S.session.instructor_used;
+    let rankLine = ranked ? '' : `<div class="find minor">${!who ? 'No student name on this run' : S.session.practice ? 'Practice run' : S.session.instructor_used ? 'An instructor changed the patient or circuit during this run' : 'The expert autopilot flew part of this run'}: it is not ranked.</div>`;
     if (ranked) {
       try {
         const d = await fetch(`/api/leaderboard?persona=${encodeURIComponent(S.persona.id)}&student=${encodeURIComponent(who)}`).then((r) => r.json());
