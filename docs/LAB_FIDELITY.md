@@ -27,6 +27,12 @@ above, each dial turnable with the mouse wheel or drag, roller heads that spin a
 buttons, and the mast displays. Add RPM and tubing size to the cardioplegia, sucker and vent readouts
 (the model already has cardioplegia flow; sucker and vent flows need an L/min value in `/api/state`).
 
+Done (`web/console.js`): the layout above, dials turned with the mouse wheel or a drag, light rings, per-pump stop
+buttons, turning roller heads, the three mast displays and the tray. `/api/state` now has `rollers` (flow, RPM,
+percent, tubing for each roller pump), `sucker_return`, `vent_return` and the alarm `limits`; sucker and vent have
+speed controls. Still open: dials on the centrifugal console for anything but speed, and tubing clamps on the
+tray that can be picked up.
+
 ## 2. Patient monitor
 
 The lab shows one large monitor, repeated on a wall screen, with: ECG, arterial pressure (systolic/diastolic and
@@ -41,6 +47,11 @@ repeater that draw scrolling ECG, arterial, PA and CVP traces from `/api/state` 
 bypass, pulsatile when ejecting, as in the photos), plus the tiles and boxes above. New state needed: PA
 pressure, urine output, a second ACT channel, cardioplegia water temperature. Each is a model change and needs
 a test.
+
+Done (`web/monitor.js`, tests in `tests/test_sim.py` `TestLabState`): the monitor on a stand at the head of the table
+and the wall repeater, with all of the above. New state: `pap`, `pap_sys`, `pap_dia`, `art_sys`, `art_dia`, `spo2`
+(none without a pulse), `urine_ml`, `urine_rate`, `last_act2`, `t_cp_water`, `mode`, and persona `age` and `sex`
+(fictional training patients). Still open: an esophageal probe separate from core temperature.
 
 ## 3. Blood gas report
 

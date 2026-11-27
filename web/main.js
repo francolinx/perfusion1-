@@ -7,6 +7,8 @@ import { initSaves } from './saves.js';
 import { initGame } from './game.js';
 import { recordTrend } from './panels.js';
 import { initGfx, pickTier } from './gfx.js';
+import { buildConsole } from './console.js';
+import { MON_W, MON_H, sampleWaves, drawMonitor } from './monitor.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { initHelp } from './help.js';
 import { trendCharts } from './charts.js';
@@ -198,71 +200,66 @@ function paintTubes(name, color, speed, dt) {
 const CART = new THREE.Vector3(-1.0, 0, -0.6);
 const hlm = new THREE.Group(); hlm.position.copy(CART); scene.add(hlm);
 const P = {};  // animated parts
+// local point on the cart -> world [x, y, z], for tubing that has to meet the parts on it
+const L = (x, y, z) => [CART.x + x, y, CART.z + z];
+const RES = { x: 0.6, y: 1.15, z: 0.26 };          // venous reservoir centre on the cart
+let consoleUI = null;
 (function buildCart() {
-  const base = mat(0x3d4f72, { roughness: 0.5 }), steel = mat(0xaab2bb, { metalness: 0.7, roughness: 0.3 }),
-    white = mat(0xf1f3f5, { roughness: 0.4 }), black = mat(0x15181c);
-  box(hlm, 1.15, 0.22, 0.62, base, 0, 0.2, 0);
-  for (const [wx, wz] of [[-0.5, -0.26], [0.5, -0.26], [-0.5, 0.26], [0.5, 0.26]]) cyl(hlm, 0.05, 0.05, 0.04, black, wx, 0.05, wz).rotation.z = Math.PI / 2;
-  cyl(hlm, 0.025, 0.025, 2.0, steel, -0.4, 1.3, -0.2);
-  cyl(hlm, 0.022, 0.022, 1.5, steel, 0.42, 1.05, -0.2);
-  cyl(hlm, 0.012, 0.012, 0.6, steel, -0.2, 2.25, -0.2).rotation.z = Math.PI / 2;
-  // cardioplegia bags, red-dyed like the lab
+  const steel = mat(0xaab2bb, { metalness: 0.7, roughness: 0.3 }), white = mat(0xf1f3f5, { roughness: 0.4 }), black = mat(0x15181c);
+  consoleUI = buildConsole({ hlm, mat, box, cyl, add, screen, glass, text });
+  // cardioplegia bags on the top bar, red-dyed like the lab
   const bag = mat(0xd8344a, { transparent: true, opacity: 0.72, roughness: 0.2 });
-  for (const bx of [-0.36, -0.12]) {
-    box(hlm, 0.15, 0.28, 0.035, bag, bx, 2.05, -0.2);
-    box(hlm, 0.15, 0.08, 0.035, mat(0xffffff, { transparent: true, opacity: 0.35 }), bx, 2.23, -0.2);
+  for (const bx of [-0.36, -0.14]) {
+    box(hlm, 0.15, 0.28, 0.035, bag, bx, 2.05, -0.22);
+    box(hlm, 0.15, 0.08, 0.035, mat(0xffffff, { transparent: true, opacity: 0.35 }), bx, 2.23, -0.22);
   }
-  // central display
-  P.central = screen(hlm, 0.62, 0.38, 640, 392, 0.12, 1.85, -0.12);
-  P.central.mesh.rotation.x = -0.18;
-  box(hlm, 0.66, 0.42, 0.03, black, 0.12, 1.85, -0.14).rotation.x = -0.18;
-  // pump console (white, blue screen, knob)
-  box(hlm, 0.3, 0.34, 0.14, white, 0.32, 1.2, 0.1);
-  P.console = screen(hlm, 0.22, 0.14, 320, 200, 0.32, 1.25, 0.172);
-  P.knob = cyl(hlm, 0.03, 0.03, 0.03, mat(0x2f7dd1), 0.4, 1.08, 0.18); P.knob.rotation.x = Math.PI / 2;
-  // gas blender + vaporizer
-  box(hlm, 0.16, 0.24, 0.1, mat(0x8fa3b8), 0.52, 1.6, -0.08);
-  cyl(hlm, 0.022, 0.022, 0.03, black, 0.48, 1.63, -0.02).rotation.x = Math.PI / 2;
-  cyl(hlm, 0.022, 0.022, 0.03, black, 0.56, 1.63, -0.02).rotation.x = Math.PI / 2;
-  cyl(hlm, 0.045, 0.045, 0.14, mat(0x7a3fb0), 0.52, 1.38, -0.08);
-  // cardioplegia delivery unit
-  box(hlm, 0.2, 0.26, 0.12, white, -0.52, 1.3, 0.05);
-  P.cp = screen(hlm, 0.16, 0.1, 256, 160, -0.52, 1.34, 0.112);
-  // venous reservoir: holder, yellow lid, clear shell, yellow filter, fluid
-  const tor = add(hlm, new THREE.TorusGeometry(0.165, 0.014, 10, 40), black, -0.05, 1.0, 0.16); tor.rotation.x = Math.PI / 2;
-  box(hlm, 0.3, 0.03, 0.04, black, -0.22, 1.0, 0.0);
-  cyl(hlm, 0.168, 0.168, 0.06, mat(0xf2c21a, { roughness: 0.35 }), -0.05, 1.06, 0.16);
-  for (let i = 0; i < 6; i++) cyl(hlm, 0.012, 0.012, 0.04, mat(i % 2 ? 0x2f6fd1 : 0xffffff), -0.05 + Math.cos(i) * 0.1, 1.11, 0.16 + Math.sin(i) * 0.1);
+  // data screen at the top of the mast
+  P.central = screen(hlm, 0.5, 0.306, 640, 392, -0.1, 1.93, -0.16);
+  P.central.mesh.rotation.x = -0.12;
+  box(hlm, 0.54, 0.34, 0.03, black, -0.1, 1.93, -0.18).rotation.x = -0.12;
+  // gas blender + vaporizer on their own short pole
+  cyl(hlm, 0.018, 0.018, 1.3, steel, 0.3, 1.03, -0.25);
+  box(hlm, 0.16, 0.24, 0.1, mat(0x8fa3b8), 0.3, 1.6, -0.14);
+  cyl(hlm, 0.022, 0.022, 0.03, black, 0.26, 1.63, -0.08).rotation.x = Math.PI / 2;
+  cyl(hlm, 0.022, 0.022, 0.03, black, 0.34, 1.63, -0.08).rotation.x = Math.PI / 2;
+  cyl(hlm, 0.045, 0.045, 0.14, mat(0x7a3fb0), 0.3, 1.38, -0.14);
+  // venous reservoir on its holder: yellow lid, clear shell, yellow filter, fluid
+  cyl(hlm, 0.018, 0.018, 1.0, steel, RES.x + 0.12, 0.88, RES.z - 0.22);
+  box(hlm, 0.04, 0.03, 0.24, black, RES.x + 0.12, RES.y - 0.15, RES.z - 0.11);
+  const tor = add(hlm, new THREE.TorusGeometry(0.165, 0.014, 10, 40), black, RES.x, RES.y - 0.15, RES.z); tor.rotation.x = Math.PI / 2;
+  cyl(hlm, 0.168, 0.168, 0.06, mat(0xf2c21a, { roughness: 0.35 }), RES.x, RES.y + 0.18, RES.z);
+  for (let i = 0; i < 6; i++) cyl(hlm, 0.012, 0.012, 0.04, mat(i % 2 ? 0x2f6fd1 : 0xffffff), RES.x + Math.cos(i) * 0.1, RES.y + 0.23, RES.z + Math.sin(i) * 0.1);
   const shell = glass(0xeaf3fa, 0.22, GLASS ? {} : { side: THREE.DoubleSide });
-  cyl(hlm, 0.155, 0.12, 0.3, shell, -0.05, 0.88, 0.16);
-  cyl(hlm, 0.12, 0.03, 0.12, shell, -0.05, 0.67, 0.16);
-  cyl(hlm, 0.07, 0.07, 0.26, mat(0xf2c21a, GLASS ? { roughness: 0.5 } : { transparent: true, opacity: 0.55 }), -0.05, 0.9, 0.16);
+  cyl(hlm, 0.155, 0.12, 0.3, shell, RES.x, RES.y, RES.z);
+  cyl(hlm, 0.12, 0.03, 0.12, shell, RES.x, RES.y - 0.21, RES.z);
+  cyl(hlm, 0.07, 0.07, 0.26, mat(0xf2c21a, GLASS ? { roughness: 0.5 } : { transparent: true, opacity: 0.55 }), RES.x, RES.y + 0.02, RES.z);
   const bloodM = () => mat(0xb01828, GLASS ? { roughness: 0.12 } : { transparent: true, opacity: 0.85, roughness: 0.15 });
-  P.fluid = cyl(hlm, 0.148, 0.118, 0.3, bloodM(), -0.05, 0.88, 0.16);
-  P.fluidTip = cyl(hlm, 0.116, 0.03, 0.115, bloodM(), -0.05, 0.67, 0.16);
-  // oxygenator (white drum, clear end)
-  const ox = cyl(hlm, 0.1, 0.1, 0.22, white, -0.3, 0.46, 0.22); ox.rotation.z = Math.PI / 2;
-  P.oxyCap = cyl(hlm, 0.102, 0.102, 0.06, mat(0xe9a6ae, { transparent: true, opacity: 0.7 }), -0.16, 0.46, 0.22); P.oxyCap.rotation.z = Math.PI / 2;
-  box(hlm, 0.2, 0.03, 0.08, steel, -0.3, 0.6, 0.12);
-  // centrifugal pump: blue drive, clear cone, spinning impeller
-  cyl(hlm, 0.075, 0.075, 0.2, mat(0x5b84b8, { roughness: 0.4 }), 0.22, 0.42, 0.3);
-  cyl(hlm, 0.03, 0.075, 0.08, glass(0xf0f4f8, 0.35), 0.22, 0.56, 0.3);
-  P.impeller = new THREE.Group(); P.impeller.position.set(0.22, 0.54, 0.3); hlm.add(P.impeller);
+  P.fluid = cyl(hlm, 0.148, 0.118, 0.3, bloodM(), RES.x, RES.y, RES.z);
+  P.fluidTip = cyl(hlm, 0.116, 0.03, 0.115, bloodM(), RES.x, RES.y - 0.21, RES.z);
+  // oxygenator (white drum, clear end) below the reservoir
+  const ox = cyl(hlm, 0.1, 0.1, 0.22, white, 0.6, 0.66, 0.38); ox.rotation.z = Math.PI / 2;
+  P.oxyCap = cyl(hlm, 0.102, 0.102, 0.06, mat(0xe9a6ae, { transparent: true, opacity: 0.7 }), 0.74, 0.66, 0.38); P.oxyCap.rotation.z = Math.PI / 2;
+  box(hlm, 0.2, 0.03, 0.08, steel, 0.6, 0.53, 0.3);
+  // centrifugal pump head on a bracket: blue drive, clear cone, spinning impeller
+  box(hlm, 0.12, 0.03, 0.12, steel, 0.42, 0.37, 0.36);
+  cyl(hlm, 0.075, 0.075, 0.16, mat(0x5b84b8, { roughness: 0.4 }), 0.42, 0.46, 0.4);
+  cyl(hlm, 0.03, 0.075, 0.08, glass(0xf0f4f8, 0.35), 0.42, 0.58, 0.4);
+  P.impeller = new THREE.Group(); P.impeller.position.set(0.42, 0.56, 0.4); hlm.add(P.impeller);
   for (let i = 0; i < 4; i++) { const b = box(P.impeller, 0.11, 0.025, 0.012, mat(0xc0283a), 0, 0, 0); b.rotation.y = (i * Math.PI) / 4; }
-  // alarm beacon
-  P.beacon = add(hlm, new THREE.SphereGeometry(0.035, 16, 12), new THREE.MeshBasicMaterial({ color: 0x402020 }), 0.42, 1.84, -0.2, false);
-  P.beaconLight = new THREE.PointLight(0xff2020, 0, 4); P.beaconLight.position.set(0.42, 1.9, -0.2); hlm.add(P.beaconLight);
+  // alarm beacon on top of the centrifugal console mast
+  P.beacon = add(hlm, new THREE.SphereGeometry(0.035, 16, 12), new THREE.MeshBasicMaterial({ color: 0x402020 }), -0.66, 1.54, -0.22, false);
+  P.beaconLight = new THREE.PointLight(0xff2020, 0, 4); P.beaconLight.position.set(-0.66, 1.6, -0.22); hlm.add(P.beaconLight);
   // clamps on the lines
-  P.venClamp = box(scene, 0.03, 0.09, 0.05, steel, -0.62, 0.84, -0.56);
-  P.artClamp = box(scene, 0.03, 0.09, 0.05, steel, -0.72, 0.3, -0.25);
-  block(CART.x - 0.7, CART.x + 0.7, CART.z - 0.42, CART.z + 0.45);
+  P.venClamp = box(scene, 0.03, 0.09, 0.05, steel, -0.15, 0.92, -0.5);
+  P.artClamp = box(scene, 0.03, 0.09, 0.05, steel, -0.16, 0.56, -0.28);
+  block(CART.x - 0.78, CART.x + 0.82, CART.z - 0.36, CART.z + 0.47);
 })();
 
 // heater-cooler
 const hc = new THREE.Group(); hc.position.set(-2.4, 0, -1.5); scene.add(hc);
 box(hc, 0.5, 0.9, 0.45, mat(0xdfe3e8, { roughness: 0.4 }), 0, 0.45, 0);
 P.hc = screen(hc, 0.3, 0.16, 256, 136, 0, 0.72, 0.228);
-tube('water', [[-2.2, 0.5, -1.4], [-1.9, 0.12, -1.1], [-1.5, 0.3, -0.5], [-1.3, 0.46, -0.38]], 0.016);
+tube('water', [[-2.2, 0.5, -1.4], [-1.9, 0.12, -1.25], L(-0.5, 0.1, -0.5), L(0.85, 0.2, -0.1), L(0.86, 0.5, 0.3), L(0.78, 0.6, 0.38)], 0.016);
 block(-2.7, -2.1, -1.78, -1.22);
 
 // drug cart
@@ -362,19 +359,24 @@ P.bellows = cyl(an, 0.075, 0.075, 0.2, mat(0x222a33), -0.15, 1.37, 0.05);
 P.anScreen = screen(an, 0.3, 0.2, 256, 170, 0.12, 1.42, 0.05); P.anScreen.mesh.rotation.y = -Math.PI / 2 + 0.5;
 block(4.15, 4.85, -1.52, -0.88);
 
-// big patient monitor on the back wall, visible from the pump
-P.monitor = screen(scene, 2.0, 1.12, 1024, 576, 2.4, 2.05, -4.96);
+// patient monitor on a stand at the head of the table, turned toward the pump, and the same picture repeated on
+// the wall screen (one canvas, two meshes)
+const monStand = new THREE.Group(); monStand.position.set(1.05, 0, -2.25); monStand.rotation.y = -0.89; scene.add(monStand);
+cyl(monStand, 0.2, 0.24, 0.05, mat(0x2a2f36), 0, 0.025, 0); cyl(monStand, 0.025, 0.025, 1.45, mat(0xaab2bb, { metalness: 0.7, roughness: 0.3 }), 0, 0.75, 0);
+box(monStand, 0.98, 0.58, 0.05, mat(0x101215), 0, 1.62, 0);
+P.monitor = screen(monStand, 0.92, 0.5175, MON_W, MON_H, 0, 1.62, 0.028);
+block(0.8, 1.3, -2.5, -2.0);
+P.repeater = add(scene, new THREE.PlaneGeometry(2.0, 1.125), P.monitor.mesh.material, 2.4, 2.05, -4.96, false);   // wall repeater
 box(scene, 2.1, 1.22, 0.04, mat(0x101215), 2.4, 2.05, -4.99);
 
 // tubing between patient and machine
 const chest = [TABLE.x + 0.05, 1.22, TABLE.z];
-tube('ven', [chest, [1.9, 1.05, -1.0], [1.1, 0.3, -0.75], [0.1, 0.22, -0.6], [-0.5, 0.5, -0.56], [-0.72, 1.0, -0.5], [-1.0, 1.2, -0.46], [-1.05, 1.1, -0.44]], 0.017);
-tube('art', [[-1.3, 0.46, -0.3], [-1.2, 0.3, -0.1], [-0.72, 0.3, -0.25], [0.2, 0.15, -0.9], [1.3, 0.3, -1.45], [2.0, 1.02, -1.38], [2.55, 1.24, -1.24]], 0.013);
-tube('res', [[-1.05, 0.62, -0.44], [-1.0, 0.5, -0.36], [-0.82, 0.48, -0.3], [-0.78, 0.6, -0.3]], 0.015);
-tube('res', [[-0.78, 0.5, -0.24], [-0.95, 0.38, -0.2], [-1.2, 0.4, -0.3], [-1.3, 0.46, -0.38]], 0.013);
-tube('cp', [[-1.24, 1.92, -0.8], [-1.4, 1.6, -0.7], [-1.52, 1.3, -0.6], [-1.3, 0.9, -0.9], [0.3, 0.5, -1.5], [1.8, 1.0, -1.5], [2.5, 1.27, -1.26]], 0.008);
-tube('vent', [[2.52, 1.27, -1.16], [2.0, 1.1, -0.7], [0.6, 0.6, -0.4], [-0.6, 1.0, -0.3], [-0.95, 1.2, -0.42]], 0.007);
-
+tube('ven', [chest, [1.9, 1.05, -1.0], [1.0, 0.35, -0.8], [0.15, 0.35, -0.72], [-0.15, 0.92, -0.5], [-0.3, 1.42, -0.36], L(RES.x, RES.y + 0.22, RES.z)], 0.017);
+tube('res', [L(RES.x, RES.y - 0.27, RES.z), L(0.55, 0.74, 0.32), L(0.44, 0.72, 0.38), L(0.42, 0.63, 0.4)], 0.015);
+tube('res', [L(0.49, 0.5, 0.4), L(0.5, 0.56, 0.42), L(0.48, 0.64, 0.4), L(0.5, 0.66, 0.38)], 0.013);
+tube('art', [L(0.72, 0.66, 0.38), L(0.84, 0.56, 0.32), [-0.16, 0.56, -0.28], [0.2, 0.15, -0.9], [1.3, 0.3, -1.45], [2.0, 1.02, -1.38], [2.55, 1.24, -1.24]], 0.013);
+tube('cp', [L(-0.3, 1.92, -0.22), L(-0.35, 1.2, -0.27), L(-0.28, 0.66, -0.02), L(-0.23, 0.64, 0.1), L(-0.1, 0.68, -0.25), [0.0, 0.45, -1.0], [1.3, 0.6, -1.5], [1.8, 1.0, -1.5], [2.5, 1.27, -1.26]], 0.008);
+tube('vent', [[2.52, 1.27, -1.16], [2.0, 1.1, -0.75], [0.6, 0.6, -0.85], L(0.5, 0.7, -0.3), L(0.21, 0.64, 0.1), L(0.4, 0.9, -0.15), L(RES.x - 0.08, RES.y + 0.22, RES.z - 0.06)], 0.007);
 // ---------------------------------------------------------------- interactables and name tags
 const interact = [];
 function tag(text) {
@@ -391,11 +393,11 @@ function addInteract(id, label, x, y, z, ty) {
   const sprite = tag(label); sprite.position.set(x, ty ?? y + 0.3, z);
   interact.push({ id, label, pos: new THREE.Vector3(x, y, z), sprite });
 }
-addInteract('pump', 'Pump console', CART.x + 0.32, 1.2, CART.z + 0.1, 1.48);
-addInteract('venous', 'Venous clamp', -0.62, 0.84, -0.56, 0.72);
-addInteract('gas', 'Gas blender', CART.x + 0.52, 1.55, CART.z - 0.08, 1.8);
-addInteract('cp', 'Cardioplegia', CART.x - 0.52, 1.3, CART.z + 0.05, 1.54);
-addInteract('res', 'Reservoir', CART.x - 0.05, 0.9, CART.z + 0.16, 1.2);
+addInteract('pump', 'Pump console', CART.x - 0.6, 1.3, CART.z - 0.1, 1.55);
+addInteract('venous', 'Venous clamp', -0.15, 0.92, -0.5, 1.1);
+addInteract('gas', 'Gas blender', CART.x + 0.3, 1.55, CART.z - 0.12, 1.8);
+addInteract('cp', 'Cardioplegia', CART.x - 0.23, 0.5, CART.z + 0.29, 1.0);
+addInteract('res', 'Reservoir', CART.x + RES.x, RES.y, CART.z + RES.z, RES.y + 0.42);
 addInteract('hc', 'Heater-cooler', -2.4, 0.75, -1.5, 1.08);
 addInteract('meds', 'Drug cart', -3.7, 1.0, -2.6, 1.3);
 addInteract('lab', 'ACT and blood gas', -3.7, 1.05, 0.9, 1.4);
@@ -406,53 +408,11 @@ addInteract('talk', 'Surgeon', 2.5, 1.5, -1.95, 1.95);
 function text(g, s, x, y, size, color = '#fff', align = 'left', weight = 600) {
   g.font = `${weight} ${size}px system-ui, sans-serif`; g.fillStyle = color; g.textAlign = align; g.textBaseline = 'alphabetic'; g.fillText(s, x, y);
 }
-const wave = { ecg: new Float32Array(480), art: new Float32Array(480), cvp: new Float32Array(480), i: 0, ph: 0 };
-function ecgShape(p, rhythm, t) {
-  if (rhythm === 'asystole') return Math.sin(t * 2) * 0.01;
-  if (rhythm === 'vf') return (Math.sin(t * 31) + Math.sin(t * 43.7) * 0.7 + Math.sin(t * 17.3) * 0.5) * 0.25;
-  const gs = (c, w, a) => a * Math.exp(-((p - c) ** 2) / (2 * w * w));
-  return gs(0.18, 0.025, 0.12) - gs(0.27, 0.008, 0.12) + gs(0.29, 0.01, 1.0) - gs(0.315, 0.01, 0.22) + gs(0.5, 0.045, 0.25);
-}
-function artShape(p) {   // 0..1 with dicrotic notch
-  const up = p < 0.12 ? p / 0.12 : Math.exp(-(p - 0.12) * 3.2);
-  return up + 0.12 * Math.exp(-((p - 0.42) ** 2) / 0.002);
-}
-function sampleWaves(S, dt) {
-  const hr = S.hr || 60; wave.ph = (wave.ph + (dt * hr) / 60) % 1; const t = performance.now() / 1000;
-  const n = Math.max(1, Math.round(dt * 110));
-  for (let k = 0; k < n; k++) {
-    const i = wave.i = (wave.i + 1) % 480, p = (wave.ph + (k / n) * ((dt * hr) / 60)) % 1;
-    wave.ecg[i] = ecgShape(p, S.rhythm, t + k * 0.009);
-    const beating = S.rhythm === 'sinus' || S.rhythm === 'brady';
-    wave.art[i] = S.map + (beating ? S.pulse * (artShape(p) - 0.42) : 0) + Math.sin(t * 40) * 0.25;
-    wave.cvp[i] = S.cvp + (beating ? Math.sin(p * 6.28) * 0.8 : 0);
-  }
-}
-function trace(g, buf, x0, y0, w, h, lo, hi, color) {
-  g.strokeStyle = color; g.lineWidth = 3; g.beginPath();
-  for (let k = 0; k < 480; k++) {
-    const v = buf[(wave.i + 1 + k) % 480], y = y0 + h - ((v - lo) / (hi - lo)) * h;
-    k ? g.lineTo(x0 + (k / 480) * w, Math.max(y0, Math.min(y0 + h, y))) : g.moveTo(x0, y);
-  }
-  g.stroke();
-}
 function drawScreens(S) {
-  // wall monitor
-  let { ctx: g, t } = P.monitor;
-  g.fillStyle = '#02070b'; g.fillRect(0, 0, 1024, 576);
-  trace(g, wave.ecg, 20, 30, 700, 130, -0.4, 1.2, '#39d98a');
-  trace(g, wave.art, 20, 200, 700, 170, 0, 140, '#ff5a5a');
-  trace(g, wave.cvp, 20, 410, 700, 120, -4, 20, '#5ab0ff');
-  const sys = S.map + S.pulse * 0.58, dia = S.map - S.pulse * 0.42;
-  text(g, 'HR', 750, 60, 26, '#39d98a'); text(g, String(S.hr), 1000, 130, 96, '#39d98a', 'right');
-  text(g, 'ART', 750, 220, 26, '#ff5a5a'); text(g, `${fmt(sys)}/${fmt(dia)}`, 1000, 280, 64, '#ff5a5a', 'right');
-  text(g, `(${fmt(S.map)})`, 1000, 340, 56, '#ff5a5a', 'right');
-  text(g, 'CVP', 750, 420, 26, '#5ab0ff'); text(g, fmt(S.cvp), 870, 480, 60, '#5ab0ff', 'right');
-  text(g, 'TEMP', 890, 420, 26, '#ffd24d'); text(g, fmt(S.temp, 1), 1000, 480, 48, '#ffd24d', 'right');
-  text(g, `rSO2 ${fmt(S.rso2)}   SaO2 ${fmt(S.sao2)}%   ${S.rhythm.toUpperCase()}`, 750, 545, 24, '#c9d1d9');
-  t.needsUpdate = true;
-  // heart-lung machine central display
-  ({ ctx: g, t } = P.central);
+  drawMonitor(P.monitor.ctx, S); P.monitor.t.needsUpdate = true;
+  consoleUI.draw(S);
+  // heart-lung machine data screen
+  let { ctx: g, t } = P.central;
   g.fillStyle = '#0a1622'; g.fillRect(0, 0, 640, 392);
   const cell = (label, val, unit, x, y, col = '#e8f1ff') => { text(g, label, x, y, 18, '#7f93a8', 'left', 500); text(g, val, x, y + 46, 44, col); text(g, unit, x, y + 68, 16, '#7f93a8', 'left', 500); };
   cell('FLOW', fmt(S.flow, 2), `L/min   CI ${fmt(S.ci, 2)}`, 20, 30, S.flow < 0 ? '#ff5a5a' : '#6fe3a1');
@@ -466,32 +426,18 @@ function drawScreens(S) {
   cell('PaCO2 / PaO2', `${fmt(S.paco2)} / ${fmt(S.pao2)}`, 'mmHg', 400, 230);
   text(g, `BYPASS ${mmss(S.bypass_time)}    CLAMP ${mmss(S.clamp_time)}    SINCE CPG ${S.xclamp ? mmss(S.since_cp) : '--'}`, 20, 360, 22, '#9fd0ff');
   t.needsUpdate = true;
-  // pump console
-  ({ ctx: g, t } = P.console);
-  g.fillStyle = '#123a7a'; g.fillRect(0, 0, 320, 200);
-  text(g, fmt(S.flow, 2), 300, 92, 84, '#fff', 'right'); text(g, 'L/min', 20, 40, 24, '#bcd4ff');
-  text(g, `${fmt(S.rpm)} RPM`, 300, 150, 40, '#bcd4ff', 'right');
-  text(g, S.controls.art_clamp ? 'ART LINE CLAMPED' : 'ART LINE OPEN', 20, 186, 20, S.controls.art_clamp ? '#ffb84d' : '#6fe3a1');
-  t.needsUpdate = true;
-  // cardioplegia
-  ({ ctx: g, t } = P.cp);
-  g.fillStyle = S.controls.cp_on ? '#3b2408' : '#141a20'; g.fillRect(0, 0, 256, 160);
-  text(g, S.controls.cp_on ? 'DELIVERING' : 'STOPPED', 12, 30, 22, S.controls.cp_on ? '#ffb84d' : '#8b97a3');
-  text(g, `${fmt(S.cp_dose)} mL`, 244, 84, 46, '#fff', 'right');
-  text(g, `${fmt(S.cp_pressure)} mmHg  ${S.controls.cp_route === 'ante' ? 'ANTE' : 'RETRO'}`, 12, 124, 22, '#ffd9a8');
-  text(g, { highK: 'HIGH K', lowK: 'LOW K', hot: 'HOT SHOT' }[S.controls.cp_type], 12, 150, 20, '#ffd9a8');
-  t.needsUpdate = true;
   // heater-cooler
   ({ ctx: g, t } = P.hc);
   g.fillStyle = '#0d1a14'; g.fillRect(0, 0, 256, 136);
-  text(g, `${fmt(S.t_water, 1)} C`, 244, 70, 56, S.t_water < 34 ? '#6fc8ff' : '#ff9d5a', 'right');
-  text(g, `SET ${fmt(S.controls.water_set, 1)}`, 12, 116, 24, '#9fb7a8');
+  const hcRow = (lbl, tw, set, on, y) => { text(g, lbl, 10, y - 30, 16, '#9fb7a8', 'left', 600); text(g, on ? 'ON' : 'OFF', 246, y - 30, 16, on ? '#6fe3a1' : '#ffb84d', 'right', 700);
+    text(g, `${fmt(tw, 1)} C`, 150, y, 30, tw < 30 ? '#6fc8ff' : '#ff9d5a', 'right'); text(g, `set ${fmt(set, 1)}`, 246, y, 16, '#9fb7a8', 'right', 500); };
+  hcRow('PATIENT', S.t_water, S.controls.water_set, S.controls.hc_on, 62); hcRow('CARDIOPLEGIA', S.t_cp_water, S.controls.cp_water_set, S.controls.cp_hc_on, 128);
   t.needsUpdate = true;
   // analyzer
   ({ ctx: g, t } = P.lab);
   g.fillStyle = '#0f1720'; g.fillRect(0, 0, 320, 192);
   text(g, S.labs_pending ? 'RUNNING...' : 'READY', 12, 28, 20, S.labs_pending ? '#ffb84d' : '#6fe3a1');
-  text(g, `ACT ${S.last_act ? S.last_act[1] + ' s' : '--'}`, 12, 80, 40, '#fff');
+  text(g, `ACT ${S.last_act ? S.last_act[1] : '--'} / ${S.last_act2 ? S.last_act2[1] : '--'} s`, 12, 80, 34, '#fff');
   const a = S.last_abg && S.last_abg[1];
   text(g, a ? `pH ${a.ph}  CO2 ${a.paco2}  O2 ${a.pao2}` : 'no blood gas yet', 12, 124, 22, '#c9d1d9');
   text(g, a ? `K ${a.k}  Hct ${a.hct}  Lac ${a.lactate}` : '', 12, 156, 22, '#c9d1d9');
@@ -696,15 +642,38 @@ function cycleView() {
   $('view-chip').textContent = names[player.view]; $('view-chip').classList.add('show');
   clearTimeout(cycleView.t); cycleView.t = setTimeout(() => $('view-chip').classList.remove('show'), 1200);
 }
+// console dials and stop buttons: aim with the centre of the view; wheel or drag turns a dial, click presses a button.
+// Sends go through the same 'set' action as the panels, at most every 80 ms while turning.
+const ray = new THREE.Raycaster(), CENTER = new THREE.Vector2(0, 0);
+let ctl = null, dialDrag = null;
+const dialSend = { t: 0, kv: null, timer: 0 };
+function flushDial() { clearTimeout(dialSend.timer); dialSend.timer = 0; dialSend.t = performance.now(); if (dialSend.kv) act({ type: 'set', key: dialSend.kv[0], value: dialSend.kv[1] }); dialSend.kv = null; }
+function sendDial(kv) {
+  if (!kv) return; dialSend.kv = kv;
+  if (performance.now() - dialSend.t > 80) flushDial(); else if (!dialSend.timer) dialSend.timer = setTimeout(flushDial, 90);
+}
+function pressControl(c) {
+  if (c.kind === 'button' && c.toggle && !c.inert) act({ type: 'set', key: c.toggle, value: !state.S.controls[c.toggle] });
+}
+window.addEventListener('wheel', (e) => {
+  if (!ctl || ctl.kind !== 'dial' || uiBlocked() || !state.S) return;
+  e.preventDefault(); sendDial(consoleUI.turn(ctl, state.S, e.deltaY < 0 ? 1 : -1));
+}, { passive: false });
 canvas.addEventListener('click', () => {
   if (uiBlocked()) return;
   if (smash.state.on) { if (document.pointerLockElement !== canvas) canvas.requestPointerLock?.(); smash.swing(); return; }
+  if (ctl) { pressControl(ctl); return; }
   if (document.pointerLockElement === canvas) { if (focus) openPanel(focus.id); } else canvas.requestPointerLock?.();
 });
 let dragging = false;
-canvas.addEventListener('mousedown', () => { dragging = true; });
-window.addEventListener('mouseup', () => { dragging = false; });
+canvas.addEventListener('mousedown', () => { dragging = true; if (ctl && ctl.kind === 'dial' && !uiBlocked()) dialDrag = { c: ctl, acc: 0 }; });
+window.addEventListener('mouseup', () => { dragging = false; dialDrag = null; });
 window.addEventListener('mousemove', (e) => {
+  if (dialDrag && state.S) {                         // dragging a dial turns it (up or right is more) instead of looking
+    dialDrag.acc += (e.movementX - e.movementY) / 7; const n = Math.trunc(dialDrag.acc);
+    if (n) { dialDrag.acc -= n; sendDial(consoleUI.turn(dialDrag.c, state.S, n)); }
+    return;
+  }
   if (document.pointerLockElement === canvas || (dragging && !uiBlocked())) {
     player.yaw -= e.movementX * 0.0023; player.pitch = Math.max(-1.3, Math.min(1.3, player.pitch - e.movementY * 0.0023));
   }
@@ -783,6 +752,11 @@ function findFocus() {
   }
   focus = best;
   $('hint').textContent = best && !uiBlocked() ? `${best.label}: ${matchMedia('(pointer: coarse)').matches ? 'tap to use' : 'press E or click'}` : '';
+  ctl = null;
+  if (state.S && !uiBlocked() && !matchMedia('(pointer: coarse)').matches) {
+    ray.setFromCamera(CENTER, camera); ctl = dialDrag ? dialDrag.c : consoleUI.pick(ray);
+    if (ctl) $('hint').textContent = consoleUI.describe(ctl, state.S) + (focus ? `  ·  E: ${focus.label}` : '');
+  }
 }
 
 // ---------------------------------------------------------------- scene update from state
@@ -799,12 +773,12 @@ function updateScene(S, dt, now) {
   paintTubes('water', tmpC.set(S.t_water < 34 ? 0x4aa8ff : 0xff8a4a).clone(), S.on_bypass ? 1 : 0, dt);
   // reservoir level
   const lvl = Math.min(1, S.res / 3000);
-  P.fluid.scale.y = Math.max(0.001, lvl); P.fluid.position.y = 0.73 + 0.15 * lvl; P.fluid.visible = S.res > 60;
+  P.fluid.scale.y = Math.max(0.001, lvl); P.fluid.position.y = RES.y - 0.15 + 0.15 * lvl; P.fluid.visible = S.res > 60;
   P.fluidTip.visible = S.res > 5;
   P.fluid.material.color.lerp(ven, 0.08); P.fluidTip.material.color.lerp(ven, 0.08);
   P.oxyCap.material.color.lerp(art, 0.08);
   P.impeller.rotation.y += (S.rpm / 60) * 6.283 * dt * 0.12;
-  P.knob.rotation.y = (S.controls.rpm_set / 4500) * 4.7;
+  consoleUI.update(S, dt);
   // clamps: red and rotated shut when closed
   P.artClamp.material.color.set(S.controls.art_clamp ? 0xd63b3b : 0x9aa3ad); P.artClamp.rotation.z = S.controls.art_clamp ? 0 : 0.9;
   P.venClamp.material.color.set(S.controls.ven_occl > 0.95 ? 0xd63b3b : S.controls.ven_occl > 0.05 ? 0xe0a030 : 0x9aa3ad);
@@ -904,7 +878,7 @@ function frame(nowMs) {
   if (S) {
     const run = S.speed > 0 ? dt : 0;
     if (!smash.state.on) updateScene(S, run, now);
-    if (run) sampleWaves(S, dt);
+    if (run) sampleWaves(S, run);
     screenT += dt;
     if (screenT > 0.07) { screenT = 0; drawScreens(S); }
   }
@@ -912,6 +886,7 @@ function frame(nowMs) {
   gfx.render(dt, real);
   requestAnimationFrame(frame);
 }
-window.P1 = { gfx, player, camera, openPanel, closePanel, state, smash, avatar, cycleView, focused: () => focus && focus.id, savesUI };
+window.P1 = { gfx, player, camera, openPanel, closePanel, state, smash, avatar, cycleView, focused: () => focus && focus.id, savesUI,
+  console: consoleUI, control: () => ctl && ctl.id, monitor: { canvas: P.monitor.c, shared: () => P.repeater.material === P.monitor.mesh.material } };
 boot();
 requestAnimationFrame(frame);

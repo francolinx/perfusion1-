@@ -507,6 +507,7 @@ class Case:
                  lines=self.lines[-6:], n_lines=len(self.lines), objectives=self.objectives(),
                  expected_callout=EXPECTED.get(self.phase), callout_made=self.phase in self.callouts_done,
                  speed=self.speed, autopilot=self.autopilot,
-                 persona=dict(id=self.persona.id, name=self.persona.name, weight=self.persona.weight),
+                 persona=dict(id=self.persona.id, name=self.persona.name, weight=self.persona.weight,
+                              height=self.persona.height, age=self.persona.age, sex=self.persona.sex),
                  score=self.score(detail=self.phase == "DONE"))     # the full rubric report only once the case is over
         return d

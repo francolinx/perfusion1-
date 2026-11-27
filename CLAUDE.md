@@ -46,7 +46,8 @@ Open 3D cardiopulmonary bypass trainer. Read `README.md`, `docs/ARCHITECTURE.md`
   `perfusion/instructor.py`, page `web/instructor.html`, `GET/POST /api/instructor`. What the real lab has and what
   to build to match it: `docs/LAB_FIDELITY.md`
 - Server and API: `perfusion/server.py`
-- 3D room, HUD, input: `web/main.js`; equipment control panels: `web/panels.js`
+- 3D room, HUD, input: `web/main.js`; equipment control panels: `web/panels.js`; the pump console with turnable
+  dials and roller heads: `web/console.js`; patient monitor and wall repeater: `web/monitor.js`
 - Smash mode (cosmetic rage room, client only, never graded): `web/smash.js`
 - Rendering quality (image-based light, bloom, ambient occlusion, tiers that step down when slow): `web/gfx.js`;
   three.js addon modules are vendored in `web/vendor/addons/` and resolved by the importmap in `web/index.html`
