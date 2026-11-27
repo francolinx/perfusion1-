@@ -8,7 +8,8 @@ Open 3D cardiopulmonary bypass trainer. Read `README.md`, `docs/ARCHITECTURE.md`
 - Run: `./run.sh` (serves http://localhost:8080; `PORT=9000 ./run.sh` to change port)
 - Test: `./run.sh --test` or `python3 -m unittest discover -s tests -v`
 - Browser check (headless, no window, needs Node 22 and Chrome): `node tools/browser_check.mjs --url http://localhost:9000 --gpu`
-  (`--full` also plays the expert case to the debrief). Keep browser tests headless.
+  (`--full` also plays the expert case to the debrief). Keep browser tests headless. Point it at a
+  scratch server (`--port 9100 --saves-dir ... --logs-dir ...`): it resets the shared case.
 - Play a case headless: `python3 scripts/play_case.py --persona ckd`
   (`--mistake flow_up_early` replays the sequencing error from the lab video)
 
@@ -37,6 +38,8 @@ Open 3D cardiopulmonary bypass trainer. Read `README.md`, `docs/ARCHITECTURE.md`
 - 3D room, HUD, input: `web/main.js`; equipment control panels: `web/panels.js`
 - Smash mode (cosmetic rage room, client only, never graded): `web/smash.js`
 - Player avatar and third-person body (cosmetic, client only): `web/player.js`
+- Save / load (exact case state, saves/ folder): `perfusion/saves.py`; session logs and the rule-based
+  summary (logs/ folder): `perfusion/sessionlog.py`; their screens: `web/saves.js`
 
 ## Next work
 

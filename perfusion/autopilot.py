@@ -9,9 +9,12 @@ class Autopilot:
         self.next_t = 0.0
         self.mem = {}
         self.mult = 1.0
+        self.on_act = None          # optional observer (session log); never changes what the expert does
 
     def act(self, **a):
         self.case.action(a)
+        if self.on_act:
+            self.on_act(a)
 
     def set(self, key, value):
         if self.case.sim.c[key] != value:

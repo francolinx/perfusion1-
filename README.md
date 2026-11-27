@@ -47,6 +47,13 @@ with a baseball bat (click or F to swing) where the equipment breaks, with sound
 case, is never graded, and leaving it rebuilds the lab. On a phone: left pad moves, drag to look,
 Jump / Crouch / View buttons, Controls button for the panels.
 
+Saves and sessions: F5 quick-saves (it never reloads the page here), F9 opens Save / Load, where you name a
+save, add a description, and see persona, phase, case time and date for each one before loading. The case also
+saves itself at the start of every phase (last 10 kept). Loading a save turns that run into practice, so its
+score is kept apart from clean runs. Sessions lists every past session with its plain-English summary (what you
+did in each phase, what went well, what was flagged, three things to improve) and the full timeline. Saves go in
+`saves/` and logs in `logs/` (both git-ignored; `--saves-dir` and `--logs-dir` change that).
+
 Ctrl+W closes a browser tab and no page can stop that, so the page asks before leaving a running
 case. C is the safer crouch key. The surgeon's browser voice is a placeholder and starts off on
 desktop Linux (press Voice to turn it on); a local voice service will replace it.

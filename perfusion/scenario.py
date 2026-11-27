@@ -464,8 +464,8 @@ class Case:
             findings=self.findings,
         )
 
-    def objectives(self):
-        s, p = self.sim, self.phase
+    def objectives(self, phase=None):
+        s, p = self.sim, phase or self.phase
         tf = s.target_flow
         o = {
             "PRE": [f"Give heparin: 300 to 400 units per kg ({300*self.persona.weight:.0f} to {400*self.persona.weight:.0f} units)",
