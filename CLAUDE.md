@@ -44,7 +44,8 @@ Open 3D cardiopulmonary bypass trainer. Read `README.md`, `docs/ARCHITECTURE.md`
 - Expert policy: `perfusion/autopilot.py`
 - Instructor controls (patient and circuit changes, pace, surgeon voice; instructor-led runs are not ranked):
   `perfusion/instructor.py`, page `web/instructor.html`, `GET/POST /api/instructor`. What the real lab has and what
-  to build to match it: `docs/LAB_FIDELITY.md`
+  to build to match it: `docs/LAB_FIDELITY.md`. The lab's spoken script, common errors and the build list that
+  follows from them: `docs/LAB_SESSION_NOTES.md`
 - Server and API: `perfusion/server.py`
 - 3D room, HUD, input: `web/main.js`; equipment control panels: `web/panels.js`; the pump console with turnable
   dials and roller heads: `web/console.js`; patient monitor and wall repeater: `web/monitor.js`
