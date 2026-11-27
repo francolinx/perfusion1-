@@ -33,8 +33,8 @@ export function buildConsole({ hlm, mat, box, cyl, add, screen, glass, text }) {
     const c = { ...def, kind: 'dial', knob, ring, back, hit, r, frac: -1 };
     hit.userData.control = c; controls.push(c); return c;
   }
-  function stopButton(parent, x, y, z, r, def) {
-    const b = cyl(parent, r, r, 0.014, red.clone(), x, y, z + 0.007); b.rotation.x = Math.PI / 2;
+  function stopButton(parent, x, y, z, r, def, m = red) {
+    const b = cyl(parent, r, r, 0.014, m.clone(), x, y, z + 0.007); b.rotation.x = Math.PI / 2;
     const hit = add(parent, new THREE.CircleGeometry(r * 1.8, 12), hitM, x, y, z + 0.02, false);
     const c = { ...def, kind: 'button', mesh: b, hit }; hit.userData.control = c; controls.push(c); return c;
   }
@@ -92,6 +92,13 @@ export function buildConsole({ hlm, mat, box, cyl, add, screen, glass, text }) {
     const g = new THREE.Group(); g.position.set(-0.1, mastY[k], -0.19); g.rotation.x = -0.1; hlm.add(g);
     box(g, 0.24, 0.16, 0.03, black, 0, 0, -0.012);
     screens[n] = screen(g, 0.22, 0.14, 352, 224, 0, 0, 0.005);
+    if (n !== 'timers') return;
+    // the student's timers: start/stop (green) and reset (grey) beside each line
+    box(g, 0.07, 0.15, 0.03, black, 0.152, 0, -0.012);
+    [['bypass', 'Bypass timer', 0.019], ['clamp', 'Clamp timer', -0.016], ['cp', 'Cardioplegia timer', -0.051]].forEach(([k, label, y]) => {
+      stopButton(g, 0.136, y, 0.004, 0.009, { id: 'tm_' + k, label, timer: k, op: 'toggle' }, mat(0x2e9e5b, { roughness: 0.4 }));
+      stopButton(g, 0.168, y, 0.004, 0.009, { id: 'tm_' + k + '_reset', label, timer: k, op: 'reset' }, mat(0x8a939c, { roughness: 0.4 }));
+    });
   });
   // tray: tubing clamps, syringes, drug vials
   box(hlm, 0.32, 0.02, 0.2, trayM, 0.52, 0.395, -0.17);
@@ -123,6 +130,8 @@ export function buildConsole({ hlm, mat, box, cyl, add, screen, glass, text }) {
         setRing(c, frac);
       } else if (c.toggle) {
         c.mesh.material.emissive?.setHex(S.controls[c.toggle] ? 0x000000 : 0x550000);
+      } else if (c.timer && c.op === 'toggle') {
+        c.mesh.material.emissive?.setHex(S.clocks[c.timer].run ? 0x1f7a3f : 0x000000);
       }
     }
     const R = S.rollers;
@@ -179,10 +188,13 @@ export function buildConsole({ hlm, mat, box, cyl, add, screen, glass, text }) {
     });
     t.needsUpdate = true;
     // mast: timers
-    ({ ctx: g, t } = screens.timers);
+    ({ ctx: g, t } = screens.timers);           // the student's own timers: nothing here runs unless they start it
     g.fillStyle = '#0a1622'; g.fillRect(0, 0, 352, 224); text(g, 'TIMERS', 14, 30, 20, '#7f93a8', 'left', 700);
-    [['Bypass', mmss(S.bypass_time)], ['Cross-clamp', S.xclamp || S.clamp_time ? mmss(S.clamp_time) : '--'], ['Since CPG', S.xclamp ? mmss(S.since_cp) : '--']].forEach(([k, v], i) => {
-      const y = 82 + i * 56; text(g, k, 14, y, 22, '#b8c6d4', 'left', 500); text(g, v, 338, y, 38, k === 'Since CPG' && S.since_cp > 1200 && S.xclamp ? '#ffb84d' : '#e8f1ff', 'right', 700);
+    [['Bypass', 'bypass'], ['Cross-clamp', 'clamp'], ['Since CPG', 'cp']].forEach(([k, id], i) => {
+      const c = S.clocks[id], y = 82 + i * 56;
+      text(g, k, 14, y, 22, '#b8c6d4', 'left', 500);
+      text(g, mmss(c.s), 338, y, 38, c.run ? (id === 'cp' && c.s > 1200 ? '#ffb84d' : '#6fe3a1') : '#7f93a8', 'right', 700);
+      if (S.asked.includes(id)) text(g, 'ASKED', 150, y, 16, '#ffb84d', 'left', 700);
     });
     t.needsUpdate = true;
     // mast: temperatures
@@ -200,6 +212,8 @@ export function buildConsole({ hlm, mat, box, cyl, add, screen, glass, text }) {
   const pick = (ray) => { const h = ray.intersectObjects(hits, false)[0]; return h && h.distance < 1.9 ? h.object.userData.control : null; };
   function describe(c, S) {
     if (c.inert) return `${c.label}: ${c.inert}`;
+    if (c.timer) return c.op === 'reset' ? `${c.label} ${mmss(S.clocks[c.timer].s)}: click to reset to zero`
+      : `${c.label} ${mmss(S.clocks[c.timer].s)}: ${S.clocks[c.timer].run ? 'running, click to stop' : 'stopped, click to start'}`;
     if (c.kind === 'button') return `${c.label}: ${S.controls[c.toggle] ? 'running, click to stop' : 'stopped, click to start'}`;
     return `${c.label} ${fmt(valueOf(c, S))} ${c.unit}: mouse wheel or drag to turn`;
   }

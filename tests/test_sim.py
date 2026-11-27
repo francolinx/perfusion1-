@@ -207,6 +207,91 @@ class TestLabState(unittest.TestCase):
             restore(state)
 
 
+def rubric_items(case):
+    return {i["id"]: i for sec in case.score()["rubric"]["sections"] for i in sec["items"]}
+
+
+class TestStudentTimers(unittest.TestCase):
+    """docs/LAB_SESSION_NOTES.md item 1: bypass, clamp and cardioplegia timers the student runs (rubric C1b, D4, F5b)."""
+
+    def test_timer_start_stop_reset_follow_case_time(self):
+        c = Case(P["standard_adult"])
+        c.action(dict(type="timer", which="bypass", op="start"))
+        for _ in range(500):
+            c.tick()                                              # 10 s
+        self.assertAlmostEqual(c.clock("bypass"), 10.0, delta=0.05)
+        c.action(dict(type="timer", which="bypass", op="stop"))
+        for _ in range(250):
+            c.tick()
+        self.assertAlmostEqual(c.clock("bypass"), 10.0, delta=0.05)   # stopped: holds its reading
+        c.action(dict(type="timer", which="bypass", op="start"))
+        for _ in range(250):
+            c.tick()
+        self.assertAlmostEqual(c.clock("bypass"), 15.0, delta=0.05)   # restart continues from the reading
+        c.action(dict(type="timer", which="bypass", op="reset"))
+        self.assertAlmostEqual(c.clock("bypass"), 0.0, delta=0.05)
+        snap = c.snapshot()["clocks"]
+        self.assertTrue(snap["bypass"]["run"]); self.assertFalse(snap["clamp"]["run"])
+        for bad in (dict(which="lunch", op="start"), dict(which="clamp", op="explode")):
+            with self.assertRaises(ValueError):
+                c.action(dict(type="timer", **bad))
+
+    def test_expert_runs_the_timers_and_answers_the_surgeon(self):
+        case = run("standard_adult")
+        items = rubric_items(case)
+        for k in ("C1b", "D4", "F5b"):
+            self.assertEqual(items[k]["status"], "full", (k, items[k]["why"]))
+        asked = [l["text"] for l in case.lines]
+        for q in ("What was the clamp time?", "What is the bypass time?", "How long since the last dose?"):
+            self.assertIn(q, asked)
+        self.assertEqual({r["what"] for r in case.reports}, {"clamp_time", "bypass_time", "cp_time"})
+        self.assertTrue(all(abs(r["said"] - r["true"]) <= 5 and r["asked"] for r in case.reports))
+
+    def test_no_timers_loses_c1b_d4_f5b_with_reasons(self):
+        case = run("standard_adult", mistake="no_timers")
+        items = rubric_items(case)
+        for k in ("C1b", "D4", "F5b"):
+            self.assertEqual(items[k]["status"], "zero", k)
+            self.assertTrue(items[k]["why"], k)
+        self.assertIn("not running 30 seconds after going on bypass", " ".join(items["C1b"]["why"]))
+        self.assertIn("got no answer", " ".join(items["D4"]["why"]))
+        self.assertEqual(case.score()["critical"], 0)
+        self.assertGreaterEqual(case.score()["score"], 80)        # missing timers alone does not fail the run
+
+    def test_late_bypass_timer_is_half(self):
+        c = Case(P["standard_adult"]); c.goto("INITIATE"); c.sim.cannulated = True
+        c.flags["bp_on_t"] = c.t
+        for _ in range(int(40 / c.sim.DT)):
+            c.tick()
+        c.action(dict(type="timer", which="bypass", op="start"))   # 40 s after going on
+        c.flags.setdefault("bp_clock_30", dict(run=False, read=0))
+        c.goto("COOL")
+        frac, why = __import__("perfusion.rubric", fromlist=["x"])._bypass_timer_started(c)
+        self.assertEqual(frac, 0.5); self.assertIn("late", why[0])
+
+    def test_wrong_reported_time_is_explained(self):
+        c = Case(P["standard_adult"])
+        c.sim.clamp_time = 2400.0
+        c.ask("clamp", "What was the clamp time?")
+        c.action(dict(type="timer", which="clamp", op="start"))    # started now: reads 0
+        c.action(dict(type="report", what="clamp_time"))
+        self.assertIn("Is your cross-clamp timer running?", c.lines[-1]["text"])
+        from perfusion.rubric import _answer
+        ok, why = _answer(c, "clamp", "clamp time")
+        self.assertFalse(ok); self.assertIn("it was 40:00", why)
+        self.assertIsNone(c.flags.get("ask_clamp"))             # the question is answered, even if wrongly
+
+    def test_older_saves_load_with_timers_reset(self):
+        from perfusion.saves import capture, restore
+        from perfusion.autopilot import Autopilot
+        c = Case(P["standard_adult"]); state = capture(c, Autopilot(c))
+        for k in ("clocks", "clock_log", "reports"):
+            del state["case"][k]
+        case, _ = restore(state)
+        self.assertEqual(case.clock("bypass"), 0.0)
+        self.assertEqual(case.snapshot()["clocks"]["clamp"]["run"], False)
+
+
 class TestCase_(unittest.TestCase):
     def test_expert_plays_clean_case_every_persona(self):
         for pid in P:

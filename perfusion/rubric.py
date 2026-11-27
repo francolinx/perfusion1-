@@ -23,7 +23,7 @@ SECTIONS = [("A", "Setup and air-free prime", 30), ("B", "Calculations and readi
 
 NOT_BUILT = "The simulator starts with the circuit already built and primed."
 NO_CALC = "The simulator works this out for you, so there is nothing to grade yet."
-AUTO = "The simulator records this automatically."
+TOL = 60.0      # seconds a timer may be off (scenario.TIME_TOLERANCE)
 NO_VENOUS = "There is no venous sample to draw yet; venous saturation is shown continuously."
 
 CREDIT_WHY = dict(
@@ -130,6 +130,58 @@ def _arrest(case):
     return 1.0, []
 
 
+# ---- student timers (scenario.CLOCKS) ------------------------------------------------
+def _started_on_time(mark, what, event):
+    """The timer was running and read about right 30 s after the event (started at most a minute early)."""
+    def check(case):
+        m = case.flags.get(mark)
+        if m and m["run"] and 0 < m["read"] <= 30 + TOL:
+            return True, None
+        if not m or not m["run"]:
+            return False, f"The {what} timer was not running 30 seconds after {event}."
+        if m["read"] <= 0:
+            return False, f"The {what} timer was not running 30 seconds after {event}."
+        return False, f"The {what} timer read {m['read'] // 60}:{m['read'] % 60:02d} 30 seconds after {event}: it was started too early or not reset."
+    return check
+
+
+def _answer(case, name, label):
+    """The student's answer when the surgeon asked for this time: right within a minute of the true time."""
+    if not case.flags.get("asked_" + name):
+        return True, None                     # never asked (for example the case ended first)
+    r = case.answered(name)
+    if r is None:
+        return False, f"The surgeon asked for the {label} and got no answer."
+    if abs(r["said"] - r["true"]) <= TOL:
+        return True, None
+    return False, (f"You gave the {label} as {r['said'] // 60}:{r['said'] % 60:02d}; it was {r['true'] // 60}:{r['true'] % 60:02d}. "
+                   "Read it off a timer you started at the right moment.")
+
+
+def _bypass_timer_started(case):
+    ok, why = _started_on_time("bp_clock_30", "bypass", "going on bypass")(case)
+    if ok:
+        return 1.0, []
+    if case.flags.get("bp_timer_late"):
+        return 0.5, ["The bypass timer was started late, after you were already on bypass."]
+    return 0.0, [why]
+
+
+def _clamp_and_events(case):
+    parts = [_started_on_time("clamp_clock_30", "clamp", "the clamp went on")(case),
+             _answer(case, "clamp", "clamp time"), _answer(case, "cp", "time since the last dose")]
+    return sum(ok for ok, _ in parts) / 3.0, [w for ok, w in parts if not ok]
+
+
+def _bypass_timer_stopped(case):
+    off = case.flags.get("off_t")
+    stops = [e["t"] for e in case.clock_log if e["clock"] == "bypass" and e["op"] == "stop"]
+    stopped = off is not None and any(off - 15 <= t <= off + TOL for t in stops)
+    parts = [(stopped, None if stopped else "The bypass timer was not stopped as you came off bypass."),
+             _answer(case, "bypass", "bypass time")]
+    return sum(ok for ok, _ in parts) / 2.0, [w for ok, w in parts if not ok]
+
+
 COMPONENTS = dict(
     A=[_na("A1", "Packaging, sterility, components and prime solution checked", 3, NOT_BUILT),
        _na("A2", "Circuit assembled: raceways, flow direction, loop, recirculation, connections, clamps", 6, NOT_BUILT),
@@ -146,7 +198,7 @@ COMPONENTS = dict(
        _na("B3c", "Cannula connections and shunts checked", 1, "The surgeon places the cannulas; there is nothing to inspect yet."),
        _c("B3d", "Told the surgeon you were ready", 1, "PRE", calls=("PRE",))],
     C=[_c("C1a", "Closed-loop call with the surgeon on going on", 2, "INITIATE", calls=("INITIATE",)),
-       _na("C1b", "Bypass timer started", 1, AUTO),
+       _c("C1b", "Bypass timer started", 1, "INITIATE", fn=_bypass_timer_started),
        _c("C2a", "Sweep gas running as flow came up", 1, "INITIATE", flags=(("sweep_at_init", "Sweep gas was off as you went on bypass."),)),
        _c("C2b", "Oxygen blender set correctly", 1, "STABILIZE", fn=_first_gas("pao2", 150, 400, "PaO2", "oxygen fraction")),
        _c("C2c", "Sweep gas flow set correctly", 1, "STABILIZE", fn=_first_gas("paco2", 35, 45, "CO2", "sweep gas")),
@@ -167,7 +219,7 @@ COMPONENTS = dict(
           lose={"flow_up_early@CLAMP_ON": 1.0, "clamp_full_flow@CLAMP_ON": 1.0, "map_low": 0.5, "do2_low": 0.5, "cp_interval": 0.5, "hyperkalemia": 0.5, "activity_returning": 0.5, "res_low@OPERATE": 0.5,
                 "res_low@HOTSHOT": 0.5, "res_low@REWARM": 0.5, "line_p@OPERATE": 0.5}),
        _c("D3b", "Changes called out to the team", 1, "HOTSHOT", fn=_calls(("CLAMP_ON", "OPERATE", "HOTSHOT"), "changes")),
-       _na("D4", "Clamp timer started and key events recorded", 1, AUTO),
+       _c("D4", "Clamp timer started and key events recorded", 1, "CLAMP_OFF", fn=_clamp_and_events),
        _c("D5a", "Cooled to the assigned temperature", 1, "COOL", credits=("cooled",), lose={"gradient@COOL": 0.5}),
        _c("D5b", "Rewarmed safely", 1, "REWARM", credits=("rewarmed",), lose={"hyperthermia": 1.0, "gradient@REWARM": 0.5}),
        _c("D5c", "Temperature called out", 1, "REWARM", fn=_calls(("COOL", "REWARM"), "temperature"))],
@@ -198,7 +250,7 @@ COMPONENTS = dict(
        _c("F4b", "Held and assessed at quarter flow", 2, "WEAN", credits=("wean_2",), lose={"wean_before_ejecting#2": 0.5}),
        _c("F5a", "Came off and clamped in the right order", 2, "WEAN", credits=("off_bypass",),
           lose={"retrograde@WEAN": 0.5, "retrograde@POST": 0.5}),
-       _na("F5b", "Bypass timer stopped", 0.5, AUTO),
+       _c("F5b", "Bypass timer stopped", 0.5, "POST", fn=_bypass_timer_stopped),
        _c("F5c", "Off-bypass status reported", 0.5, "WEAN", calls=("WEAN",))],
 )
 

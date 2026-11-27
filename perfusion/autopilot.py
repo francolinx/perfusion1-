@@ -5,7 +5,7 @@ API a student uses. Used by the tests and by the demo's 'watch the expert' mode.
 class Autopilot:
     def __init__(self, case, mistake=None):
         self.case = case
-        self.mistake = mistake      # None | "flow_up_early"
+        self.mistake = mistake      # None | "flow_up_early" | "no_timers"
         self.next_t = 0.0
         self.mem = {}
         self.mult = 1.0
@@ -29,6 +29,26 @@ class Autopilot:
     def call(self, cid):
         if self.once("call_" + self.case.phase + cid):
             self.act(type="callout", id=cid)
+
+    def timer(self, which, op):
+        if self.mistake == "no_timers":
+            return
+        c = self.case.clocks[which]
+        if (op == "start" and c["run"]) or (op == "stop" and not c["run"]):
+            return
+        self.act(type="timer", which=which, op=op)
+
+    def restart(self, which):
+        if self.mistake != "no_timers":
+            self.act(type="timer", which=which, op="reset")
+            self.timer(which, "start")
+
+    def answer(self):
+        """Give the surgeon any time asked for, read off the timers."""
+        for name, what in (("clamp", "clamp_time"), ("bypass", "bypass_time"), ("cp", "cp_time")):
+            if self.case.flags.get("ask_" + name) is not None and self.case.t - self.case.flags["ask_" + name] > 2:
+                if self.mistake != "no_timers":
+                    self.act(type="report", what=what)
 
     def flow_to(self, target):
         s = self.case.sim
@@ -80,6 +100,7 @@ class Autopilot:
         self.next_t = case.t + 0.5
         s, ph, tf = case.sim, case.phase, case.sim.target_flow
         getattr(self, "p_" + ph)(s, tf)
+        self.answer()
         if ph not in ("PRE", "WEAN", "POST"):
             self.keep_gases()
         elif ph == "WEAN" and s.vr < 500 and case.t - self.mem.get("vol", -99) > 15:
@@ -87,6 +108,9 @@ class Autopilot:
             self.act(type="volume", ml=250, kind="crystalloid")
 
     def p_PRE(self, s, tf):
+        if self.once("reset_timers") and self.mistake != "no_timers":
+            for k in ("bypass", "clamp", "cp"):
+                self.act(type="timer", which=k, op="reset")
         if self.once("hep"):
             self.act(type="heparin", units=round(400 * s.p.weight / 1000) * 1000)
             self.act(type="measure", what="act")
@@ -103,6 +127,7 @@ class Autopilot:
             need = max(1600.0, round(1000.0 * ((s.pa + 30.0) / 45.0) ** 0.5, -1))   # pump head must beat patient pressure
             self.set("rpm_set", need)
             if s.rpm > need - 60:
+                self.timer("bypass", "start")           # timer first, then open the line
                 self.set("art_clamp", False)
                 self.set("sucker", True)
         else:
@@ -133,6 +158,8 @@ class Autopilot:
         if not s.xclamp:
             self.flow_to(0.25 * tf)
         else:
+            if self.once("clamp_timer"):
+                self.restart("clamp")
             self.flow_to(tf)
             if s.qa >= 0.9 * tf:
                 self.call("full_flow")
@@ -173,6 +200,8 @@ class Autopilot:
     def p_OPERATE(self, s, tf):
         self.flow_to(tf)
         self.hold_temp(s)
+        if self.once("cp_timer_induction"):
+            self.restart("cp")                   # arrest called: start the cardioplegia timer
         el = self.case.t - self.case.phase_t0
         if el > 120 and self.once("abg2"):
             self.act(type="measure", what="abg")
@@ -188,6 +217,7 @@ class Autopilot:
             else:
                 self.set("cp_on", False)
                 self.mem["redose_done"] = True
+                self.restart("cp")
 
     def p_HOTSHOT(self, s, tf):
         self.flow_to(tf)
@@ -212,6 +242,8 @@ class Autopilot:
 
     def p_CLAMP_OFF(self, s, tf):
         self.set("water_set", 37.0)
+        if not s.xclamp:
+            self.timer("clamp", "stop")
         if s.xclamp:
             if self.mistake == "flow_up_early" and "down_t" in self.case.flags and not self.mem.get("oops") \
                     and self.case.t - self.case.flags["down_t"] > 2:
@@ -249,6 +281,8 @@ class Autopilot:
             else:
                 self.set("art_clamp", True)
                 self.set("rpm_set", 0.0)
+                if s.qa < 0.1:
+                    self.timer("bypass", "stop")
                 self.call("off_bypass")
 
     def p_POST(self, s, tf):

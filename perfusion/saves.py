@@ -12,7 +12,7 @@ from dataclasses import asdict
 
 from .autopilot import Autopilot
 from .model import Persona, Sim
-from .scenario import PHASE_TITLES, Case
+from .scenario import PHASE_TITLES, Case, new_clocks
 
 FORMAT = 1
 AUTO_KEEP = 10
@@ -85,6 +85,8 @@ def _dec(v):
 # model fields added after saves were first written (lab console and monitor). A save without them still loads,
 # with the field at its starting value; new controls are merged in the same way. Anything else missing is refused.
 _BACKFILL_SIM = {"t_cp_water", "urine_ml", "urine_rate", "q_suck", "q_vent", "last_act2"}
+# case fields added since (student timers): older saves start with the timers reset and nothing reported
+_BACKFILL_CASE = dict(clocks=new_clocks, clock_log=list, reports=list)
 
 # object references that are rebuilt on load instead of stored
 _SKIP = {"case": {"sim", "persona"}, "sim": {"p"}, "pilot": {"case", "on_act"}}
@@ -126,6 +128,9 @@ def restore(state):
                 missing = set(fresh) - set(data) - _SKIP["sim"]
                 if missing:
                     raise ValueError("the save is missing model fields: " + ", ".join(sorted(missing)))
+            if part == "case":
+                for k, make in _BACKFILL_CASE.items():
+                    data.setdefault(k, make())
             vars(obj).update(data)
         sim.p = persona
         case.sim, case.persona = sim, persona
